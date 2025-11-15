@@ -4,85 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RPGタスク管理</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 500px;
-      margin: auto;
-      padding: 20px;
-      background-color: #f0f0f0;
-    }
-    h1 { text-align: center; }
-    #status, #quests {
-      background-color: #fff;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    .bar {
-      height: 20px;
-      background-color: #ddd;
-      border-radius: 10px;
-      margin: 5px 0;
-      overflow: hidden;
-    }
-    .fill {
-      height: 100%;
-      background-color: #4caf50;
-      width: 0%;
-      transition: width 0.3s;
-    }
-    button {
-      padding: 10px 15px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      background-color: #2196f3;
-      color: #fff;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #1976d2;
-    }
-  </style>
+  <!-- CSS読み込み -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>RPGタスク管理</h1>
+<h1>RPGタスク管理</h1>
 
-  <div id="status">
-    <p>レベル: <span id="level">1</span></p>
-    <p>経験値: <span id="exp">0</span>/100</p>
-    <div class="bar"><div id="expBar" class="fill"></div></div>
-    <p>HP: <span id="hp">100</span></p>
-  </div>
+<div id="status">
+  <p>レベル: <span id="level">1</span></p>
+  <p>経験値: <span id="exp">0</span>/100</p>
+  <div class="bar"><div id="expBar" class="fill"></div></div>
+  <p>HP: <span id="hp">100</span></p>
+  <p>MP: <span id="mp">50</span></p>
+</div>
 
-  <div id="quests">
-    <p>デイリークエスト:</p>
-    <button onclick="completeQuest(30)">クエスト1完了 (+30EXP)</button>
-    <button onclick="completeQuest(50)">クエスト2完了 (+50EXP)</button>
-  </div>
+<div id="quests">
+  <p>デイリークエスト:</p>
+</div>
 
-  <script>
-    let level = 1;
-    let exp = 0;
-    let hp = 100;
-
-    function completeQuest(gain) {
-      exp += gain;
-      if (exp >= 100) {
-        level++;
-        exp = exp - 100;
-        hp += 10; // レベルアップでHP増加
-        alert("レベルアップ！ レベル " + level);
-      }
-      document.getElementById("level").textContent = level;
-      document.getElementById("exp").textContent = exp;
-      document.getElementById("hp").textContent = hp;
-      document.getElementById("expBar").style.width = exp + "%";
-    }
-  </script>
+<!-- JavaScript読み込み -->
+<script src="script.js"></script>
 
 </body>
 </html>
+

@@ -1,17 +1,36 @@
-const quests = [
-    "腕立て10回",
-    "水をコップ1杯飲む",
-    "写真1枚撮る",
-    "英単語5個覚える",
-    "部屋の物を1つ片付ける",
-    "深呼吸を5回する",
-    "日記を1行書く"
-];
+let player = { level:1, exp:0, hp:100, mp:50 };
+let quests = [ {name:"クエスト1", exp:30}, {name:"クエスト2", exp:50}, {name:"クエスト3", exp:20} ];
 
-const questBox = document.getElementById("quest-box");
-const btn = document.getElementById("generate-btn");
-
-btn.addEventListener("click", () => {
-    const randomIndex = Math.floor(Math.random() * quests.length);
-    questBox.textContent = quests[randomIndex];
+const questsDiv = document.getElementById("quests");
+quests.forEach(q => {
+  const btn = document.createElement("button");
+  btn.textContent = `${q.name} (+${q.exp}EXP)`;
+  btn.onclick = () => completeQuest(q.exp);
+  questsDiv.appendChild(btn);
 });
+
+function updateStatus() {
+  document.getElementById("level").textContent = player.level;
+  document.getElementById("exp").textContent = player.exp;
+  document.getElementById("hp").textContent = player.hp;
+  document.getElementById("mp").textContent = player.mp;
+  document.getElementById("expBar").style.width = player.exp + "%";
+}
+
+function completeQuest(expGain) {
+  player.exp += expGain;
+  player.hp += 5;
+  player.mp += 5;
+
+  if(player.exp >= 100) {
+    player.level++;
+    player.exp -= 100;
+    player.hp += 20;
+    player.mp += 10;
+    alert(`レベルアップ！ レベル ${player.level}`);
+  }
+
+  updateStatus();
+}
+
+updateStatus();
