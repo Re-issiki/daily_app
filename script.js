@@ -47,8 +47,7 @@ function resetQuests(category) {
   ul.innerHTML = "";
 }
 
-// ページ読み込み時に初期表示
+// ページ読み込み時は何も表示しない
 document.addEventListener("DOMContentLoaded", () => {
-  randomQuests('study');
-  randomQuests('life');
+  // ここは空にして初期表示なし
 });
