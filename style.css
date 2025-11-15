@@ -7,9 +7,9 @@ body {
   color: #e0e0e0;
 }
 
-h1 {
+h1#title {
   text-align: center;
-  color: #ffcc00;
+  color: #2196f3; /* 青色に変更 */
 }
 
 .category {
@@ -41,6 +41,15 @@ button {
 button:hover {
   background-color: #985eff;
 }
+
+button.reset {
+  background-color: #ff5252;
+}
+
+button.reset:hover {
+  background-color: #e04848;
+}
+
 
 
 

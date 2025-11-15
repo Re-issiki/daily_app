@@ -21,6 +21,7 @@ const quests = {
   ]
 };
 
+// ランダムで5個選んで表示
 function randomQuests(category) {
   const list = quests[category];
   const shuffled = [...list].sort(() => 0.5 - Math.random());
@@ -33,6 +34,12 @@ function randomQuests(category) {
     li.textContent = q;
     ul.appendChild(li);
   });
+}
+
+// 表示中のクエストをリセット
+function resetQuests(category) {
+  const ul = document.getElementById(category + "Quest");
+  ul.innerHTML = "";
 }
 
 // 初期表示
