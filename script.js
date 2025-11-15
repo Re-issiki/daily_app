@@ -4,23 +4,37 @@ const quests = {
     "英単語を20個覚える",
     "プログラミング1時間やる",
     "読書を30分する",
-    "日記を1ページ書く"
+    "日記を1ページ書く",
+    "英語のニュースを読む",
+    "漢字を10個覚える",
+    "歴史のまとめノートを書く"
   ],
   life: [
     "部屋を片付ける",
     "洗濯をする",
     "買い物に行く",
     "料理を作る",
-    "ストレッチを10分する"
+    "ストレッチを10分する",
+    "植物に水やりする",
+    "掃除機をかける",
+    "ゴミをまとめる"
   ]
 };
 
-function randomQuest(category) {
+function randomQuests(category) {
   const list = quests[category];
-  const index = Math.floor(Math.random() * list.length);
-  document.getElementById(category + "Quest").textContent = list[index];
+  const shuffled = [...list].sort(() => 0.5 - Math.random());
+  const selected = shuffled.slice(0, 5);
+
+  const ul = document.getElementById(category + "Quest");
+  ul.innerHTML = "";
+  selected.forEach(q => {
+    const li = document.createElement("li");
+    li.textContent = q;
+    ul.appendChild(li);
+  });
 }
 
-// ページ開いたときに初期表示
-randomQuest('study');
-randomQuest('life');
+// 初期表示
+randomQuests('study');
+randomQuests('life');

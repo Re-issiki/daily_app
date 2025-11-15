@@ -3,19 +3,25 @@ body {
   max-width: 500px;
   margin: auto;
   padding: 20px;
-  background-color: #f0f0f0;
+  background-color: #121212;
+  color: #e0e0e0;
 }
 
 h1 {
   text-align: center;
+  color: #ffcc00;
 }
 
 .category {
-  background-color: #fff;
+  background-color: #1e1e1e;
   padding: 15px;
   margin: 10px 0;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.7);
+}
+
+ul {
+  padding-left: 20px;
 }
 
 button {
@@ -26,14 +32,16 @@ button {
   font-size: 16px;
   border: none;
   border-radius: 5px;
-  background-color: #2196f3;
-  color: #fff;
+  background-color: #bb86fc;
+  color: #121212;
+  font-weight: bold;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #1976d2;
+  background-color: #985eff;
 }
+
 
 
 
