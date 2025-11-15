@@ -24,10 +24,14 @@ const quests = {
 // ランダムで5個選んで表示
 function randomQuests(category) {
   const list = quests[category];
+  if (!list) return;
+
   const shuffled = [...list].sort(() => 0.5 - Math.random());
   const selected = shuffled.slice(0, 5);
 
   const ul = document.getElementById(category + "Quest");
+  if (!ul) return;
+
   ul.innerHTML = "";
   selected.forEach(q => {
     const li = document.createElement("li");
@@ -39,9 +43,12 @@ function randomQuests(category) {
 // 表示中のクエストをリセット
 function resetQuests(category) {
   const ul = document.getElementById(category + "Quest");
+  if (!ul) return;
   ul.innerHTML = "";
 }
 
-// 初期表示
-randomQuests('study');
-randomQuests('life');
+// ページ読み込み時に初期表示
+document.addEventListener("DOMContentLoaded", () => {
+  randomQuests('study');
+  randomQuests('life');
+});
