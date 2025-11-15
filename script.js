@@ -1,36 +1,26 @@
-let player = { level:1, exp:0, hp:100, mp:50 };
-let quests = [ {name:"クエスト1", exp:30}, {name:"クエスト2", exp:50}, {name:"クエスト3", exp:20} ];
+const quests = {
+  study: [
+    "数学の問題を10問解く",
+    "英単語を20個覚える",
+    "プログラミング1時間やる",
+    "読書を30分する",
+    "日記を1ページ書く"
+  ],
+  life: [
+    "部屋を片付ける",
+    "洗濯をする",
+    "買い物に行く",
+    "料理を作る",
+    "ストレッチを10分する"
+  ]
+};
 
-const questsDiv = document.getElementById("quests");
-quests.forEach(q => {
-  const btn = document.createElement("button");
-  btn.textContent = `${q.name} (+${q.exp}EXP)`;
-  btn.onclick = () => completeQuest(q.exp);
-  questsDiv.appendChild(btn);
-});
-
-function updateStatus() {
-  document.getElementById("level").textContent = player.level;
-  document.getElementById("exp").textContent = player.exp;
-  document.getElementById("hp").textContent = player.hp;
-  document.getElementById("mp").textContent = player.mp;
-  document.getElementById("expBar").style.width = player.exp + "%";
+function randomQuest(category) {
+  const list = quests[category];
+  const index = Math.floor(Math.random() * list.length);
+  document.getElementById(category + "Quest").textContent = list[index];
 }
 
-function completeQuest(expGain) {
-  player.exp += expGain;
-  player.hp += 5;
-  player.mp += 5;
-
-  if(player.exp >= 100) {
-    player.level++;
-    player.exp -= 100;
-    player.hp += 20;
-    player.mp += 10;
-    alert(`レベルアップ！ レベル ${player.level}`);
-  }
-
-  updateStatus();
-}
-
-updateStatus();
+// ページ開いたときに初期表示
+randomQuest('study');
+randomQuest('life');

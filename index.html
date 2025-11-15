@@ -3,29 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RPGタスク管理</title>
-  <!-- CSS読み込み -->
+  <title>ランダムクエスト</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>RPGタスク管理</h1>
+<h1>今日のクエスト</h1>
 
-<div id="status">
-  <p>レベル: <span id="level">1</span></p>
-  <p>経験値: <span id="exp">0</span>/100</p>
-  <div class="bar"><div id="expBar" class="fill"></div></div>
-  <p>HP: <span id="hp">100</span></p>
-  <p>MP: <span id="mp">50</span></p>
+<div class="category">
+  <h2>勉強系</h2>
+  <p id="studyQuest">読み込み中…</p>
+  <button onclick="randomQuest('study')">もう一度</button>
 </div>
 
-<div id="quests">
-  <p>デイリークエスト:</p>
+<div class="category">
+  <h2>生活系</h2>
+  <p id="lifeQuest">読み込み中…</p>
+  <button onclick="randomQuest('life')">もう一度</button>
 </div>
 
-<!-- JavaScript読み込み -->
 <script src="script.js"></script>
-
 </body>
 </html>
+
 
