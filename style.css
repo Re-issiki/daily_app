@@ -32,14 +32,14 @@ button {
   font-size: 16px;
   border: none;
   border-radius: 5px;
-  background-color: #bb86fc;
+  background-color: #2196f3;
   color: #121212;
   font-weight: bold;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #985eff;
+  background-color: #2196f3;
 }
 
 button.reset {
