@@ -21,7 +21,14 @@ h1#title {
 }
 
 ul {
-  padding-left: 20px;
+  padding-left: 15px;
+}
+
+li {
+  margin: 6px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 button {
@@ -36,13 +43,13 @@ button {
   color: #121212;
   font-weight: bold;
   cursor: pointer;
+  transition: 0.2s;
 }
 
 button:hover {
   background-color: #1976d2;
 }
 
-/* Resetボタン専用 */
 button.reset {
   background-color: #ff5252;
 }
@@ -51,35 +58,20 @@ button.reset:hover {
   background-color: #e04848;
 }
 
-
-ul {
-  padding-left: 20px;
-}
-
-button {
-  display: block;
+input {
   width: 100%;
-  margin-top: 10px;
   padding: 10px;
-  font-size: 16px;
+  margin-top: 10px;
+  background: #2a2a2a;
   border: none;
   border-radius: 5px;
-  background-color: #bb86fc;
-  background-color: #2196f3;
-  color: #121212;
-  font-weight: bold;
+  color: #fff;
+}
+
+.delete-btn {
+  background: none;
+  color: #ff5252;
+  border: none;
+  font-size: 18px;
   cursor: pointer;
-}
-
-button:hover {
-  background-color: #985eff;
-  background-color: #2196f3;
-}
-
-button.reset {
-  background-color: #ff5252;
-}
-
-button.reset:hover {
-  background-color: #e04848;
 }

@@ -1,53 +1,80 @@
-const quests = {
+// 保存データ読み込み or 初期データ
+let quests = JSON.parse(localStorage.getItem("quests")) || {
   study: [
     "数学の問題を10問解く",
     "英単語を20個覚える",
     "プログラミング1時間やる",
     "読書を30分する",
-    "日記を1ページ書く",
-    "英語のニュースを読む",
-    "漢字を10個覚える",
-    "歴史のまとめノートを書く"
+    "日記を書く"
   ],
   life: [
     "部屋を片付ける",
-    "洗濯をする",
-    "買い物に行く",
-    "料理を作る",
-    "ストレッチを10分する",
-    "植物に水やりする",
-    "掃除機をかける",
-    "ゴミをまとめる"
+    "洗濯する",
+    "ストレッチ10分",
+    "掃除機をかける"
   ]
 };
 
-// ランダムで5個選んで表示
-function randomQuests(category) {
-  const list = quests[category];
-  if (!list) return;
+// 保存処理
+function saveData() {
+  localStorage.setItem("quests", JSON.stringify(quests));
+}
 
-  const shuffled = [...list].sort(() => 0.5 - Math.random());
-  const selected = shuffled.slice(0, 5);
+// クエスト追加
+function addQuest(category) {
+  const input = document.getElementById(category + "Input");
+  const text = input.value.trim();
+  if (!text) return;
 
+  quests[category].push(text);
+  input.value = "";
+  saveData();
+  renderQuests(category);
+}
+
+// 削除
+function deleteQuest(category, index) {
+  quests[category].splice(index, 1);
+  saveData();
+  renderQuests(category);
+}
+
+// 表示更新
+function renderQuests(category) {
   const ul = document.getElementById(category + "Quest");
-  if (!ul) return;
-
   ul.innerHTML = "";
-  selected.forEach(q => {
+
+  quests[category].forEach((q, i) => {
     const li = document.createElement("li");
     li.textContent = q;
+
+    const btn = document.createElement("button");
+    btn.textContent = "✖";
+    btn.classList.add("delete-btn");
+    btn.onclick = () => deleteQuest(category, i);
+
+    li.appendChild(btn);
     ul.appendChild(li);
   });
 }
 
-// 表示中のクエストをリセット
-function resetQuests(category) {
-  const ul = document.getElementById(category + "Quest");
-  if (!ul) return;
-  ul.innerHTML = "";
+// ランダム5個
+function randomQuests(category) {
+  const list = quests[category];
+  const shuffled = [...list].sort(() => Math.random() - 0.5);
+  quests[category] = shuffled.slice(0, 5);
+  saveData();
+  renderQuests(category);
 }
 
-// ページ読み込み時は何も表示しない
+// 完全リセット
+function resetQuests(category) {
+  quests[category] = [];
+  saveData();
+  renderQuests(category);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-  // ここは空にして初期表示なし
+  renderQuests("study");
+  renderQuests("life");
 });

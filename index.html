@@ -13,14 +13,22 @@
 <div class="category">
   <h2>勉強系</h2>
   <ul id="studyQuest"></ul>
-  <button onclick="randomQuests('study')">開始</button>
+
+  <input type="text" id="studyInput" placeholder="クエストを追加...">
+  <button onclick="addQuest('study')">追加</button>
+  
+  <button onclick="randomQuests('study')">ランダム5個生成</button>
   <button class="reset" onclick="resetQuests('study')">リセット</button>
 </div>
 
 <div class="category">
   <h2>生活系</h2>
   <ul id="lifeQuest"></ul>
-  <button onclick="randomQuests('life')">開始</button>
+
+  <input type="text" id="lifeInput" placeholder="クエストを追加...">
+  <button onclick="addQuest('life')">追加</button>
+
+  <button onclick="randomQuests('life')">ランダム5個生成</button>
   <button class="reset" onclick="resetQuests('life')">リセット</button>
 </div>
 
