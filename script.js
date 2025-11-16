@@ -1,3 +1,4 @@
+localStorage.clear();
 // データ読み込み
 let quests = JSON.parse(localStorage.getItem("quests")) || {};
 
