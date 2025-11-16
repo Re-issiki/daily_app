@@ -28,13 +28,7 @@ li {
   margin: 6px 0;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* 左右に分散 */
   transition: opacity 0.5s ease;
-}
-
-li span {
-  flex: 1;           /* テキストを左側に広げる */
-  margin-right: 10px; /* ボタンとの間隔 */
 }
 
 button {
@@ -65,22 +59,14 @@ button.reset:hover {
   background-color: #e04848;
 }
 
-#manageBtn {
-  margin-top: 30px;
-}
-
-#backBtn {
-  background-color: #444;
-}
-
-#backBtn:hover {
-  background-color: #666;
-}
-
 .delete-btn {
-  width: auto;       /* 固定幅をやめる */
-  padding: 5px 10px; /* 小さめの高さと横の余白 */
-  font-size: 14px;   /* 少し小さく */
+  background: #ff5252;
+  width: auto;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: auto;
 }
 
 input[type="text"] {
@@ -106,11 +92,7 @@ li:hover {
 }
 
 .clear-text {
-  color: #2196f3;
+  color: #4caf50;
   font-weight: bold;
   margin-left: 10px;
 }
-
-
-
-
