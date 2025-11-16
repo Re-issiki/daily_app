@@ -28,7 +28,6 @@ li {
   margin: 6px 0;
   display: flex;
   align-items: center;
-  gap: 10px; /* ←追加！横の隙間 */
   transition: opacity 0.5s ease;
 }
 
@@ -104,17 +103,11 @@ li:hover {
 }
 
 .clear-text {
-  color: #2196f3;
+  color: #4caf50;
   font-weight: bold;
   margin-left: 10px;
 }
 
-li span {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 
 
