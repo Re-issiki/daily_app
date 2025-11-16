@@ -65,13 +65,15 @@ function randomQuests(category) {
     const selected = shuffled.slice(0, 5);
 
     selected.forEach(q => {
-  const li = createQuestElement(q);
-  li.style.opacity = 0;
-  ul.appendChild(li);
-  setTimeout(() => li.style.opacity = 1, 50);
-});
-  }, 2000);
-}
+      const li = createQuestElement(q);
+       li.style.display = "flex";       // ←これ追加
+       li.style.alignItems = "center";  // ←これ追加
+       li.style.opacity = 0;
+       ul.appendChild(li);
+       setTimeout(() => li.style.opacity = 1, 50);
+      });
+    }, 2000);
+  }
 
 // 完全リセット（必要なら使用）
 function resetQuests(category) {
