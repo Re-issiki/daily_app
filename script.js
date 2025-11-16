@@ -25,38 +25,13 @@ function addQuest(category) {
   let input = prompt("クエストを入力してください:");
   if (!input) return;
 
-  let li = document.createElement("li");
+  const ul = document.getElementById(category + "List");
+  ul.appendChild(createQuestElement(input));
 
-  let checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.classList.add("quest-check");
-
-  let span = document.createElement("span");
-  span.textContent = input;
-
-  let clearLabel = document.createElement("span");
-  clearLabel.textContent = "CLEAR";
-  clearLabel.classList.add("clear-text");
-  clearLabel.style.display = "none";
-
-  checkbox.addEventListener("change", () => {
-    if (checkbox.checked) {
-      span.style.textDecoration = "line-through";
-      clearLabel.style.display = "inline";
-    } else {
-      span.style.textDecoration = "none";
-      clearLabel.style.display = "none";
-    }
-    saveQuests();
-  });
-
-  li.appendChild(checkbox);
-  li.appendChild(span);
-  li.appendChild(clearLabel);
-
-  document.getElementById(category + "List").appendChild(li);
-  saveQuests();
+  quests[category].push(input);
+  saveData();
 }
+
 
 // 削除
 function deleteQuest(category, index) {
@@ -90,13 +65,11 @@ function randomQuests(category) {
     const selected = shuffled.slice(0, 5);
 
     selected.forEach(q => {
-      const li = document.createElement("li");
-      li.textContent = q;
-      li.style.opacity = 0;
-      ul.appendChild(li);
-      // フェードインアニメーション
-      setTimeout(() => li.style.opacity = 1, 50);
-    });
+  const li = createQuestElement(q);
+  li.style.opacity = 0;
+  ul.appendChild(li);
+  setTimeout(() => li.style.opacity = 1, 50);
+});
   }, 2000);
 }
 
@@ -106,6 +79,39 @@ function resetQuests(category) {
   if (!ul) return;
   ul.innerHTML = "";
 }
+//チェックボックス
+function createQuestElement(text) {
+  let li = document.createElement("li");
+
+  let checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.classList.add("quest-check");
+
+  let span = document.createElement("span");
+  span.textContent = text;
+
+  let clearLabel = document.createElement("span");
+  clearLabel.textContent = "CLEAR";
+  clearLabel.classList.add("clear-text");
+  clearLabel.style.display = "none";
+
+  checkbox.addEventListener("change", () => {
+    if (checkbox.checked) {
+      span.style.textDecoration = "line-through";
+      clearLabel.style.display = "inline";
+    } else {
+      span.style.textDecoration = "none";
+      clearLabel.style.display = "none";
+    }
+  });
+
+  li.appendChild(checkbox);
+  li.appendChild(span);
+  li.appendChild(clearLabel);
+
+  return li;
+}
+
 
 // ===== 画面切り替え =====
 function showManage() {
