@@ -88,3 +88,26 @@ input {
   border-radius: 5px;
   color: #fff;
 }
+
+li {
+  margin: 6px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: opacity 0.5s ease; /* フェードイン用 */
+}
+
+button {
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: scale(1.05); /* 少し大きくなる */
+}
+
+li:hover {
+  background-color: #333; /* ホバーで背景色変化 */
+  border-radius: 5px;
+  padding-left: 5px;
+}
+

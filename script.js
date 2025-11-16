@@ -53,14 +53,22 @@ function renderQuests(category) {
 // ランダム生成
 function randomQuests(category) {
   const ul = document.getElementById(category + "Quest");
-  ul.innerHTML = "";                    // まずリストを空にする
-  const loading = document.createElement("li");
-  loading.textContent = "生成中です…";
-  ul.appendChild(loading);              // 生成中表示
+  ul.innerHTML = "";
 
-  // 1秒後に本番クエストを表示
+  const loading = document.createElement("li");
+  loading.textContent = "生成中";
+  ul.appendChild(loading);
+
+  let dots = 0;
+  const interval = setInterval(() => {
+    dots = (dots + 1) % 4;
+    loading.textContent = "生成中" + ".".repeat(dots);
+  }, 300);
+
   setTimeout(() => {
-    ul.innerHTML = "";                  // 「生成中です」を消す
+    clearInterval(interval);
+    ul.innerHTML = "";
+
     const list = quests[category];
     const shuffled = [...list].sort(() => Math.random() - 0.5);
     const selected = shuffled.slice(0, 5);
@@ -68,10 +76,14 @@ function randomQuests(category) {
     selected.forEach(q => {
       const li = document.createElement("li");
       li.textContent = q;
+      li.style.opacity = 0;
       ul.appendChild(li);
+      // フェードインアニメーション
+      setTimeout(() => li.style.opacity = 1, 50);
     });
-  }, 1000); // 1000ミリ秒 = 1秒
+  }, 1000);
 }
+
 
 // 完全リセット（必要なら使用）
 function resetQuests(category) {
