@@ -1,16 +1,16 @@
-// 保存データ読み込み or 初期データ
+// 保存読み込み or 初期データ
 let quests = JSON.parse(localStorage.getItem("quests")) || {
   study: [
-    "数学の問題を10問解く",
-    "英単語を20個覚える",
-    "プログラミング1時間やる",
-    "読書を30分する",
+    "数学を10問解く",
+    "英単語20個覚える",
+    "プログラミング1時間",
+    "読書30分",
     "日記を書く"
   ],
   life: [
-    "部屋を片付ける",
+    "部屋の片付け",
     "洗濯する",
-    "ストレッチ10分",
+    "ストレッチ",
     "掃除機をかける"
   ]
 };
@@ -20,28 +20,82 @@ function saveData() {
   localStorage.setItem("quests", JSON.stringify(quests));
 }
 
-// クエスト追加
+// 追加
 function addQuest(category) {
   const input = document.getElementById(category + "Input");
-  const text = input.value.trim();
-  if (!text) return;
+  const value = input.value.trim();
+  if (!value) return;
 
-  quests[category].push(text);
+  quests[category].push(value);
   input.value = "";
   saveData();
-  renderQuests(category);
+  renderManage();
 }
 
 // 削除
 function deleteQuest(category, index) {
   quests[category].splice(index, 1);
   saveData();
-  renderQuests(category);
+  renderManage();
 }
 
-// 表示更新
+// リスト表示（ホーム側）
 function renderQuests(category) {
   const ul = document.getElementById(category + "Quest");
+  ul.innerHTML = "";
+  quests[category].forEach(q => {
+    const li = document.createElement("li");
+    li.textContent = q;
+    ul.appendChild(li);
+  });
+}
+
+// ランダム生成
+function randomQuests(category) {
+  const list = quests[category];
+  const shuffled = [...list].sort(() => Math.random() - 0.5);
+  const selected = shuffled.slice(0, 5);
+
+  const ul = document.getElementById(category + "Quest");
+  ul.innerHTML = "";
+  selected.forEach(q => {
+    const li = document.createElement("li");
+    li.textContent = q;
+    ul.appendChild(li);
+  });
+}
+
+// 完全リセット（必要なら使用）
+function resetQuests(category) {
+  quests[category] = [];
+  saveData();
+  renderManage();
+}
+
+// ===== 画面切り替え =====
+
+function showManage() {
+  document.getElementById("homeScreen").style.display = "none";
+  document.getElementById("manageScreen").style.display = "block";
+  renderManage();
+}
+
+function backHome() {
+  document.getElementById("manageScreen").style.display = "none";
+  document.getElementById("homeScreen").style.display = "block";
+  renderQuests("study");
+  renderQuests("life");
+}
+
+// 管理画面リスト描画
+function renderManage() {
+  renderListEditor("study", "manageStudy");
+  renderListEditor("life", "manageLife");
+}
+
+// 編集用描画関数
+function renderListEditor(category, elementId) {
+  const ul = document.getElementById(elementId);
   ul.innerHTML = "";
 
   quests[category].forEach((q, i) => {
@@ -49,29 +103,13 @@ function renderQuests(category) {
     li.textContent = q;
 
     const btn = document.createElement("button");
-    btn.textContent = "✖";
+    btn.textContent = "削除";
     btn.classList.add("delete-btn");
     btn.onclick = () => deleteQuest(category, i);
 
     li.appendChild(btn);
     ul.appendChild(li);
   });
-}
-
-// ランダム5個
-function randomQuests(category) {
-  const list = quests[category];
-  const shuffled = [...list].sort(() => Math.random() - 0.5);
-  quests[category] = shuffled.slice(0, 5);
-  saveData();
-  renderQuests(category);
-}
-
-// 完全リセット
-function resetQuests(category) {
-  quests[category] = [];
-  saveData();
-  renderQuests(category);
 }
 
 document.addEventListener("DOMContentLoaded", () => {

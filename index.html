@@ -8,30 +8,44 @@
 </head>
 <body>
 
-<h1 id="title">今日のクエスト</h1>
+<!-- ===== ホーム画面 ===== -->
+<div id="homeScreen">
+  <h1 id="title">今日のクエスト</h1>
 
-<div class="category">
-  <h2>勉強系</h2>
-  <ul id="studyQuest"></ul>
+  <div class="category">
+    <h2>勉強系</h2>
+    <ul id="studyQuest"></ul>
+    <button onclick="randomQuests('study')">ランダム生成</button>
+  </div>
 
-  <input type="text" id="studyInput" placeholder="クエストを追加...">
-  <button onclick="addQuest('study')">追加</button>
-  
-  <button onclick="randomQuests('study')">ランダム5個生成</button>
-  <button class="reset" onclick="resetQuests('study')">リセット</button>
+  <div class="category">
+    <h2>生活系</h2>
+    <ul id="lifeQuest"></ul>
+    <button onclick="randomQuests('life')">ランダム生成</button>
+  </div>
+
+  <button id="manageBtn" onclick="showManage()">⚙ クエスト管理</button>
 </div>
 
-<div class="category">
-  <h2>生活系</h2>
-  <ul id="lifeQuest"></ul>
 
-  <input type="text" id="lifeInput" placeholder="クエストを追加...">
+<!-- ===== 管理画面 ===== -->
+<div id="manageScreen" style="display:none;">
+  <h1>クエスト管理</h1>
+
+  <h2>勉強系</h2>
+  <ul id="manageStudy"></ul>
+  <input type="text" id="studyInput" placeholder="追加クエスト…">
+  <button onclick="addQuest('study')">追加</button>
+
+  <h2>生活系</h2>
+  <ul id="manageLife"></ul>
+  <input type="text" id="lifeInput" placeholder="追加クエスト…">
   <button onclick="addQuest('life')">追加</button>
 
-  <button onclick="randomQuests('life')">ランダム5個生成</button>
-  <button class="reset" onclick="resetQuests('life')">リセット</button>
+  <button id="backBtn" onclick="backHome()">← 戻る</button>
 </div>
 
 <script src="script.js"></script>
 </body>
 </html>
+
