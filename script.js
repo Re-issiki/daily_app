@@ -92,6 +92,48 @@ function resetQuests(category) {
   ul.innerHTML = "";
 }
 
+//完了済み機能
+function renderQuests(category) {
+  const ul = document.getElementById(category + "Quest");
+  ul.innerHTML = "";
+
+  quests[category].forEach((q, i) => {
+    const li = document.createElement("li");
+
+    // チェックボックス
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+
+    // Clearボタン
+    const clearBtn = document.createElement("button");
+    clearBtn.textContent = "Clear";
+    clearBtn.classList.add("clear-btn");
+    clearBtn.style.display = "none"; // 初期は非表示
+
+    checkbox.onchange = () => {
+      if (checkbox.checked) {
+        li.style.textDecoration = "line-through";
+        clearBtn.style.display = "inline-block";
+      } else {
+        li.style.textDecoration = "none";
+        clearBtn.style.display = "none";
+      }
+    };
+
+    clearBtn.onclick = () => {
+      checkbox.checked = false;
+      li.style.textDecoration = "none";
+      clearBtn.style.display = "none";
+    };
+
+    li.appendChild(checkbox);
+    li.appendChild(document.createTextNode(q));
+    li.appendChild(clearBtn);
+
+    ul.appendChild(li);
+  });
+}
+
 // ===== 画面切り替え =====
 
 function showManage() {
