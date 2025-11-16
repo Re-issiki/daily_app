@@ -28,7 +28,13 @@ li {
   margin: 6px 0;
   display: flex;
   align-items: center;
+  justify-content: space-between; /* 左右に分散 */
   transition: opacity 0.5s ease;
+}
+
+li span {
+  flex: 1;           /* テキストを左側に広げる */
+  margin-right: 10px; /* ボタンとの間隔 */
 }
 
 button {
@@ -72,12 +78,9 @@ button.reset:hover {
 }
 
 .delete-btn {
-  background: #ff5252;
-  width: 60px;
-  padding: 5px;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
+  width: auto;       /* 固定幅をやめる */
+  padding: 5px 10px; /* 小さめの高さと横の余白 */
+  font-size: 14px;   /* 少し小さく */
 }
 
 input[type="text"] {
