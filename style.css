@@ -9,7 +9,7 @@ body {
 
 h1#title {
   text-align: center;
-  color: #2196f3; /* 青色 */
+  color: #2196f3;
 }
 
 .category {
@@ -39,6 +39,40 @@ button {
 }
 
 button:hover {
+  background-color: #1976d2;
+}
+
+/* Resetボタン専用 */
+button.reset {
+  background-color: #ff5252;
+}
+
+button.reset:hover {
+  background-color: #e04848;
+}
+
+
+ul {
+  padding-left: 20px;
+}
+
+button {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: #bb86fc;
+  background-color: #2196f3;
+  color: #121212;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #985eff;
   background-color: #2196f3;
 }
 
@@ -49,8 +83,3 @@ button.reset {
 button.reset:hover {
   background-color: #e04848;
 }
-
-
-
-
-
