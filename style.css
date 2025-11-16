@@ -126,4 +126,15 @@ li:hover {
   background-color: #1976d2;
 }
 
+li input[type="checkbox"] {
+  margin-right: 10px; /* チェックボックスとテキストの間に余白 */
+}
+
+li span {
+  flex: 1; /* テキストを真ん中に広げる */
+}
+
+.clear-btn {
+  margin-left: 10px; /* Clearボタンとテキストの間に余白 */
+}
 
