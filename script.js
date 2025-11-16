@@ -88,48 +88,29 @@ function randomQuests(category) {
   loading.textContent = "生成中";
   ul.appendChild(loading);
 
-  let dots = 0;
-  const interval = setInterval(() => {
-    dots = (dots + 1) % 4;
-    loading.textContent = "生成中" + ".".repeat(dots);
-  }, 300);
-
   setTimeout(() => {
-    clearInterval(interval);
     ul.innerHTML = "";
 
-    // 選択数は最大5個
     const list = quests[category];
-    const selectedCount = Math.min(5, list.length);
+    const shuffled = [...list].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, 5);
 
-    // 前回の生成がある場合はその順番を保持
-    if (!homeGenerated[category] || homeGenerated[category].length === 0) {
-      // 初回生成時はランダムに選ぶ
-      const shuffled = [...list].sort(() => Math.random() - 0.5);
-      homeGenerated[category] = shuffled.slice(0, selectedCount).map(text => ({
-        text,
-        checked: false
-      }));
-    } else if (homeGenerated[category].length > selectedCount) {
-      // 前回より選択数が減った場合は切り詰め
-      homeGenerated[category] = homeGenerated[category].slice(0, selectedCount);
-    } else if (homeGenerated[category].length < selectedCount) {
-      // 前回より選択数が増えた場合は新しいものを追加
-      const remaining = list.filter(q => !homeGenerated[category].some(obj => obj.text === q));
-      const newItems = remaining.slice(0, selectedCount - homeGenerated[category].length)
-        .map(text => ({ text, checked: false }));
-      homeGenerated[category] = homeGenerated[category].concat(newItems);
-    }
+    // homeGenerated にチェック状態を残す
+    homeGenerated[category] = selected.map(text => {
+      // 前回のチェック状態を引き継ぐ
+      const prev = homeGenerated[category]?.find(obj => obj.text === text);
+      return { text, checked: prev ? prev.checked : false };
+    });
 
-    // 表示
     homeGenerated[category].forEach((obj, i) => {
       const li = createQuestElement(obj, category, i);
       ul.appendChild(li);
     });
 
     saveData();
-  }, 1500);
+  }, 500);
 }
+
 
 // ===== 管理画面描画 =====
 function renderManage() {
