@@ -64,17 +64,12 @@ function randomQuests(category) {
     ul.appendChild(li);
   });
 }
-// 表示されたクエストを消すだけ（保存データには影響しない）
-function clearDisplayed(category) {
-  document.getElementById(category + "Quest").innerHTML = "";
-}
-
 
 // 完全リセット（必要なら使用）
 function resetQuests(category) {
-  quests[category] = [];
-  saveData();
-  renderManage();
+  const ul = document.getElementById(category + "Quest");
+  if (!ul) return;
+  ul.innerHTML = "";
 }
 
 // ===== 画面切り替え =====

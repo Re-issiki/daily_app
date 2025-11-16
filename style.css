@@ -51,6 +51,7 @@ button:hover {
 
 button.reset {
   background-color: #ff5252;
+  color: #fff;
 }
 
 button.reset:hover {
