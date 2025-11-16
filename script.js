@@ -10,7 +10,11 @@ function saveData() {
 function addCategory() {
   const input = document.getElementById("newCategoryInput");
   const name = input.value.trim();
-  if (!name || quests[name]) return;
+  if (!name) return;          // 空欄は追加しない
+  if (quests[name]) {          // 既存カテゴリは追加しない
+    alert("そのカテゴリは既に存在します");
+    return;
+  }
   quests[name] = [];
   saveData();
   input.value = "";
@@ -108,7 +112,6 @@ function renderManage() {
     section.appendChild(h2);
 
     const ul = document.createElement("ul");
-    ul.id = "manage_" + category;
     section.appendChild(ul);
 
     quests[category].forEach((q, i) => {
@@ -124,6 +127,7 @@ function renderManage() {
       ul.appendChild(li);
     });
 
+    // この「追加」ボタンでカテゴリ内にクエストを追加できる
     const addBtn = document.createElement("button");
     addBtn.textContent = "追加";
     addBtn.onclick = () => addQuestToCategory(category);
