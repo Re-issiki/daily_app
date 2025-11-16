@@ -1,26 +1,56 @@
-const quests = {
+// 保存読み込み or 初期データ
+let quests = JSON.parse(localStorage.getItem("quests")) || {
   study: [
-    "数学の問題を10問解く",
-    "英単語を20個覚える",
-    "プログラミング1時間やる",
-    "読書を30分する",
-    "日記を1ページ書く",
-    "英語のニュースを読む",
-    "漢字を10個覚える",
-    "歴史のまとめノートを書く"
+    "数学を10問解く",
+    "英単語20個覚える",
+    "プログラミング1時間",
+    "読書30分",
+    "日記を書く"
   ],
   life: [
-    "部屋を片付ける",
-    "洗濯をする",
-    "買い物に行く",
-    "料理を作る",
-    "ストレッチを10分する",
-    "植物に水やりする",
-    "掃除機をかける",
-    "ゴミをまとめる"
+    "部屋の片付け",
+    "洗濯する",
+    "ストレッチ",
+    "掃除機をかける"
   ]
 };
 
+// 保存処理
+function saveData() {
+  localStorage.setItem("quests", JSON.stringify(quests));
+}
+
+// 追加
+function addQuest(category) {
+  const input = document.getElementById(category + "Input");
+  const value = input.value.trim();
+  if (!value) return;
+
+  quests[category].push(value);
+  input.value = "";
+  saveData();
+  renderManage();
+}
+
+// 削除
+function deleteQuest(category, index) {
+  quests[category].splice(index, 1);
+  saveData();
+  renderManage();
+}
+
+// リスト表示（ホーム側）
+function renderQuests(category) {
+  const ul = document.getElementById(category + "Quest");
+  ul.innerHTML = "";
+  quests[category].forEach(q => {
+    const li = document.createElement("li");
+    li.textContent = q;
+    ul.appendChild(li);
+  });
+}
+
+// ランダム生成
 function randomQuests(category) {
   const list = quests[category];
   const shuffled = [...list].sort(() => Math.random() - 0.5);
@@ -28,7 +58,6 @@ function randomQuests(category) {
 
   const ul = document.getElementById(category + "Quest");
   ul.innerHTML = "";
-
   selected.forEach(q => {
     const li = document.createElement("li");
     li.textContent = q;
@@ -36,49 +65,54 @@ function randomQuests(category) {
   });
 }
 
+// 完全リセット（必要なら使用）
 function resetQuests(category) {
-  document.getElementById(category + "Quest").innerHTML = "";
+  quests[category] = [];
+  saveData();
+  renderManage();
 }
 
-function toggleEditor() {
-  const panel = document.getElementById("editorPanel");
-  panel.style.display = panel.style.display === "none" ? "block" : "none";
-  updateQuestList();
+// ===== 画面切り替え =====
+
+function showManage() {
+  document.getElementById("homeScreen").style.display = "none";
+  document.getElementById("manageScreen").style.display = "block";
+  renderManage();
 }
 
-function updateQuestList() {
-  const category = document.getElementById("categorySelect").value;
-  const list = quests[category];
-  const ul = document.getElementById("questList");
+function backHome() {
+  document.getElementById("manageScreen").style.display = "none";
+  document.getElementById("homeScreen").style.display = "block";
+  renderQuests("study");
+  renderQuests("life");
+}
 
+// 管理画面リスト描画
+function renderManage() {
+  renderListEditor("study", "manageStudy");
+  renderListEditor("life", "manageLife");
+}
+
+// 編集用描画関数
+function renderListEditor(category, elementId) {
+  const ul = document.getElementById(elementId);
   ul.innerHTML = "";
-  list.forEach(q => {
+
+  quests[category].forEach((q, i) => {
     const li = document.createElement("li");
     li.textContent = q;
 
     const btn = document.createElement("button");
     btn.textContent = "削除";
-    btn.style.background = "#ff5252";
-    btn.style.marginTop = "5px";
-    btn.onclick = () => {
-      quests[category] = quests[category].filter(item => item !== q);
-      updateQuestList();
-    };
+    btn.classList.add("delete-btn");
+    btn.onclick = () => deleteQuest(category, i);
 
     li.appendChild(btn);
     ul.appendChild(li);
   });
 }
 
-function addQuest() {
-  const category = document.getElementById("categorySelect").value;
-  const text = document.getElementById("newQuest").value;
-
-  if (text.trim() === "") return;
-  quests[category].push(text);
-  document.getElementById("newQuest").value = "";
-  updateQuestList();
-}
-
-// 初期は表示なし → OK
-document.addEventListener("DOMContentLoaded", () => {});
+document.addEventListener("DOMContentLoaded", () => {
+  renderQuests("study");
+  renderQuests("life");
+});
