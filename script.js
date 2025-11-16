@@ -69,7 +69,7 @@ function randomQuests(category) {
 function resetQuests(category) {
   const ul = document.getElementById(category + "Quest");
   if (!ul) return;
-  ul.innerHTML = ""; // 表示を消すだけ
+  ul.innerHTML = "";
 }
 
 // ===== 画面切り替え =====
@@ -113,6 +113,5 @@ function renderListEditor(category, elementId) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  renderQuests("study");
-  renderQuests("life");
+
 });
