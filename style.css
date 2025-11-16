@@ -49,6 +49,14 @@ button:hover {
   background-color: #1976d2;
 }
 
+button.reset {
+  background-color: #ff5252;
+}
+
+button.reset:hover {
+  background-color: #e04848;
+}
+
 #manageBtn {
   margin-top: 30px;
 }

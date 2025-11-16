@@ -15,13 +15,15 @@
   <div class="category">
     <h2>勉強系</h2>
     <ul id="studyQuest"></ul>
-    <button onclick="randomQuests('study')">ランダム生成</button>
+    <button onclick="randomQuests('study')">生成</button>
+    <button class="reset" onclick="clearDisplayed('study')">リセット</button>
   </div>
 
   <div class="category">
     <h2>生活系</h2>
     <ul id="lifeQuest"></ul>
-    <button onclick="randomQuests('life')">ランダム生成</button>
+    <button onclick="randomQuests('life')">生成</button>
+    <button class="reset" onclick="clearDisplayed('study')">リセット</button>
   </div>
 
   <button id="manageBtn" onclick="showManage()">⚙ クエスト管理</button>
