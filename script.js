@@ -52,17 +52,25 @@ function renderQuests(category) {
 
 // ランダム生成
 function randomQuests(category) {
-  const list = quests[category];
-  const shuffled = [...list].sort(() => Math.random() - 0.5);
-  const selected = shuffled.slice(0, 5);
-
   const ul = document.getElementById(category + "Quest");
-  ul.innerHTML = "";
-  selected.forEach(q => {
-    const li = document.createElement("li");
-    li.textContent = q;
-    ul.appendChild(li);
-  });
+  ul.innerHTML = "";                    // まずリストを空にする
+  const loading = document.createElement("li");
+  loading.textContent = "生成中です…";
+  ul.appendChild(loading);              // 生成中表示
+
+  // 1秒後に本番クエストを表示
+  setTimeout(() => {
+    ul.innerHTML = "";                  // 「生成中です」を消す
+    const list = quests[category];
+    const shuffled = [...list].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, 5);
+
+    selected.forEach(q => {
+      const li = document.createElement("li");
+      li.textContent = q;
+      ul.appendChild(li);
+    });
+  }, 1000); // 1000ミリ秒 = 1秒
 }
 
 // 完全リセット（必要なら使用）
