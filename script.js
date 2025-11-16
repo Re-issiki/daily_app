@@ -107,10 +107,25 @@ function renderManage() {
     const section = document.createElement("div");
     section.classList.add("category");
 
+    // カテゴリ名
     const h2 = document.createElement("h2");
     h2.textContent = category;
     section.appendChild(h2);
 
+    // カテゴリ削除ボタン
+    const delCatBtn = document.createElement("button");
+    delCatBtn.textContent = "カテゴリ削除";
+    delCatBtn.classList.add("delete-btn");
+    delCatBtn.style.width = "auto"; // ボタンの幅を調整
+    delCatBtn.style.marginLeft = "10px";
+    delCatBtn.onclick = () => {
+      if (confirm(`カテゴリ「${category}」を削除しますか？`)) {
+        deleteCategory(category);
+      }
+    };
+    section.appendChild(delCatBtn);
+
+    // クエスト一覧
     const ul = document.createElement("ul");
     section.appendChild(ul);
 
@@ -127,7 +142,7 @@ function renderManage() {
       ul.appendChild(li);
     });
 
-    // この「追加」ボタンでカテゴリ内にクエストを追加できる
+    // クエスト追加ボタン
     const addBtn = document.createElement("button");
     addBtn.textContent = "追加";
     addBtn.onclick = () => addQuestToCategory(category);
@@ -135,6 +150,13 @@ function renderManage() {
 
     container.appendChild(section);
   }
+}
+
+// ===== カテゴリ削除 =====
+function deleteCategory(category) {
+  delete quests[category];  // questsオブジェクトから削除
+  saveData();               // 保存
+  renderManage();           // 再描画
 }
 
 // ===== ホーム画面描画 =====
