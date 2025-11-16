@@ -1,6 +1,6 @@
 // ===== データ読み込み =====
-let quests = JSON.parse(localStorage.getItem("quests")) || {}; // カテゴリとクエスト
-let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {}; // ホーム画面で生成されたクエストとチェック状態
+let quests = JSON.parse(localStorage.getItem("quests")) || {}; 
+let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {}; 
 
 // ===== データ保存 =====
 function saveData() {
@@ -43,48 +43,32 @@ function addQuestToCategory(category) {
 // ===== クエスト削除 =====
 function deleteQuest(category, index) {
   quests[category].splice(index, 1);
-  // ホーム画面の生成済みも削除
-  if (homeGenerated[category]) {
-    homeGenerated[category].splice(index, 1);
-  }
   saveData();
   renderManage();
 }
 
 // ===== クエスト要素作成（ホーム用） =====
-function createQuestElement(text, category, index) {
+function createQuestElement(obj, category, index) {
   const li = document.createElement("li");
 
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
   checkbox.classList.add("quest-check");
+  checkbox.checked = obj.checked;
 
   const span = document.createElement("span");
-  span.textContent = text;
+  span.textContent = obj.text;
 
   const clearLabel = document.createElement("span");
   clearLabel.textContent = "CLEAR";
   clearLabel.classList.add("clear-text");
-  clearLabel.style.display = "none";
+  clearLabel.style.display = obj.checked ? "inline" : "none";
 
-  // チェック状態を復元
-  if (homeGenerated[category] && homeGenerated[category][index]) {
-    checkbox.checked = true;
-    span.style.textDecoration = "line-through";
-    clearLabel.style.display = "inline";
-  }
-
+  // チェック変更
   checkbox.addEventListener("change", () => {
-    if (!homeGenerated[category]) homeGenerated[category] = [];
-    homeGenerated[category][index] = checkbox.checked;
-
-    if (checkbox.checked) {
-      span.style.textDecoration = "line-through";
-      clearLabel.style.display = "inline";
-    } else {
-      span.style.textDecoration = "none";
-      clearLabel.style.display = "none";
-    }
+    obj.checked = checkbox.checked;
+    span.style.textDecoration = obj.checked ? "line-through" : "none";
+    clearLabel.style.display = obj.checked ? "inline" : "none";
     saveData();
   });
 
@@ -118,9 +102,11 @@ function randomQuests(category) {
     const shuffled = [...list].sort(() => Math.random() - 0.5);
     const selected = shuffled.slice(0, 5);
 
-    homeGenerated[category] = []; // リセットして生成
-    selected.forEach((q, i) => {
-      const li = createQuestElement(q, category, i);
+    // 選ばれたクエストを homeGenerated に格納
+    homeGenerated[category] = selected.map(text => ({ text, checked: false }));
+
+    homeGenerated[category].forEach((obj, i) => {
+      const li = createQuestElement(obj, category, i);
       ul.appendChild(li);
     });
 
@@ -191,14 +177,11 @@ function renderHome() {
     ul.id = "home_" + category;
     section.appendChild(ul);
 
-    // 生成済みのクエストを復元
+    // 保存されている homeGenerated から表示
     if (homeGenerated[category]) {
-      homeGenerated[category].forEach((checked, i) => {
-        const q = quests[category][i];
-        if (q !== undefined) {
-          const li = createQuestElement(q, category, i);
-          ul.appendChild(li);
-        }
+      homeGenerated[category].forEach((obj, i) => {
+        const li = createQuestElement(obj, category, i);
+        ul.appendChild(li);
       });
     }
 
