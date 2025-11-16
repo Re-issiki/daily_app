@@ -69,7 +69,7 @@ function randomQuests(category) {
 function resetQuests(category) {
   const ul = document.getElementById(category + "Quest");
   if (!ul) return;
-  ul.innerHTML = "";
+  ul.innerHTML = ""; // 表示を消すだけ
 }
 
 // ===== 画面切り替え =====
