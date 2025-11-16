@@ -88,28 +88,31 @@ function randomQuests(category) {
   loading.textContent = "生成中";
   ul.appendChild(loading);
 
+  let dots = 0;
+  const interval = setInterval(() => {
+    dots = (dots + 1) % 4;
+    loading.textContent = "生成中" + ".".repeat(dots);
+  }, 300);
+
   setTimeout(() => {
-    ul.innerHTML = "";
-
+    clearInterval(interval);
+    ul.innerHTML = ""; // ← ここでやっとクリア
+    // ランダム生成処理
     const list = quests[category];
+    const selectedCount = Math.min(5, list.length);
     const shuffled = [...list].sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, 5);
-
-    // homeGenerated にチェック状態を残す
-    homeGenerated[category] = selected.map(text => {
-      // 前回のチェック状態を引き継ぐ
-      const prev = homeGenerated[category]?.find(obj => obj.text === text);
-      return { text, checked: prev ? prev.checked : false };
-    });
-
+    homeGenerated[category] = shuffled.slice(0, selectedCount).map(text => ({
+      text,
+      checked: false
+    }));
     homeGenerated[category].forEach((obj, i) => {
       const li = createQuestElement(obj, category, i);
       ul.appendChild(li);
     });
-
     saveData();
-  }, 500);
+  }, 1500);
 }
+
 
 
 // ===== 管理画面描画 =====
