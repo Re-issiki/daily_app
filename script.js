@@ -114,12 +114,16 @@ function randomQuests(category) {
     const shuffled = [...list].sort(() => Math.random() - 0.5);
     const selected = shuffled.slice(0, 5);
 
-    homeGenerated[category] = []; // 選ばれたクエストのチェック初期化
-
+    // homeGenerated を上書きせず、選ばれた index を正しくマッピング
+    if (!homeGenerated[category]) homeGenerated[category] = [];
+    const newGenerated = [];
     selected.forEach((q, i) => {
+      newGenerated[i] = homeGenerated[category][i] || false;
       const li = createQuestElement(q, category, i);
       ul.appendChild(li);
     });
+
+    homeGenerated[category] = newGenerated;
     saveData();
   }, 1500);
 }
