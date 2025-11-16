@@ -39,18 +39,7 @@ function deleteQuest(category, index) {
   renderManage();
 }
 
-// リスト表示（ホーム側）
-function renderQuests(category) {
-  const ul = document.getElementById(category + "Quest");
-  ul.innerHTML = "";
-  quests[category].forEach(q => {
-    const li = document.createElement("li");
-    li.textContent = q;
-    ul.appendChild(li);
-  });
-}
-
-// ランダム生成
+// ランダム生成（生成中アニメーション＋フェードイン）
 function randomQuests(category) {
   const ul = document.getElementById(category + "Quest");
   ul.innerHTML = "";
@@ -66,7 +55,6 @@ function randomQuests(category) {
     loading.textContent = "生成中" + ".".repeat(dots);
   }, 300);
 
-  // 生成アニメーション後にクエスト表示
   setTimeout(() => {
     clearInterval(interval);
     ul.innerHTML = "";
@@ -77,45 +65,14 @@ function randomQuests(category) {
 
     selected.forEach(q => {
       const li = document.createElement("li");
-
-      // チェックボックス
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-
-      // Clearボタン
-      const clearBtn = document.createElement("button");
-      clearBtn.textContent = "Clear";
-      clearBtn.classList.add("clear-btn");
-      clearBtn.style.display = "none";
-
-      checkbox.onchange = () => {
-        if (checkbox.checked) {
-          li.style.textDecoration = "line-through";
-          clearBtn.style.display = "inline-block";
-        } else {
-          li.style.textDecoration = "none";
-          clearBtn.style.display = "none";
-        }
-      };
-
-      clearBtn.onclick = () => {
-        checkbox.checked = false;
-        li.style.textDecoration = "none";
-        clearBtn.style.display = "none";
-      };
-
-      li.appendChild(checkbox);
-      li.appendChild(document.createTextNode(q));
-      li.appendChild(clearBtn);
-
-      li.style.opacity = 0; // フェードイン用
+      li.textContent = q;
+      li.style.opacity = 0;
       ul.appendChild(li);
+      // フェードインアニメーション
       setTimeout(() => li.style.opacity = 1, 50);
     });
-  }, 2000); // ← 待機時間（生成中表示の長さ）
+  }, 2000);
 }
-
-
 
 // 完全リセット（必要なら使用）
 function resetQuests(category) {
@@ -124,51 +81,7 @@ function resetQuests(category) {
   ul.innerHTML = "";
 }
 
-//完了済み機能
-function renderQuestsWithCheck(category) {
-  const ul = document.getElementById(category + "Quest");
-  ul.innerHTML = "";
-
-  quests[category].forEach((q, i) => {
-    const li = document.createElement("li");
-
-    // チェックボックス
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-
-    // Clearボタン
-    const clearBtn = document.createElement("button");
-    clearBtn.textContent = "Clear";
-    clearBtn.classList.add("clear-btn");
-    clearBtn.style.display = "none";
-
-    checkbox.onchange = () => {
-      if (checkbox.checked) {
-        li.style.textDecoration = "line-through";
-        clearBtn.style.display = "inline-block";
-      } else {
-        li.style.textDecoration = "none";
-        clearBtn.style.display = "none";
-      }
-    };
-
-    clearBtn.onclick = () => {
-      checkbox.checked = false;
-      li.style.textDecoration = "none";
-      clearBtn.style.display = "none";
-    };
-
-    li.appendChild(checkbox);
-    li.appendChild(document.createTextNode(q));
-    li.appendChild(clearBtn);
-
-    ul.appendChild(li);
-  });
-}
-
-
 // ===== 画面切り替え =====
-
 function showManage() {
   document.getElementById("homeScreen").style.display = "none";
   document.getElementById("manageScreen").style.display = "block";
@@ -178,8 +91,6 @@ function showManage() {
 function backHome() {
   document.getElementById("manageScreen").style.display = "none";
   document.getElementById("homeScreen").style.display = "block";
-  renderQuestsWithCheck("study");
-  renderQuestsWithCheck("life");
 }
 
 // 管理画面リスト描画
@@ -208,5 +119,5 @@ function renderListEditor(category, elementId) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-
+  // 最初は何も表示せず
 });
