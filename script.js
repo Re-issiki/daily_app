@@ -81,7 +81,7 @@ function randomQuests(category) {
       // フェードインアニメーション
       setTimeout(() => li.style.opacity = 1, 50);
     });
-  }, 1000);
+  }, 2000);
 }
 
 
