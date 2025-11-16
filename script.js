@@ -1,6 +1,6 @@
 // ===== データ読み込み =====
 let quests = JSON.parse(localStorage.getItem("quests")) || {}; // カテゴリとクエスト
-let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {}; // ホーム画面で生成されたクエストのチェック状態
+let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {}; // ホーム画面で生成されたクエストとチェック状態
 
 // ===== データ保存 =====
 function saveData() {
@@ -43,6 +43,10 @@ function addQuestToCategory(category) {
 // ===== クエスト削除 =====
 function deleteQuest(category, index) {
   quests[category].splice(index, 1);
+  // ホーム画面の生成済みも削除
+  if (homeGenerated[category]) {
+    homeGenerated[category].splice(index, 1);
+  }
   saveData();
   renderManage();
 }
@@ -114,16 +118,12 @@ function randomQuests(category) {
     const shuffled = [...list].sort(() => Math.random() - 0.5);
     const selected = shuffled.slice(0, 5);
 
-    // homeGenerated を上書きせず、選ばれた index を正しくマッピング
-    if (!homeGenerated[category]) homeGenerated[category] = [];
-    const newGenerated = [];
+    homeGenerated[category] = []; // リセットして生成
     selected.forEach((q, i) => {
-      newGenerated[i] = homeGenerated[category][i] || false;
       const li = createQuestElement(q, category, i);
       ul.appendChild(li);
     });
 
-    homeGenerated[category] = newGenerated;
     saveData();
   }, 1500);
 }
@@ -190,6 +190,17 @@ function renderHome() {
     const ul = document.createElement("ul");
     ul.id = "home_" + category;
     section.appendChild(ul);
+
+    // 生成済みのクエストを復元
+    if (homeGenerated[category]) {
+      homeGenerated[category].forEach((checked, i) => {
+        const q = quests[category][i];
+        if (q !== undefined) {
+          const li = createQuestElement(q, category, i);
+          ul.appendChild(li);
+        }
+      });
+    }
 
     const genBtn = document.createElement("button");
     genBtn.textContent = "生成";
