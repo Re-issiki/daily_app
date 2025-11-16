@@ -97,3 +97,16 @@ li:hover {
   padding-left: 5px;
 }
 
+.quest-check {
+  margin-right: 10px;
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+.clear-text {
+  color: #4caf50;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+

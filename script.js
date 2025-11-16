@@ -22,14 +22,40 @@ function saveData() {
 
 // 追加
 function addQuest(category) {
-  const input = document.getElementById(category + "Input");
-  const value = input.value.trim();
-  if (!value) return;
+  let input = prompt("クエストを入力してください:");
+  if (!input) return;
 
-  quests[category].push(value);
-  input.value = "";
-  saveData();
-  renderManage();
+  let li = document.createElement("li");
+
+  let checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.classList.add("quest-check");
+
+  let span = document.createElement("span");
+  span.textContent = input;
+
+  let clearLabel = document.createElement("span");
+  clearLabel.textContent = "CLEAR";
+  clearLabel.classList.add("clear-text");
+  clearLabel.style.display = "none";
+
+  checkbox.addEventListener("change", () => {
+    if (checkbox.checked) {
+      span.style.textDecoration = "line-through";
+      clearLabel.style.display = "inline";
+    } else {
+      span.style.textDecoration = "none";
+      clearLabel.style.display = "none";
+    }
+    saveQuests();
+  });
+
+  li.appendChild(checkbox);
+  li.appendChild(span);
+  li.appendChild(clearLabel);
+
+  document.getElementById(category + "List").appendChild(li);
+  saveQuests();
 }
 
 // 削除
