@@ -99,7 +99,7 @@ function randomQuests(category) {
     ul.innerHTML = ""; // ← ここでやっとクリア
     // ランダム生成処理
     const list = quests[category];
-    const selectedCount = Math.min(5, list.length);
+    const selectedCount = Math.min(3, list.length);
     const shuffled = [...list].sort(() => Math.random() - 0.5);
     homeGenerated[category] = shuffled.slice(0, selectedCount).map(text => ({
       text,
