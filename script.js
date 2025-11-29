@@ -7,6 +7,7 @@ let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {};
 function saveData() {
   localStorage.setItem("quests", JSON.stringify(quests));
   localStorage.setItem("homeGenerated", JSON.stringify(homeGenerated));
+  localStorage.setItem("playerData", JSON.stringify(playerData));
 }
 
 // ===== カテゴリ追加 =====
