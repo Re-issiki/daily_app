@@ -13,7 +13,18 @@
   <h1 id="title">今日のクエスト</h1>
   <div id="homeCategories"></div>
   <button id="manageBtn" onclick="showManage()">⚙ クエスト管理</button>
+  <button id="statusBtn" onclick="showStatus()">⚙ ステータス</button>
 </div>
+
+<!-- ===== ステータス画面 ===== -->
+<div id="statusScreen" style="display:none;">
+  <h1>ステータス</h1>
+  <label>名前: <input type="text" id="playerNameInput"></label>
+  <p>レベル: <span id="playerLevel">1</span></p>
+  <button onclick="saveStatus()">保存</button>
+  <button onclick="backHomeFromStatus()">← 戻る</button>
+</div>
+
 
 <!-- ===== 管理画面 ===== -->
 <div id="manageScreen" style="display:none;">

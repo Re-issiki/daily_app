@@ -1,4 +1,5 @@
 // ===== データ読み込み =====
+let playerData = JSON.parse(localStorage.getItem("playerData")) || { name: "名無し", level: 1 };
 let quests = JSON.parse(localStorage.getItem("quests")) || {}; 
 let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {}; 
 
@@ -80,6 +81,10 @@ function createQuestElement(obj, category, index) {
     obj.checked = checkbox.checked;
     span.style.textDecoration = obj.checked ? "line-through" : "none";
     clearLabel.style.display = obj.checked ? "inline" : "none";
+    if (obj.checked) {
+      playerData.level += 1; // レベル上昇
+      document.getElementById("playerLevel").textContent = playerData.level;
+    }
     saveData();
   });
 
@@ -171,6 +176,27 @@ function renderManage() {
     container.appendChild(section);
   }
 }
+// ===== ステータス画面 =====
+function showStatus() {
+  document.getElementById("homeScreen").style.display = "none";
+  document.getElementById("statusScreen").style.display = "block";
+
+  document.getElementById("playerNameInput").value = playerData.name;
+  document.getElementById("playerLevel").textContent = playerData.level;
+}
+
+function saveStatus() {
+  const input = document.getElementById("playerNameInput");
+  playerData.name = input.value.trim() || "名無し";
+  saveData();
+  alert("保存しました");
+}
+
+function backHomeFromStatus() {
+  document.getElementById("statusScreen").style.display = "none";
+  document.getElementById("homeScreen").style.display = "block";
+}
+
 
 // ===== ホーム画面 =====
 function renderHome() {

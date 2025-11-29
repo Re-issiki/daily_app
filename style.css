@@ -108,3 +108,19 @@ input[type="text"] {
   color: #121212;
 }
 
+/*===== ステータス画面 =====*/
+#statusScreen input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  background: #2a2a2a;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+}
+
+#statusScreen p {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
