@@ -2,11 +2,18 @@
 let quests = JSON.parse(localStorage.getItem("quests")) || {}; 
 let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {}; 
 
-// ===== データ保存 =====
+// ===== 保存 =====
 function saveData() {
   localStorage.setItem("quests", JSON.stringify(quests));
   localStorage.setItem("homeGenerated", JSON.stringify(homeGenerated));
 }
+
+// ===== レア度アイコン =====
+const rarityIcon = {
+  bronze: "🥉",
+  silver: "🥈",
+  gold: "🥇"
+};
 
 // ===== カテゴリ追加 =====
 function addCategory() {
@@ -23,7 +30,6 @@ function addCategory() {
 
 // ===== カテゴリ削除 =====
 function deleteCategory(name) {
-  if (!quests[name]) return;
   delete quests[name];
   delete homeGenerated[name];
   saveData();
@@ -31,11 +37,22 @@ function deleteCategory(name) {
   renderHome();
 }
 
-// ===== クエスト追加 =====
+// ===== クエスト追加（レア度対応） =====
 function addQuestToCategory(category) {
-  const input = prompt("クエストを入力してください:");
-  if (!input) return;
-  quests[category].push(input);
+  const text = prompt("クエストを入力:");
+  if (!text) return;
+
+  const rarity = prompt("レア度を入力（bronze / silver / gold）");
+  if (!rarityIcon[rarity]) {
+    alert("bronze / silver / gold のどれかを入力してください。");
+    return;
+  }
+
+  quests[category].push({
+    text: text,
+    rarity: rarity
+  });
+
   saveData();
   renderManage();
 }
@@ -47,7 +64,7 @@ function deleteQuest(category, index) {
   renderManage();
 }
 
-// ===== クエスト要素作成（ホーム用） =====
+// ===== クエスト表示要素 =====
 function createQuestElement(obj, category, index) {
   const li = document.createElement("li");
 
@@ -57,14 +74,13 @@ function createQuestElement(obj, category, index) {
   checkbox.checked = obj.checked;
 
   const span = document.createElement("span");
-  span.textContent = obj.text;
+  span.textContent = `${rarityIcon[obj.rarity] || ""} ${obj.text}`;
 
   const clearLabel = document.createElement("span");
   clearLabel.textContent = "CLEAR";
   clearLabel.classList.add("clear-text");
   clearLabel.style.display = obj.checked ? "inline" : "none";
 
-  // チェック変更
   checkbox.addEventListener("change", () => {
     obj.checked = checkbox.checked;
     span.style.textDecoration = obj.checked ? "line-through" : "none";
@@ -96,26 +112,27 @@ function randomQuests(category) {
 
   setTimeout(() => {
     clearInterval(interval);
-    ul.innerHTML = ""; // ← ここでやっとクリア
-    // ランダム生成処理
+    ul.innerHTML = "";
+
     const list = quests[category];
     const selectedCount = Math.min(3, list.length);
     const shuffled = [...list].sort(() => Math.random() - 0.5);
-    homeGenerated[category] = shuffled.slice(0, selectedCount).map(text => ({
-      text,
+
+    homeGenerated[category] = shuffled.slice(0, selectedCount).map(obj => ({
+      ...obj,
       checked: false
     }));
+
     homeGenerated[category].forEach((obj, i) => {
       const li = createQuestElement(obj, category, i);
       ul.appendChild(li);
     });
+
     saveData();
   }, 1500);
 }
 
-
-
-// ===== 管理画面描画 =====
+// ===== 管理画面 =====
 function renderManage() {
   const container = document.getElementById("manageCategories");
   container.innerHTML = "";
@@ -128,20 +145,19 @@ function renderManage() {
     h2.textContent = category;
     section.appendChild(h2);
 
-    // カテゴリ削除ボタン
-    const catDelBtn = document.createElement("button");
-    catDelBtn.textContent = "カテゴリ削除";
-    catDelBtn.classList.add("delete-btn");
-    catDelBtn.onclick = () => deleteCategory(category);
-    section.appendChild(catDelBtn);
+    // 削除ボタン
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "カテゴリ削除";
+    delBtn.classList.add("delete-btn");
+    delBtn.onclick = () => deleteCategory(category);
+    section.appendChild(delBtn);
 
     const ul = document.createElement("ul");
-    ul.id = "manage_" + category;
     section.appendChild(ul);
 
     quests[category].forEach((q, i) => {
       const li = document.createElement("li");
-      li.textContent = q;
+      li.textContent = `${rarityIcon[q.rarity]} ${q.text}`;
 
       const btn = document.createElement("button");
       btn.textContent = "削除";
@@ -161,7 +177,7 @@ function renderManage() {
   }
 }
 
-// ===== ホーム画面描画 =====
+// ===== ホーム画面 =====
 function renderHome() {
   const container = document.getElementById("homeCategories");
   container.innerHTML = "";
@@ -178,7 +194,6 @@ function renderHome() {
     ul.id = "home_" + category;
     section.appendChild(ul);
 
-    // 保存されている homeGenerated から表示
     if (homeGenerated[category]) {
       homeGenerated[category].forEach((obj, i) => {
         const li = createQuestElement(obj, category, i);
@@ -218,7 +233,6 @@ function backHome() {
   renderHome();
 }
 
-// ===== 初期描画 =====
 document.addEventListener("DOMContentLoaded", () => {
   renderHome();
 });
