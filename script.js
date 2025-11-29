@@ -1,7 +1,15 @@
 // ===== データ読み込み =====
-let playerData = JSON.parse(localStorage.getItem("playerData")) || { name: "名無し", level: 1 };
-let quests = JSON.parse(localStorage.getItem("quests")) || {}; 
-let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {}; 
+let playerData = JSON.parse(localStorage.getItem("playerData")) || {
+  name: "名無し",
+  categories: {} // カテゴリごとのランク・経験値
+};
+
+let quests = JSON.parse(localStorage.getItem("quests")) || {};
+let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {};
+
+// ===== ランク定義 =====
+const rankOrder = ["F","E","D","C","B","A","S","SS","SSS"];
+const expPerRank = 100;
 
 // ===== 保存 =====
 function saveData() {
@@ -15,8 +23,14 @@ function addCategory() {
   const input = document.getElementById("newCategoryInput");
   const name = input.value.trim();
   if (!name || quests[name]) return;
+
   quests[name] = [];
   homeGenerated[name] = [];
+  // ステータス用カテゴリも初期化
+  if (!playerData.categories[name]) {
+    playerData.categories[name] = { exp: 0, rank: "F" };
+  }
+
   input.value = "";
   saveData();
   renderManage();
@@ -27,12 +41,13 @@ function addCategory() {
 function deleteCategory(name) {
   delete quests[name];
   delete homeGenerated[name];
+  delete playerData.categories[name];
   saveData();
   renderManage();
   renderHome();
 }
 
-// ===== クエスト追加（レア度対応） =====
+// ===== クエスト追加 =====
 function addQuestToCategory(category) {
   const text = prompt("クエストを入力:");
   if (!text) return;
@@ -43,11 +58,7 @@ function addQuestToCategory(category) {
     return;
   }
 
-  quests[category].push({
-    text: text,
-    rarity: rarity
-  });
-
+  quests[category].push({ text, rarity });
   saveData();
   renderManage();
 }
@@ -59,11 +70,10 @@ function deleteQuest(category, index) {
   renderManage();
 }
 
-// ===== クエスト表示要素 =====
+// ===== クエスト要素作成 =====
 function createQuestElement(obj, category, index) {
   const li = document.createElement("li");
-
-  li.classList.add(obj.rarity); // ←★追加：カラー反映
+  li.classList.add(obj.rarity);
 
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
@@ -82,17 +92,34 @@ function createQuestElement(obj, category, index) {
     obj.checked = checkbox.checked;
     span.style.textDecoration = obj.checked ? "line-through" : "none";
     clearLabel.style.display = obj.checked ? "inline" : "none";
+
     if (obj.checked) {
-      playerData.level += 1; // レベル上昇
-      document.getElementById("playerLevel").textContent = playerData.level;
+      // 経験値加算
+      if (!playerData.categories[category]) {
+        playerData.categories[category] = { exp: 0, rank: "F" };
+      }
+      let catData = playerData.categories[category];
+      catData.exp += (obj.rarity === "bronze" ? 10 : obj.rarity === "silver" ? 20 : 30);
+
+      // ランクアップ判定
+      let currentRank = catData.rank;
+      let currentExp = catData.exp;
+      while (currentExp >= expPerRank && rankOrder.indexOf(currentRank) < rankOrder.length -1) {
+        currentExp -= expPerRank;
+        currentRank = rankOrder[rankOrder.indexOf(currentRank)+1];
+      }
+      catData.rank = currentRank;
+      catData.exp = currentExp;
+
+      updateStatusScreen();
     }
+
     saveData();
   });
 
   li.appendChild(checkbox);
   li.appendChild(span);
   li.appendChild(clearLabel);
-
   return li;
 }
 
@@ -100,7 +127,6 @@ function createQuestElement(obj, category, index) {
 function randomQuests(category) {
   const ul = document.getElementById("home_" + category);
   ul.innerHTML = "";
-
   const loading = document.createElement("li");
   loading.textContent = "生成中";
   ul.appendChild(loading);
@@ -119,18 +145,15 @@ function randomQuests(category) {
     const selectedCount = Math.min(3, list.length);
     const shuffled = [...list].sort(() => Math.random() - 0.5);
 
-    homeGenerated[category] = shuffled.slice(0, selectedCount).map(obj => ({
-      ...obj,
-      checked: false
-    }));
+    homeGenerated[category] = shuffled.slice(0, selectedCount).map(obj => ({ ...obj, checked:false }));
 
-    homeGenerated[category].forEach((obj, i) => {
+    homeGenerated[category].forEach((obj,i) => {
       const li = createQuestElement(obj, category, i);
       ul.appendChild(li);
     });
 
     saveData();
-  }, 1500);
+  },1500);
 }
 
 // ===== 管理画面 =====
@@ -155,15 +178,15 @@ function renderManage() {
     const ul = document.createElement("ul");
     section.appendChild(ul);
 
-    quests[category].forEach((q, i) => {
+    quests[category].forEach((q,i) => {
       const li = document.createElement("li");
       li.textContent = q.text;
-      li.classList.add(q.rarity); // ←管理画面にも色反映
+      li.classList.add(q.rarity);
 
       const btn = document.createElement("button");
       btn.textContent = "削除";
       btn.classList.add("delete-btn");
-      btn.onclick = () => deleteQuest(category, i);
+      btn.onclick = () => deleteQuest(category,i);
 
       li.appendChild(btn);
       ul.appendChild(li);
@@ -177,27 +200,6 @@ function renderManage() {
     container.appendChild(section);
   }
 }
-// ===== ステータス画面 =====
-function showStatus() {
-  document.getElementById("homeScreen").style.display = "none";
-  document.getElementById("statusScreen").style.display = "block";
-
-  document.getElementById("playerNameInput").value = playerData.name;
-  document.getElementById("playerLevel").textContent = playerData.level;
-}
-
-function saveStatus() {
-  const input = document.getElementById("playerNameInput");
-  playerData.name = input.value.trim() || "名無し";
-  saveData();
-  alert("保存しました");
-}
-
-function backHomeFromStatus() {
-  document.getElementById("statusScreen").style.display = "none";
-  document.getElementById("homeScreen").style.display = "block";
-}
-
 
 // ===== ホーム画面 =====
 function renderHome() {
@@ -217,7 +219,7 @@ function renderHome() {
     section.appendChild(ul);
 
     if (homeGenerated[category]) {
-      homeGenerated[category].forEach((obj, i) => {
+      homeGenerated[category].forEach((obj,i) => {
         const li = createQuestElement(obj, category, i);
         ul.appendChild(li);
       });
@@ -242,6 +244,54 @@ function renderHome() {
   }
 }
 
+// ===== ステータス画面 =====
+function showStatus() {
+  document.getElementById("homeScreen").style.display = "none";
+  document.getElementById("statusScreen").style.display = "block";
+
+  document.getElementById("playerNameInput").value = playerData.name;
+  updateStatusScreen();
+}
+
+function saveStatus() {
+  const input = document.getElementById("playerNameInput");
+  playerData.name = input.value.trim() || "名無し";
+  saveData();
+  alert("保存しました");
+}
+
+function backHomeFromStatus() {
+  document.getElementById("statusScreen").style.display = "none";
+  document.getElementById("homeScreen").style.display = "block";
+}
+
+function updateStatusScreen() {
+  const container = document.getElementById("categoryStatus");
+  container.innerHTML = "";
+  for (const cat in playerData.categories) {
+    const data = playerData.categories[cat];
+
+    const div = document.createElement("div");
+    div.classList.add("category-rank");
+
+    const label = document.createElement("span");
+    label.textContent = `${cat}: ${data.rank}`;
+
+    const expContainer = document.createElement("div");
+    expContainer.classList.add("exp-container");
+
+    const expBar = document.createElement("div");
+    expBar.classList.add("exp-bar");
+    expBar.style.width = `${Math.min(100, (data.exp/expPerRank*100))}%`;
+    expContainer.appendChild(expBar);
+
+    div.appendChild(label);
+    div.appendChild(expContainer);
+    container.appendChild(div);
+  }
+}
+
+// ===== 画面切り替え =====
 function showManage() {
   document.getElementById("homeScreen").style.display = "none";
   document.getElementById("manageScreen").style.display = "block";
