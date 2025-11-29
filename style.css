@@ -29,6 +29,8 @@ li {
   display: flex;
   align-items: center;
   transition: opacity 0.5s ease;
+  padding: 6px;
+  border-radius: 6px;
 }
 
 button {
@@ -79,12 +81,6 @@ input[type="text"] {
   color: #fff;
 }
 
-li:hover {
-  background-color: #333;
-  border-radius: 5px;
-  padding-left: 5px;
-}
-
 .quest-check {
   margin-right: 10px;
   transform: scale(1.2);
@@ -92,7 +88,23 @@ li:hover {
 }
 
 .clear-text {
-  color: #2196f3;
+  color: #00eaff;
   font-weight: bold;
   margin-left: 10px;
 }
+
+/*===== レア度背景色 =====*/
+.bronze {
+  background-color: #8a5c2e;
+}
+
+.silver {
+  background-color: #9a9a9a;
+  color: #121212;
+}
+
+.gold {
+  background-color: #d4af37;
+  color: #121212;
+}
+

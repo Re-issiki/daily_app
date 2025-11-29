@@ -8,13 +8,6 @@ function saveData() {
   localStorage.setItem("homeGenerated", JSON.stringify(homeGenerated));
 }
 
-// ===== レア度アイコン =====
-const rarityIcon = {
-  bronze: "🥉",
-  silver: "🥈",
-  gold: "🥇"
-};
-
 // ===== カテゴリ追加 =====
 function addCategory() {
   const input = document.getElementById("newCategoryInput");
@@ -43,7 +36,7 @@ function addQuestToCategory(category) {
   if (!text) return;
 
   const rarity = prompt("レア度を入力（bronze / silver / gold）");
-  if (!rarityIcon[rarity]) {
+  if (!["bronze","silver","gold"].includes(rarity)) {
     alert("bronze / silver / gold のどれかを入力してください。");
     return;
   }
@@ -68,13 +61,15 @@ function deleteQuest(category, index) {
 function createQuestElement(obj, category, index) {
   const li = document.createElement("li");
 
+  li.classList.add(obj.rarity); // ←★追加：カラー反映
+
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
   checkbox.classList.add("quest-check");
   checkbox.checked = obj.checked;
 
   const span = document.createElement("span");
-  span.textContent = `${rarityIcon[obj.rarity] || ""} ${obj.text}`;
+  span.textContent = obj.text;
 
   const clearLabel = document.createElement("span");
   clearLabel.textContent = "CLEAR";
@@ -145,7 +140,6 @@ function renderManage() {
     h2.textContent = category;
     section.appendChild(h2);
 
-    // 削除ボタン
     const delBtn = document.createElement("button");
     delBtn.textContent = "カテゴリ削除";
     delBtn.classList.add("delete-btn");
@@ -157,7 +151,8 @@ function renderManage() {
 
     quests[category].forEach((q, i) => {
       const li = document.createElement("li");
-      li.textContent = `${rarityIcon[q.rarity]} ${q.text}`;
+      li.textContent = q.text;
+      li.classList.add(q.rarity); // ←管理画面にも色反映
 
       const btn = document.createElement("button");
       btn.textContent = "削除";
@@ -220,7 +215,6 @@ function renderHome() {
   }
 }
 
-// ===== 画面切り替え =====
 function showManage() {
   document.getElementById("homeScreen").style.display = "none";
   document.getElementById("manageScreen").style.display = "block";
