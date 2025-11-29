@@ -9,7 +9,6 @@ let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {};
 
 // ===== ランク定義 =====
 const rankOrder = ["F","E","D","C","B","A","S","SS","SSS"];
-const expPerRank = 100;
 
 // ===== 保存 =====
 function saveData() {
@@ -26,9 +25,8 @@ function addCategory() {
 
   quests[name] = [];
   homeGenerated[name] = [];
-  // ステータス用カテゴリも初期化
   if (!playerData.categories[name]) {
-    playerData.categories[name] = { exp: 0, rank: "F" };
+    playerData.categories[name] = { exp: 0, rank: "F", nextExp: 100 };
   }
 
   input.value = "";
@@ -70,6 +68,25 @@ function deleteQuest(category, index) {
   renderManage();
 }
 
+// ===== 経験値加算とランクアップ処理 =====
+function addExp(category, rarity) {
+  if (!playerData.categories[category]) {
+    playerData.categories[category] = { exp: 0, rank: "F", nextExp: 100 };
+  }
+  const catData = playerData.categories[category];
+
+  const expGain = { bronze: 10, silver: 30, gold: 60 };
+  catData.exp += expGain[rarity];
+
+  while (catData.exp >= catData.nextExp && rankOrder.indexOf(catData.rank) < rankOrder.length - 1) {
+    catData.exp -= catData.nextExp;
+    catData.rank = rankOrder[rankOrder.indexOf(catData.rank) + 1];
+    catData.nextExp *= 2;
+  }
+
+  saveData();
+}
+
 // ===== クエスト要素作成 =====
 function createQuestElement(obj, category, index) {
   const li = document.createElement("li");
@@ -94,23 +111,7 @@ function createQuestElement(obj, category, index) {
     clearLabel.style.display = obj.checked ? "inline" : "none";
 
     if (obj.checked) {
-      // 経験値加算
-      if (!playerData.categories[category]) {
-        playerData.categories[category] = { exp: 0, rank: "F" };
-      }
-      let catData = playerData.categories[category];
-      catData.exp += (obj.rarity === "bronze" ? 10 : obj.rarity === "silver" ? 20 : 30);
-
-      // ランクアップ判定
-      let currentRank = catData.rank;
-      let currentExp = catData.exp;
-      while (currentExp >= expPerRank && rankOrder.indexOf(currentRank) < rankOrder.length -1) {
-        currentExp -= expPerRank;
-        currentRank = rankOrder[rankOrder.indexOf(currentRank)+1];
-      }
-      catData.rank = currentRank;
-      catData.exp = currentExp;
-
+      addExp(category, obj.rarity);
       updateStatusScreen();
     }
 
@@ -145,7 +146,7 @@ function randomQuests(category) {
     const selectedCount = Math.min(3, list.length);
     const shuffled = [...list].sort(() => Math.random() - 0.5);
 
-    homeGenerated[category] = shuffled.slice(0, selectedCount).map(obj => ({ ...obj, checked:false }));
+    homeGenerated[category] = shuffled.slice(0, selectedCount).map(obj => ({ ...obj, checked: false }));
 
     homeGenerated[category].forEach((obj,i) => {
       const li = createQuestElement(obj, category, i);
@@ -271,23 +272,9 @@ function updateStatusScreen() {
   for (const cat in playerData.categories) {
     const data = playerData.categories[cat];
 
-    const div = document.createElement("div");
-    div.classList.add("category-rank");
-
-    const label = document.createElement("span");
-    label.textContent = `${cat}: ${data.rank}`;
-
-    const expContainer = document.createElement("div");
-    expContainer.classList.add("exp-container");
-
-    const expBar = document.createElement("div");
-    expBar.classList.add("exp-bar");
-    expBar.style.width = `${Math.min(100, (data.exp/expPerRank*100))}%`;
-    expContainer.appendChild(expBar);
-
-    div.appendChild(label);
-    div.appendChild(expContainer);
-    container.appendChild(div);
+    const p = document.createElement("p");
+    p.textContent = `${cat}: ランク ${data.rank} / EXP ${data.exp} / ${data.nextExp}`;
+    container.appendChild(p);
   }
 }
 
