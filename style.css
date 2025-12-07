@@ -1,67 +1,35 @@
-/* ==== 全体：ギルド風ダーク森背景 ==== */
+/* ==== フォント ==== */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* ==== 全体 ==== */
 body {
-  font-family: 'Cormorant', serif;
+  background-color: #000;
+  color: #ffffff;
+  font-family: 'Press Start 2P', monospace;
   max-width: 500px;
   margin: auto;
   padding: 20px;
-
-  /* ====== 背景：魔術的ダークブルーグラデ ====== */
-  background: radial-gradient(circle at 50% 30%, #1c2340 0%, #0b0f1c 70%, #05060a 100%);
-
-  /* 粒子（魔力のきらめき） */
-  background-image:
-    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.08) 0px, transparent 150px),
-    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.05) 0px, transparent 200px),
-    radial-gradient(circle at 60% 90%, rgba(255,255,255,0.04) 0px, transparent 180px);
-
-  color: #f7e9c5;
+  line-height: 1.5;
 }
 
-/* ==== タイトル ==== */
-h1#title,
-h1,
-h2 {
-  font-family: 'Cinzel', serif;
+/* ===== タイトル ===== */
+h1, h2 {
   text-align: center;
-  color: #f5dbaa;
-  letter-spacing: 2px;
-  text-shadow: 0 0 10px rgba(255,220,150,0.4);
+  color: #ffffff;
+  margin-bottom: 15px;
 }
 
-/* ==== カード（カテゴリなど） ==== */
-.category,
-.category-card {
-  background: #f7e9c5;
-  color: #3a2f1c;
-  padding: 15px;
-  border-radius: 12px;
-  border: 2px solid #d1c08e;
-  box-shadow: inset 0 0 8px rgba(0,0,0,0.2),
-              0 4px 8px rgba(0,0,0,0.4);
-  transition: 0.2s;
+/* ==== 青ウィンドウ（DQメニュー風） ==== */
+.window {
+  background: #1b3cff;
+  border: 4px double #ffffff;
+  padding: 16px;
+  margin: 15px 0;
+  border-radius: 0;
+  box-shadow: 0 0 12px rgba(0,0,0,0.6);
 }
 
-.category-card {
-  min-width: 80%;
-  flex-shrink: 0;
-  scroll-snap-align: center;
-}
-
-.category-card:hover,
-.category:hover {
-  border-color: #f5dbaa;
-  box-shadow: inset 0 0 10px rgba(255,220,150,0.35),
-              0 5px 12px rgba(0,0,0,0.45);
-}
-
-/* カテゴリ名だけ中央 */
-.category-card h2 {
-  text-align: center;
-  font-family: 'Cinzel', serif;
-  color: #3a2f1c;
-}
-
-/* ==== 横スライドUI ==== */
+/* ==== カテゴリ（横スライドカード） ==== */
 #homeCategories {
   display: flex;
   gap: 20px;
@@ -70,98 +38,106 @@ h2 {
   padding: 10px;
 }
 
+.category-card {
+  background: #1b3cff;
+  border: 4px double #ffffff;
+  min-width: 80%;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  padding: 15px;
+  border-radius: 0;
+  color: white;
+}
+
+/* カテゴリ名だけ中央 */
+.category-card h2 {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
 /* ==== クエストリスト ==== */
 ul {
-  padding-left: 15px;
+  padding-left: 20px;
 }
 
 li {
-  margin: 6px 0;
+  margin: 8px 0;
   display: flex;
   align-items: center;
-  padding: 6px;
-  border-radius: 6px;
+  padding: 4px 0;
 }
 
-/* ==== チェックボックス ==== */
+/* チェックボックス */
 .quest-check {
-  margin-right: 10px;
-  transform: scale(1.2);
+  margin-right: 12px;
+  transform: scale(1.3);
   cursor: pointer;
 }
 
-/* ==== レア度カラー ==== */
-.bronze { background-color: #b99263; }
-.silver { background-color: #e5e5e5; color: #3a2f1c; }
-.gold   { background-color: #ffdf6b; color: #3a2f1c; }
+/* レア度カラー（控えめに） */
+.bronze { color: #d7b48a; }
+.silver { color: #e5e5e5; }
+.gold   { color: #ffe88a; }
 
-/* ==== ボタン：木材パネル風 ==== */
+/* ===== ボタン：ドラクエ風 ===== */
 button {
   width: 100%;
-  margin-top: 10px;
+  margin-top: 12px;
   padding: 12px;
-  font-family: 'Cinzel', serif;
-  letter-spacing: 1px;
-  border: 2px solid #d1c08e;
-  border-radius: 8px;
-  background: linear-gradient(#6a4f2f, #4a341f);
-  color: #f7e9c5;
+  font-family: 'Press Start 2P', monospace;
+  border: 4px double #ffffff;
+  background: #1b3cff;
+  color: white;
+  border-radius: 0;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 button:hover {
-  background: linear-gradient(#7a5f38, #5a4428);
-  transform: translateY(-2px);
+  background: #243cff;
+  transform: translateY(-3px);
 }
 
-/* ステータスリセット：赤魔法 */
+/* 赤いボタン（ステータスリセット） */
 .resetBtn {
-  background: linear-gradient(#a83232, #7a2525);
-  color: #fff;
-  border-color: #d1a0a0;
+  background: #b22c2c;
+  border: 4px double #ffffff;
 }
 
 .resetBtn:hover {
-  background: linear-gradient(#b83a3a, #8b2d2d);
-  transform: translateY(-2px);
+  background: #c63d3d;
 }
 
-/* ==== 削除ボタン ==== */
+/* 削除ボタン */
 .delete-btn {
-  background: linear-gradient(#a83232, #7a2525);
-  border: 2px solid #d1a0a0;
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-family: 'Cinzel', serif;
-  cursor: pointer;
+  background: #b22c2c;
+  border: 4px double #ffffff;
+  padding: 6px 10px;
   margin-left: auto;
+  color: white;
+  cursor: pointer;
 }
 
-/* ==== 入力欄（羊皮紙風） ==== */
+/* ==== 入力欄 ==== */
 input[type="text"] {
   width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  background: #f7e9c5;
-  border: 2px solid #d1c08e;
-  border-radius: 6px;
-  color: #3a2f1c;
-  font-family: 'Cormorant', serif;
+  padding: 12px;
+  margin: 10px 0;
+  font-family: 'Press Start 2P', monospace;
+  background: #000;
+  border: 4px double #ffffff;
+  color: #ffffff;
 }
 
-/* ==== ステータス用 === */
+/* ===== ステータス画面 ===== */
 .category-rank {
   display: flex;
   justify-content: space-between;
   padding: 6px;
-  background: #f7e9c5;
-  color: #3a2f1c;
-  border-radius: 6px;
   margin: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.4);
 }
 
 #statusRadar {
-  margin: 15px auto;
   display: block;
+  margin: 20px auto;
 }
