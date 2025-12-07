@@ -1,8 +1,8 @@
 /* ==== 全体 ==== */
 body {
-  background-color: #000;
+  background: linear-gradient(135deg, rgba(0,40,90,1), rgba(0,10,30,1));
   color: #ffffff;
-  font-family: 'Arial', 'Helvetica', 'sans-serif'; /* ゴシック系で統一 */
+  font-family: Arial, Helvetica, sans-serif;
   max-width: 500px;
   margin: auto;
   padding: 20px;
@@ -12,21 +12,22 @@ body {
 /* ===== タイトル ===== */
 h1, h2 {
   text-align: center;
-  color: #ffffff;
+  color: #cfe8ff;
   margin-bottom: 15px;
+  text-shadow: 0 0 6px rgba(0,140,255,0.8);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-/* ==== 青ウィンドウ（ゲーム風） ==== */
-.window,
-.category,
-.category-card {
-  background: rgba(27, 60, 255, 0.9); /* 青透明 */
-  border: 4px double #ffffff;
+/* ==== 青ウィンドウ（透明＋ネオンサイン風） ==== */
+.window {
+  background: rgba(0, 60, 140, 0.35);
+  border: 2px solid rgba(180, 220, 255, 0.5);
+  backdrop-filter: blur(6px);
   padding: 16px;
   margin: 15px 0;
-  border-radius: 4px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.6);
-  color: white;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,140,255,0.4);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* ==== カテゴリ（横スライドカード） ==== */
@@ -39,21 +40,32 @@ h1, h2 {
 }
 
 .category-card {
+  background: rgba(0, 60, 140, 0.35);
+  border: 2px solid rgba(180, 220, 255, 0.5);
+  backdrop-filter: blur(6px);
   min-width: 80%;
   flex-shrink: 0;
   scroll-snap-align: center;
   padding: 15px;
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0 0 12px rgba(0,140,255,0.3);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* カテゴリ名だけ中央 */
 .category-card h2 {
   text-align: center;
   margin-bottom: 12px;
+  color: #cfe8ff;
+  text-shadow: 0 0 6px rgba(0,140,255,0.7);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* ==== クエストリスト ==== */
 ul {
   padding-left: 20px;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 li {
@@ -61,6 +73,7 @@ li {
   display: flex;
   align-items: center;
   padding: 4px 0;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* チェックボックス */
@@ -70,49 +83,50 @@ li {
   cursor: pointer;
 }
 
-/* レア度カラー */
+/* レア度カラー（透明UI向けに調整） */
 .bronze { color: #d7b48a; }
 .silver { color: #e5e5e5; }
-.gold   { color: #ffe88a; }
+.gold   { color: #ffdf7e; }
 
-/* ===== ボタン（ゲーム風青透明） ===== */
+/* ===== ボタン：サイバー青UI風 ===== */
 button {
   width: 100%;
   margin-top: 12px;
   padding: 12px;
-  font-family: 'Arial', 'Helvetica', 'sans-serif'; /* ゴシック系 */
-  border: 4px double #ffffff;
-  background: rgba(27, 60, 255, 0.9);
+  border: 2px solid rgba(180, 220, 255, 0.5);
+  background: rgba(0, 60, 140, 0.35);
   color: white;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: 0.2s;
+  box-shadow: 0 0 10px rgba(0,140,255,0.4);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 button:hover {
-  background: rgba(36, 60, 255, 0.95);
+  background: rgba(0, 90, 180, 0.45);
   transform: translateY(-3px);
 }
 
-/* 赤いボタン（ステータスリセット） */
+/* 赤いボタン（リセット） */
 .resetBtn {
-  background: rgba(178, 44, 44, 0.9);
-  border: 4px double #ffffff;
+  background: rgba(140, 20, 20, 0.4);
+  border: 2px solid rgba(255, 150, 150, 0.6);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .resetBtn:hover {
-  background: rgba(198, 61, 61, 0.95);
-  transform: translateY(-3px);
+  background: rgba(180, 40, 40, 0.45);
 }
 
 /* 削除ボタン */
 .delete-btn {
-  background: rgba(178, 44, 44, 0.9);
-  border: 4px double #ffffff;
+  background: rgba(140, 20, 20, 0.4);
+  border: 2px solid rgba(255, 150, 150, 0.6);
   padding: 6px 10px;
   margin-left: auto;
   color: white;
   cursor: pointer;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* ==== 入力欄 ==== */
@@ -120,10 +134,11 @@ input[type="text"] {
   width: 100%;
   padding: 12px;
   margin: 10px 0;
-  font-family: 'Arial', 'Helvetica', 'sans-serif'; /* ゴシック系 */
-  background: #000;
-  border: 4px double #ffffff;
+  background: rgba(0, 0, 20, 0.7);
+  border: 2px solid rgba(180, 220, 255, 0.5);
   color: #ffffff;
+  border-radius: 10px;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* ===== ステータス画面 ===== */
@@ -132,7 +147,8 @@ input[type="text"] {
   justify-content: space-between;
   padding: 6px;
   margin: 6px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.4);
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 #statusRadar {
