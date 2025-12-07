@@ -4,13 +4,20 @@ let playerData = JSON.parse(localStorage.getItem("playerData")) || {
   name: "名無し",
   categories: {} // 各カテゴリごとの経験値・ランク
 };
-
+let radarChart = null;
 let quests = JSON.parse(localStorage.getItem("quests")) || {}; // クエスト一覧
 let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {}; // ホーム画面に表示するランダム生成結果
 
 // ===== ランク関連設定 =====
 const rankOrder = ["F","E","D","C","B","A","S","SS","SSS"];
 const baseExpPerRank = 100; // 最初のランクに必要な経験値
+
+//レーダーチャート用ランク変換
+function rankToNumber(rank) {
+  const order = ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS"];
+  return order.indexOf(rank) + 1; // F=1, E=2, D=3 …
+}
+
 
 // ===== データ保存 =====
 function saveData() {
@@ -242,14 +249,14 @@ function renderManage() {
   }
 }
 
-// ===== ホーム画面描画 =====
+// ===== ホーム画面描画（横スライドカード版） =====
 function renderHome() {
   const container = document.getElementById("homeCategories");
   container.innerHTML = "";
 
   for (const category in quests) {
-    const section = document.createElement("div");
-    section.classList.add("category");
+    const card = document.createElement("div");
+    card.classList.add("category-card");
 
     const h2 = document.createElement("h2");
     h2.textContent = category;
@@ -257,7 +264,7 @@ function renderHome() {
     const ul = document.createElement("ul");
     ul.id = "home_" + category;
 
-    // 保存されたランダム生成結果を表示
+    // すでに保存されているランダム生成結果の表示
     if (homeGenerated[category]) {
       homeGenerated[category].forEach((obj, i) => {
         const li = createQuestElement(obj, category, i);
@@ -278,12 +285,12 @@ function renderHome() {
       saveData();
     };
 
-    section.appendChild(h2);
-    section.appendChild(ul);
-    section.appendChild(genBtn);
-    section.appendChild(resetBtn);
+    card.appendChild(h2);
+    card.appendChild(ul);
+    card.appendChild(genBtn);
+    card.appendChild(resetBtn);
 
-    container.appendChild(section);
+    container.appendChild(card);
   }
 }
 
@@ -314,18 +321,69 @@ function updateStatusScreen() {
   const container = document.getElementById("categoryStatus");
   container.innerHTML = "";
 
+  // カテゴリ一覧を画面表示（テキスト部）
   for (const cat in playerData.categories) {
-    const data = playerData.categories[cat];
-
     const div = document.createElement("div");
     div.classList.add("category-rank");
 
     const label = document.createElement("span");
-    label.textContent = `${cat}: ${data.rank} (${data.exp}/${getExpForRank(data.rank)})`;
+    const data = playerData.categories[cat];
+    const needExp = getExpForRank(data.rank);
+
+    label.textContent = `${cat}: ランク${data.rank} / EXP ${data.exp}/${needExp}`;
 
     div.appendChild(label);
     container.appendChild(div);
   }
+
+  // レーダーチャート作成
+  const ctx = document.getElementById("statusRadar").getContext("2d");
+
+  // 既に描画済みなら削除してから描き直す
+  if (radarChart) {
+    radarChart.destroy();
+  }
+
+  const labels = Object.keys(playerData.categories);
+  const values = labels.map(cat =>
+    rankToNumber(playerData.categories[cat].rank)
+  );
+
+  radarChart = new Chart(ctx, {
+    type: "radar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "ステータス",
+        data: values,
+        borderWidth: 2,
+        backgroundColor: "rgba(33, 150, 243, 0.4)", 
+        borderColor: "rgb(33, 150, 243)",           
+        pointBackgroundColor: "rgb(33, 150, 243)"
+      }]
+    },
+    options: {
+      scales: {
+        r: {
+          beginAtZero: true,
+          suggestedMin: 0,
+          suggestedMax: 9, // SSS = 9相当
+          grid: { color: "rgba(255,255,255,0.2)" },
+          angleLines: { color: "rgba(255,255,255,0.2)" },
+          ticks: { stepSize: 1, display: false },
+          pointLabels: {
+            color: "#fff",
+            font: { size: 14 }
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: { color: "#fff" }
+        }
+      }
+    }
+  });
 }
 
 // ランクの必要EXP計算
