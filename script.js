@@ -301,6 +301,10 @@ function backHomeFromStatus(){
 }
 
 function updateStatusScreen(){
+  for (const cat in playerData.categories) {
+    const exists = weekdays.some(day => quests[day][cat] && Object.keys(quests[day]).includes(cat));
+    if (!exists) delete playerData.categories[cat];
+  }
   const container=document.getElementById("categoryStatus");
   container.innerHTML="";
   for(const cat in playerData.categories){
