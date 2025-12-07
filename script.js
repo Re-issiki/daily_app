@@ -3,6 +3,7 @@ const weekdays = ["月曜日","火曜日","水曜日","木曜日","金曜日","�
 let playerData = JSON.parse(localStorage.getItem("playerData")) || {name:"名無し", categories:{}};
 let quests = JSON.parse(localStorage.getItem("quests")) || {}; 
 let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {};
+let emergencyQuests = JSON.parse(localStorage.getItem("emergencyQuests")) || [];
 let radarChart = null;
 
 // 各曜日の初期化
@@ -24,6 +25,7 @@ function saveData(){
   localStorage.setItem("quests", JSON.stringify(quests));
   localStorage.setItem("homeGenerated", JSON.stringify(homeGenerated));
   localStorage.setItem("playerData", JSON.stringify(playerData));
+  localStorage.setItem("emergencyQuests", JSON.stringify(emergencyQuests));
 }
 
 // ===== ホーム画面曜日 =====
@@ -46,11 +48,9 @@ function addCategory(){
   const name = input.value.trim();
   if(!name) return;
 
-  // ✅ 現在管理中の曜日だけに追加
   if(!quests[currentManageWeekday][name]) quests[currentManageWeekday][name]=[];
   if(!homeGenerated[currentManageWeekday][name]) homeGenerated[currentManageWeekday][name]=[];
 
-  // ステータス用データは全体で1回だけ
   if(!playerData.categories[name]) playerData.categories[name]={exp:0, rank:"F"};
 
   input.value="";
@@ -61,11 +61,9 @@ function addCategory(){
 
 // ===== カテゴリ削除 =====
 function deleteCategory(name){
-  // ✅ 現在管理中の曜日だけ削除
   delete quests[currentManageWeekday][name];
   delete homeGenerated[currentManageWeekday][name];
 
-  // 他の曜日にも存在していなければステータスから削除
   const stillExists = weekdays.some(day => quests[day][name] && Object.keys(quests[day]).includes(name));
   if(!stillExists){
     delete playerData.categories[name];
@@ -301,10 +299,6 @@ function backHomeFromStatus(){
 }
 
 function updateStatusScreen(){
-  for (const cat in playerData.categories) {
-    const exists = weekdays.some(day => quests[day][cat] && Object.keys(quests[day]).includes(cat));
-    if (!exists) delete playerData.categories[cat];
-  }
   const container=document.getElementById("categoryStatus");
   container.innerHTML="";
   for(const cat in playerData.categories){
@@ -320,10 +314,8 @@ function updateStatusScreen(){
 
   const ctx=document.getElementById("statusRadar").getContext("2d");
   if(radarChart) radarChart.destroy();
-  const labels = Object.keys(playerData.categories)
-  .filter(cat => weekdays.some(day => quests[day][cat] && Object.keys(quests[day]).includes(cat)));
-  const values = labels.map(cat => rankToNumber(playerData.categories[cat].rank));
-
+  const labels = Object.keys(playerData.categories);
+  const values = labels.map(cat=>rankToNumber(playerData.categories[cat].rank));
 
   radarChart=new Chart(ctx,{
     type:"radar",
@@ -379,6 +371,63 @@ function backHome(){
   document.getElementById("manageScreen").style.display="none";
   document.getElementById("homeScreen").style.display="block";
   renderHome();
+}
+
+// ===== 緊急クエスト =====
+function showEmergencyScreen(){
+  document.getElementById("manageScreen").style.display="none";
+  document.getElementById("emergencyScreen").style.display="block";
+  renderEmergencyList();
+}
+
+function backFromEmergency(){
+  document.getElementById("emergencyScreen").style.display="none";
+  document.getElementById("manageScreen").style.display="block";
+}
+
+function addEmergencyQuest(){
+  const text = document.getElementById("emergencyText").value.trim();
+  const deadline = document.getElementById("emergencyDeadline").value;
+  const rarity = document.getElementById("emergencyRarity").value;
+  if(!text || !deadline) return alert("内容と期限を入力してください。");
+  emergencyQuests.push({text, deadline, rarity});
+  document.getElementById("emergencyText").value="";
+  document.getElementById("emergencyDeadline").value="";
+  saveData();
+  renderEmergencyList();
+}
+
+function renderEmergencyList(){
+  const container = document.getElementById("emergencyList");
+  container.innerHTML = "";
+
+  const now = new Date();
+
+  emergencyQuests.forEach((q, index) => {
+    const questEnd = new Date(q.deadline);
+    if(questEnd < now) return;
+
+    const card = document.createElement("div");
+    card.classList.add("category-card");
+
+    const span = document.createElement("span");
+    span.textContent = `${q.text} (期限: ${q.deadline})`;
+    span.classList.add(q.rarity);
+
+    const btn = document.createElement("button");
+    btn.textContent = "クリア";
+    btn.onclick = () => {
+      if(confirm("この緊急クエストをクリアしますか？")){
+        emergencyQuests.splice(index,1);
+        saveData();
+        renderEmergencyList();
+      }
+    }
+
+    card.appendChild(span);
+    card.appendChild(btn);
+    container.appendChild(card);
+  });
 }
 
 // ===== 初期処理 =====
