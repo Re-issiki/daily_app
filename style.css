@@ -1,132 +1,182 @@
+/* ===============================
+   全体（背景 & ベースカラー）
+================================= */
+
 body {
-  background: #1e1e1e;
-  color: white;
-  font-family: "Yu Gothic", sans-serif;
-  margin: 0;
-}
-
-header {
-  padding: 10px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-h1 {
-  margin: 0;
-}
-
-.screen {
+  font-family: "Orbitron", sans-serif;
+  max-width: 500px;
+  margin: auto;
   padding: 20px;
+  background: radial-gradient(circle at 50% 20%, #0b1d33 0%, #03070d 80%);
+  color: #dff6ff;
 }
 
-/* ==========================
-   カテゴリカード（ホーム画面）
-   ========================== */
-.category-container {
+/* ===============================
+   タイトル（発光させる）
+================================= */
+
+h1#title,
+h1, h2 {
+  text-align: center;
+  color: #cfe9ff;
+  text-shadow: 0 0 8px rgba(120, 200, 255, 0.6);
+  letter-spacing: 1px;
+}
+
+/* ===============================
+   ホログラムカード（クエスト・カテゴリ共通）
+================================= */
+
+.category,
+.category-card,
+.category-rank,
+#manageCategories > div,
+#homeCategories {
+  background: rgba(20, 80, 160, 0.18);
+  border: 1px solid rgba(60, 150, 255, 0.6);
+  backdrop-filter: blur(6px);
+  border-radius: 14px;
+  padding: 15px;
+  margin: 10px 0;
+  box-shadow: 0 0 10px rgba(60,150,255,0.2);
+  transition: 0.25s;
+}
+
+.category:hover,
+.category-card:hover,
+.category-rank:hover {
+  box-shadow: 0 0 18px rgba(60,150,255,0.5);
+  transform: translateY(-3px);
+}
+
+/* ===============================
+   横スライドカテゴリカード
+================================= */
+
+#homeCategories {
   display: flex;
   gap: 20px;
   overflow-x: auto;
-  padding-bottom: 20px;
+  scroll-snap-type: x mandatory;
+  padding: 10px;
 }
 
 .category-card {
-  background: #2b2b2b;
-  padding: 15px;
-  width: 250px;
-  border-radius: 12px;
+  min-width: 85%;
   flex-shrink: 0;
+  scroll-snap-align: center;
+  padding: 20px;
 }
 
-/* カテゴリ名は中央揃え */
-.category-title {
-  text-align: center;
-  font-size: 22px;
-  margin-bottom: 10px;
-  font-weight: bold;
+/* ===============================
+   クエストの li（選択部分）
+================================= */
+
+li {
+  margin: 6px 0;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  background: rgba(10,40,80,0.2);
+  border: 1px solid rgba(60,150,255,0.3);
+  transition: 0.2s;
 }
 
-.category-card ul {
-  padding-left: 0;
-  margin-bottom: 10px;
+li:hover {
+  background: rgba(30,80,160,0.35);
 }
 
-.category-card li {
-  list-style: none;
-  margin: 5px 0;
-  padding: 6px;
-  background: #3a3a3a;
-  border-radius: 6px;
+/* ===============================
+   ボタン（青いホログラム）
+================================= */
 
-  /* クエストは左揃え */
-  text-align: left;
-}
-
-/* レア度カラー */
-.bronze { border-left: 6px solid #cd7f32; }
-.silver { border-left: 6px solid #c0c0c0; }
-.gold   { border-left: 6px solid #ffd700; }
-
-/* CLEAR文字 */
-.clear-text {
-  color: #4caf50;
-  font-weight: bold;
-  margin-left: 10px;
-}
-
-/* ==========================
-   管理画面
-   ========================== */
-#manageCategories .category {
-  background: #2b2b2b;
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
-
-#manageCategories h2 {
-  text-align: center;
-  font-size: 22px;
-  margin-bottom: 10px;
-}
-
-#manageCategories ul {
-  padding-left: 20px;
-}
-
-#manageCategories li {
-  margin: 5px 0;
-}
-
-/* ==========================
-   ステータス画面
-   ========================== */
-#categoryStatus {
-  margin-bottom: 20px;
-}
-
-.category-rank {
-  margin-bottom: 8px;
-}
-
-/* ==========================
-   ボタン
-   ========================== */
 button {
-  background: #2196f3;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  color: white;
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  font-size: 15px;
+  border: 1px solid rgba(80,170,255,0.7);
+  background: rgba(25, 120, 255, 0.2);
+  color: #e4f7ff;
+  border-radius: 8px;
   cursor: pointer;
+  transition: 0.25s;
+  backdrop-filter: blur(4px);
 }
 
 button:hover {
-  background: #0b7dda;
+  background: rgba(50,150,255,0.35);
+  box-shadow: 0 0 15px rgba(80,170,255,0.6);
+  transform: translateY(-2px);
 }
 
-input {
-  padding: 6px;
-  border-radius: 6px;
-  border: none;
+/* 赤いボタン（ステータスリセット） */
+
+.resetBtn {
+  background: rgba(255, 80, 80, 0.3);
+  border: 1px solid rgba(255,80,80,0.8);
+}
+
+.resetBtn:hover {
+  background: rgba(255,100,100,0.45);
+  box-shadow: 0 0 10px rgba(255,100,100,0.5);
+}
+
+/* ===============================
+   テキストボックス（透明ガラス風）
+================================= */
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  background: rgba(30,60,100,0.25);
+  border: 1px solid rgba(60,150,255,0.5);
+  color: #dff6ff;
+  backdrop-filter: blur(4px);
+}
+
+input[type="text"]:focus {
+  border-color: rgba(120,200,255,0.9);
+  box-shadow: 0 0 10px rgba(120,200,255,0.4);
+  outline: none;
+}
+
+/* ===============================
+   チェックボックス
+================================= */
+
+.quest-check {
+  margin-right: 10px;
+  transform: scale(1.3);
+  cursor: pointer;
+}
+
+/* ===============================
+   レア度カラー（ホログラム風）
+================================= */
+
+.bronze {
+  background: rgba(150, 90, 30, 0.4);
+}
+
+.silver {
+  background: rgba(180, 180, 180, 0.5);
+  color: #000;
+}
+
+.gold {
+  background: rgba(220, 180, 50, 0.5);
+  color: #000;
+}
+
+/* ===============================
+   レーダーチャート位置
+================================= */
+
+#statusRadar {
+  display: block;
+  margin: 0 auto;
 }
