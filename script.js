@@ -4,6 +4,7 @@ let playerData = JSON.parse(localStorage.getItem("playerData")) || {
   name: "名無し",
   categories: {} // 各カテゴリごとの経験値・ランク
 };
+let radarChart = null;
 
 let quests = JSON.parse(localStorage.getItem("quests")) || {}; // クエスト一覧
 let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {}; // ホーム画面に表示するランダム生成結果
@@ -314,19 +315,71 @@ function updateStatusScreen() {
   const container = document.getElementById("categoryStatus");
   container.innerHTML = "";
 
+  // カテゴリ一覧を画面表示（テキスト部）
   for (const cat in playerData.categories) {
-    const data = playerData.categories[cat];
-
     const div = document.createElement("div");
     div.classList.add("category-rank");
 
     const label = document.createElement("span");
-    label.textContent = `${cat}: ${data.rank} (${data.exp}/${getExpForRank(data.rank)})`;
+    const data = playerData.categories[cat];
+    const needExp = getExpForRank(data.rank);
+
+    label.textContent = `${cat}: ランク${data.rank} / EXP ${data.exp}/${needExp}`;
 
     div.appendChild(label);
     container.appendChild(div);
   }
+
+  // レーダーチャート作成
+  const ctx = document.getElementById("statusRadar").getContext("2d");
+
+  // 既に描画済みなら削除してから描き直す
+  if (radarChart) {
+    radarChart.destroy();
+  }
+
+  const labels = Object.keys(playerData.categories);
+  const values = labels.map(cat =>
+    rankToNumber(playerData.categories[cat].rank)
+  );
+
+  radarChart = new Chart(ctx, {
+    type: "radar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "ステータス",
+        data: values,
+        borderWidth: 2,
+        borderColor: "rgba(255,105,180,1)",
+        backgroundColor: "rgba(255,105,180,0.3)",
+        pointBackgroundColor: "rgba(255,105,180,1)"
+      }]
+    },
+    options: {
+      scales: {
+        r: {
+          beginAtZero: true,
+          suggestedMin: 0,
+          suggestedMax: 9, // SSS = 9相当
+          grid: { color: "rgba(255,255,255,0.2)" },
+          angleLines: { color: "rgba(255,255,255,0.2)" },
+          ticks: { stepSize: 1, display: false },
+          pointLabels: {
+            color: "#fff",
+            font: { size: 14 }
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: { color: "#fff" }
+        }
+      }
+    }
+  });
 }
+
 
 // ランクの必要EXP計算
 function getExpForRank(rank) {
@@ -334,6 +387,13 @@ function getExpForRank(rank) {
   for (let i = 0; i < rankOrder.indexOf(rank); i++) exp *= 2;
   return exp;
 }
+
+//レーダーチャート用ランク変換
+function rankToNumber(rank) {
+  const order = ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS"];
+  return order.indexOf(rank) + 1; // F=1, E=2, D=3 …
+}
+
 
 // ===== ステータス全リセット =====
 function resetAllStatus() {
