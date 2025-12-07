@@ -119,6 +119,20 @@ input[type="text"] {
   color: #fff;
 }
 
+/*リセットボタン*/
+.resetBtn {
+  background: #e74c3c;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.resetBtn:hover {
+  background: #c0392b;
+}
+
+
 .category-rank {
   display: flex;
   justify-content: space-between;
