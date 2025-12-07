@@ -15,7 +15,6 @@ h1, h2 {
   color: #cfe8ff;
   margin-bottom: 15px;
   text-shadow: 0 0 6px rgba(0,140,255,0.8);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* ==== 青ウィンドウ（透明＋ネオンサイン風） ==== */
@@ -27,7 +26,6 @@ h1, h2 {
   padding: 15px;
   color: white;
   box-shadow: 0 0 12px rgba(0,140,255,0.3);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* ==== 横スライド共通 ==== */
@@ -74,18 +72,17 @@ li {
 
 /* レア度カラー */
 .bronze {
-  color: #b87333;             /* 銅っぽい濃い茶色 */
-  text-shadow: 1px 1px 2px #7a4b24; /* 少し立体感を演出 */
+  color: #b87333;
+  text-shadow: 1px 1px 2px #7a4b24;
 }
 .silver {
-  color: #c0c0c0;             /* 銀色に近い明るめグレー */
-  text-shadow: 1px 1px 2px #7f7f7f; /* メタリック感 */
+  color: #c0c0c0;
+  text-shadow: 1px 1px 2px #7f7f7f;
 }
 .gold {
-  color: #ffd700;             /* 金色 */
-  text-shadow: 1px 1px 2px #b38f00; /* 立体感・光沢感 */
+  color: #ffd700;
+  text-shadow: 1px 1px 2px #b38f00;
 }
-
 
 /* ボタン */
 button {

@@ -10,37 +10,59 @@
 
 <!-- ===== ホーム画面 ===== --> 
 <div id="homeScreen">
-<h1 id="title">今日のクエスト</h1>
-<div id="homeCategories"></div>
-<button id="manageBtn" onclick="showManage()">⚙ クエスト管理</button>
-<button id="statusBtn" onclick="showStatus()">⚙ ステータス</button>
+  <div style="display:flex; justify-content: space-between; align-items:center;">
+    <h1 id="title">今日のクエスト</h1>
+    <select id="homeWeekdaySelect" onchange="changeHomeWeekday()">
+      <option value="月曜日">月曜日</option>
+      <option value="火曜日">火曜日</option>
+      <option value="水曜日">水曜日</option>
+      <option value="木曜日">木曜日</option>
+      <option value="金曜日">金曜日</option>
+      <option value="土曜日">土曜日</option>
+      <option value="日曜日">日曜日</option>
+    </select>
+  </div>
+  <div id="homeCategories"></div>
+  <button id="manageBtn" onclick="showManage()">⚙ クエスト管理</button>
+  <button id="statusBtn" onclick="showStatus()">⚙ ステータス</button>
 </div> 
+
 <!-- ===== ステータス画面 ===== --> 
 <div id="statusScreen" style="display:none;"> 
-<h1>ステータス</h1> 
-<label><input type="text" id="playerNameInput"></label> 
-<div style="text-align:center; margin: 15px 0;">
-    <canvas id="statusRadar" width="300" height="300"></canvas>
-</div>
-<div id="categoryStatus"></div>
-<button onclick="saveStatus()">保存</button> 
-<button onclick="backHomeFromStatus()">← 戻る</button> 
-<button onclick="resetAllStatus()" class="resetBtn">ステータスリセット</button>
+  <h1>ステータス</h1> 
+  <label><input type="text" id="playerNameInput"></label> 
+  <div style="text-align:center; margin: 15px 0;">
+      <canvas id="statusRadar" width="300" height="300"></canvas>
+  </div>
+  <div id="categoryStatus"></div>
+  <button onclick="saveStatus()">保存</button> 
+  <button onclick="backHomeFromStatus()">← 戻る</button> 
+  <button onclick="resetAllStatus()" class="resetBtn">ステータスリセット</button>
 </div> 
 
 <!-- ===== 管理画面 ===== --> 
 <div id="manageScreen" style="display:none;"> 
-<h1>クエスト管理</h1> 
-<div id="manageCategories"></div> 
-<h2>カテゴリ追加</h2> 
-<input type="text" id="newCategoryInput" placeholder="新しいカテゴリ名"> 
-<button onclick="addCategory()">追加</button> 
-<button id="backBtn" onclick="backHome()">← 戻る</button> 
-</div> 
+  <div style="display:flex; justify-content: space-between; align-items:center;">
+    <h1>クエスト管理</h1>
+    <select id="manageWeekdaySelect" onchange="changeManageWeekday()">
+      <option value="月曜日">月曜日</option>
+      <option value="火曜日">火曜日</option>
+      <option value="水曜日">水曜日</option>
+      <option value="木曜日">木曜日</option>
+      <option value="金曜日">金曜日</option>
+      <option value="土曜日">土曜日</option>
+      <option value="日曜日">日曜日</option>
+    </select>
+  </div>
+  <div id="manageCategories"></div> 
+  <h2>カテゴリ追加</h2> 
+  <input type="text" id="newCategoryInput" placeholder="新しいカテゴリ名"> 
+  <button onclick="addCategory()">追加</button> 
+  <button id="backBtn" onclick="backHome()">← 戻る</button> 
+</div>
 
-<!-- Chart.js 読み込み -->
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script src="script.js"></script> 
 </body> 
 </html>
