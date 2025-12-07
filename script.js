@@ -351,9 +351,9 @@ function updateStatusScreen() {
         label: "ステータス",
         data: values,
         borderWidth: 2,
-        borderColor: "rgba(255,105,180,1)",
-        backgroundColor: "rgba(255,105,180,0.3)",
-        pointBackgroundColor: "rgba(255,105,180,1)"
+        backgroundColor: "rgba(33, 150, 243, 0.4)", // ← 青いエリア
+        borderColor: "rgb(33, 150, 243)",           // ← 青い線
+        pointBackgroundColor: "rgb(33, 150, 243)"   // ← 青い点
       }]
     },
     options: {
