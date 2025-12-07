@@ -118,7 +118,7 @@ button:hover {
 
 /* 入力欄 */
 input[type="text"] {
-  width: 100%;
+  width: 70%;
   padding: 12px;
   margin: 10px 0;
   background: rgba(0, 0, 20, 0.7);
