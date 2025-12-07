@@ -1,154 +1,58 @@
+/* ==== 全体：ギルド風ダーク森背景 ==== */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Cormorant', serif;
   max-width: 500px;
   margin: auto;
   padding: 20px;
-  background-color: #121212;
-  color: #e0e0e0;
+  background: #2e3a29 url("https://www.transparenttextures.com/patterns/wood-pattern.png");
+  color: #f7e9c5;
 }
 
-h1#title {
+/* ==== タイトル ==== */
+h1#title,
+h1,
+h2 {
+  font-family: 'Cinzel', serif;
   text-align: center;
-  color: #2196f3;
+  color: #f5dbaa;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255,220,150,0.4);
 }
 
-.category {
-  background-color: #1e1e1e;
+/* ==== カード（カテゴリなど） ==== */
+.category,
+.category-card {
+  background: #f7e9c5;
+  color: #3a2f1c;
   padding: 15px;
-  margin: 10px 0;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.7);
-}
-
-ul {
-  padding-left: 15px;
-}
-
-li {
-  margin: 6px 0;
-  display: flex;
-  align-items: center;
-  transition: opacity 0.5s ease;
-  padding: 6px;
-  border-radius: 6px;
-}
-
-button {
-  width: 100%;
-  margin-top: 10px;
-  padding: 10px;
-  font-size: 16px;
-  border: none;
-  border-radius: 5px;
-  background-color: #2196f3;
-  color: #121212;
-  font-weight: bold;
-  cursor: pointer;
+  border-radius: 12px;
+  border: 2px solid #d1c08e;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.2),
+              0 4px 8px rgba(0,0,0,0.4);
   transition: 0.2s;
 }
 
-button:hover {
-  background-color: #1976d2;
-  transform: scale(1.05);
+.category-card {
+  min-width: 80%;
+  flex-shrink: 0;
+  scroll-snap-align: center;
 }
 
-button.reset {
-  background-color: #ff5252;
-  color: #fff;
+.category-card:hover,
+.category:hover {
+  border-color: #f5dbaa;
+  box-shadow: inset 0 0 10px rgba(255,220,150,0.35),
+              0 5px 12px rgba(0,0,0,0.45);
 }
 
-button.reset:hover {
-  background-color: #e04848;
+/* カテゴリ名だけ中央 */
+.category-card h2 {
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  color: #3a2f1c;
 }
 
-.delete-btn {
-  background: #ff5252;
-  width: auto;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-left: auto;
-}
-
-input[type="text"] {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  background: #2a2a2a;
-  border: none;
-  border-radius: 5px;
-  color: #fff;
-}
-
-.quest-check {
-  margin-right: 10px;
-  transform: scale(1.2);
-  cursor: pointer;
-}
-
-.clear-text {
-  color: #00eaff;
-  font-weight: bold;
-  margin-left: 10px;
-}
-
-/* レア度カラー */
-.bronze {
-  background-color: #8a5c2e;
-}
-
-.silver {
-  background-color: #9a9a9a;
-  color: #121212;
-}
-
-.gold {
-  background-color: #d4af37;
-  color: #121212;
-}
-
-/* ステータス画面 */
-#statusScreen input[type="text"] {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  background: #2a2a2a;
-  border: none;
-  border-radius: 5px;
-  color: #fff;
-}
-
-.category-rank {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px;
-  margin: 5px 0;
-  background-color: #1e1e1e;
-  border-radius: 6px;
-}
-
-.resetBtn {
-  background: #e74c3c;
-  color: white;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.resetBtn:hover {
-  background: #c0392b;
-}
-
-
-#statusRadar {
-  margin: 15px auto;
-  display: block;
-}
-
-/* ===== カテゴリカードの横スライド UI ===== */
-
+/* ==== 横スライドUI ==== */
 #homeCategories {
   display: flex;
   gap: 20px;
@@ -157,20 +61,98 @@ input[type="text"] {
   padding: 10px;
 }
 
-.category-card {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 16px;
-  padding: 20px;
-  min-width: 80%;            /* 画面の8割 → 1枚ずつ表示される */
-  flex-shrink: 0;
-  scroll-snap-align: center; /* カードが中央で止まる */
-  color: white;
+/* ==== クエストリスト ==== */
+ul {
+  padding-left: 15px;
 }
 
-.category-card h2 {
-  text-align: center;
-  margin-bottom: 10px;
-  font-size: 20px;
+li {
+  margin: 6px 0;
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  border-radius: 6px;
 }
 
+/* ==== チェックボックス ==== */
+.quest-check {
+  margin-right: 10px;
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+/* ==== レア度カラー ==== */
+.bronze { background-color: #b99263; }
+.silver { background-color: #e5e5e5; color: #3a2f1c; }
+.gold   { background-color: #ffdf6b; color: #3a2f1c; }
+
+/* ==== ボタン：木材パネル風 ==== */
+button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 1px;
+  border: 2px solid #d1c08e;
+  border-radius: 8px;
+  background: linear-gradient(#6a4f2f, #4a341f);
+  color: #f7e9c5;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: linear-gradient(#7a5f38, #5a4428);
+  transform: translateY(-2px);
+}
+
+/* ステータスリセット：赤魔法 */
+.resetBtn {
+  background: linear-gradient(#a83232, #7a2525);
+  color: #fff;
+  border-color: #d1a0a0;
+}
+
+.resetBtn:hover {
+  background: linear-gradient(#b83a3a, #8b2d2d);
+  transform: translateY(-2px);
+}
+
+/* ==== 削除ボタン ==== */
+.delete-btn {
+  background: linear-gradient(#a83232, #7a2525);
+  border: 2px solid #d1a0a0;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-family: 'Cinzel', serif;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+/* ==== 入力欄（羊皮紙風） ==== */
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: #f7e9c5;
+  border: 2px solid #d1c08e;
+  border-radius: 6px;
+  color: #3a2f1c;
+  font-family: 'Cormorant', serif;
+}
+
+/* ==== ステータス用 === */
+.category-rank {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px;
+  background: #f7e9c5;
+  color: #3a2f1c;
+  border-radius: 6px;
+  margin: 6px 0;
+}
+
+#statusRadar {
+  margin: 15px auto;
+  display: block;
+}
