@@ -73,9 +73,19 @@ li {
 }
 
 /* レア度カラー */
-.bronze { color: #d7b48a; }
-.silver { color: #e5e5e5; }
-.gold   { color: #ffdf7e; }
+.bronze {
+  color: #b87333;             /* 銅っぽい濃い茶色 */
+  text-shadow: 1px 1px 2px #7a4b24; /* 少し立体感を演出 */
+}
+.silver {
+  color: #c0c0c0;             /* 銀色に近い明るめグレー */
+  text-shadow: 1px 1px 2px #7f7f7f; /* メタリック感 */
+}
+.gold {
+  color: #ffd700;             /* 金色 */
+  text-shadow: 1px 1px 2px #b38f00; /* 立体感・光沢感 */
+}
+
 
 /* ボタン */
 button {
