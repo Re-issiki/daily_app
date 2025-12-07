@@ -316,8 +316,10 @@ function updateStatusScreen(){
 
   const ctx=document.getElementById("statusRadar").getContext("2d");
   if(radarChart) radarChart.destroy();
-  const labels=Object.keys(playerData.categories);
-  const values=labels.map(cat=>rankToNumber(playerData.categories[cat].rank));
+  const labels = Object.keys(playerData.categories)
+  .filter(cat => weekdays.some(day => quests[day][cat] && Object.keys(quests[day]).includes(cat)));
+  const values = labels.map(cat => rankToNumber(playerData.categories[cat].rank));
+
 
   radarChart=new Chart(ctx,{
     type:"radar",
