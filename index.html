@@ -1,52 +1,71 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>自由カテゴリクエスト</title>
-<link rel="stylesheet" href="style.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>クエストアプリ</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<!-- ===== ホーム画面 ===== -->
-<div id="homeScreen">
-  <h1 id="title">今日のクエスト</h1>
-  <div id="homeCategories"></div>
-  <button id="manageBtn" onclick="showManage()">⚙ クエスト管理</button>
-  <button id="statusBtn" onclick="showStatus()">⚙ ステータス</button>
-</div>
+  <!-- ホーム画面 -->
+  <div id="homeScreen" class="screen">
 
-<!-- ===== ステータス画面 ===== -->
-<div id="statusScreen" style="display:none;">
-  <h1>ステータス</h1>
-  <label>名前: <input type="text" id="playerNameInput"></label>
-  <div style="text-align:center; margin: 15px 0;">
-    <canvas id="statusRadar" width="300" height="300"></canvas>
+    <header>
+      <h1>クエスト一覧</h1>
+      <button onclick="showManage()">管理</button>
+      <button onclick="showStatus()">ステータス</button>
+    </header>
+
+    <div id="homeCategories" class="category-container"></div>
+
   </div>
-  <div id="categoryStatus"></div>
-  <button onclick="saveStatus()">保存</button>
-  <button onclick="backHomeFromStatus()">← 戻る</button>
-  <button onclick="resetAllStatus()" class="resetBtn">ステータスリセット</button>
-</div>
 
-<!-- ===== 管理画面 ===== -->
-<div id="manageScreen" style="display:none;">
-  <h1>クエスト管理</h1>
-  <div id="manageCategories"></div>
 
-  <h2>カテゴリ追加</h2>
-  <input type="text" id="newCategoryInput" placeholder="新しいカテゴリ名">
-  <button onclick="addCategory()">追加</button>
+  <!-- 管理画面 -->
+  <div id="manageScreen" class="screen" style="display:none;">
 
-  <button id="backBtn" onclick="backHome()">← 戻る</button>
-</div>
+    <header>
+      <h1>カテゴリ管理</h1>
+      <button onclick="backHome()">戻る</button>
+    </header>
 
-<!-- Chart.js 読み込み -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div id="categoryAddArea">
+      <input type="text" id="newCategoryInput" placeholder="新しいカテゴリ名">
+      <button onclick="addCategory()">追加</button>
+    </div>
 
-<script src="script.js"></script>
+    <div id="manageCategories"></div>
+
+  </div>
+
+
+  <!-- ステータス画面 -->
+  <div id="statusScreen" class="screen" style="display:none;">
+
+    <header>
+      <h1>ステータス</h1>
+      <button onclick="backHomeFromStatus()">戻る</button>
+    </header>
+
+    <div id="statusArea">
+
+      <label>プレイヤー名</label>
+      <input type="text" id="playerNameInput">
+      <button onclick="saveStatus()">保存</button>
+
+      <h2>カテゴリ別 ランク・EXP</h2>
+      <div id="categoryStatus"></div>
+
+      <h2>ステータスチャート</h2>
+      <canvas id="statusRadar" width="300" height="300"></canvas>
+
+      <button onclick="resetAllStatus()">全ステータスリセット</button>
+
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
-

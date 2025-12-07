@@ -1,17 +1,16 @@
 // ===== データ読み込み =====
-// localStorage からデータを取得（なければ初期値を作成）
 let playerData = JSON.parse(localStorage.getItem("playerData")) || {
   name: "名無し",
-  categories: {} // 各カテゴリごとの経験値・ランク
+  categories: {}
 };
 let radarChart = null;
 
-let quests = JSON.parse(localStorage.getItem("quests")) || {}; // クエスト一覧
-let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {}; // ホーム画面に表示するランダム生成結果
+let quests = JSON.parse(localStorage.getItem("quests")) || {};
+let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {};
 
 // ===== ランク関連設定 =====
 const rankOrder = ["F","E","D","C","B","A","S","SS","SSS"];
-const baseExpPerRank = 100; // 最初のランクに必要な経験値
+const baseExpPerRank = 100;
 
 // ===== データ保存 =====
 function saveData() {
@@ -30,7 +29,6 @@ function addCategory() {
   quests[name] = [];
   homeGenerated[name] = [];
 
-  // 新カテゴリにステータスが無い場合は初期化
   if (!playerData.categories[name]) {
     playerData.categories[name] = { exp: 0, rank: "F" };
   }
@@ -75,8 +73,7 @@ function deleteQuest(category, index) {
   renderManage();
 }
 
-// ===== クエスト要素生成 =====
-// チェックしたかどうかで取り消し線・CLEARを反映
+// ===== クエスト生成（取り消し線対応） =====
 function createQuestElement(obj, category, index) {
   const li = document.createElement("li");
   li.classList.add(obj.rarity);
@@ -93,7 +90,6 @@ function createQuestElement(obj, category, index) {
   clearLabel.textContent = "CLEAR";
   clearLabel.classList.add("clear-text");
 
-  // ★ 初期状態で取り消し線と CLEAR を反映
   if (obj.checked) {
     span.style.textDecoration = "line-through";
     clearLabel.style.display = "inline";
@@ -101,9 +97,7 @@ function createQuestElement(obj, category, index) {
     clearLabel.style.display = "none";
   }
 
-  // チェック処理
   checkbox.addEventListener("change", () => {
-    // チェックを外す操作は無効
     if (!checkbox.checked) return;
 
     if (!confirm("このクエストをクリアしますか？")) {
@@ -111,29 +105,23 @@ function createQuestElement(obj, category, index) {
       return;
     }
 
-    // クリア状態に変更
     obj.checked = true;
     span.style.textDecoration = "line-through";
     clearLabel.style.display = "inline";
 
-    // カテゴリの経験値データがない場合は初期化
     if (!playerData.categories[category]) {
       playerData.categories[category] = { exp: 0, rank: "F" };
     }
-    let catData = playerData.categories[category];
 
-    // 経験値加算（レア度による）
+    let catData = playerData.categories[category];
     catData.exp += obj.rarity === "bronze" ? 10 : obj.rarity === "silver" ? 20 : 30;
 
-    // ランクアップ処理
     let currentRank = catData.rank;
     let currentExp = catData.exp;
     let expPerRank = baseExpPerRank;
 
-    // 現ランクまでの必要EXPを計算
     for (let i = 0; i < rankOrder.indexOf(currentRank); i++) expPerRank *= 2;
 
-    // ランクアップループ
     while (currentExp >= expPerRank && rankOrder.indexOf(currentRank) < rankOrder.length - 1) {
       currentExp -= expPerRank;
       currentRank = rankOrder[rankOrder.indexOf(currentRank) + 1];
@@ -158,7 +146,6 @@ function randomQuests(category) {
   const ul = document.getElementById("home_" + category);
   ul.innerHTML = "";
 
-  // ローディング演出
   const loading = document.createElement("li");
   loading.textContent = "生成中";
   ul.appendChild(loading);
@@ -169,24 +156,19 @@ function randomQuests(category) {
     loading.textContent = "生成中" + ".".repeat(dots);
   }, 300);
 
-  // 1.5秒後に生成
   setTimeout(() => {
     clearInterval(interval);
     ul.innerHTML = "";
 
     const list = quests[category];
     const selectedCount = Math.min(3, list.length);
-
-    // クエストをシャッフルして3つ選ぶ
     const shuffled = [...list].sort(() => Math.random() - 0.5);
 
-    // ホーム画面用の生成結果を保存
     homeGenerated[category] = shuffled.slice(0, selectedCount).map(obj => ({
       ...obj,
       checked: false
     }));
 
-    // 生成されたクエストを描画
     homeGenerated[category].forEach((obj, i) => {
       const li = createQuestElement(obj, category, i);
       ul.appendChild(li);
@@ -206,16 +188,15 @@ function renderManage() {
     section.classList.add("category");
 
     const h2 = document.createElement("h2");
+    h2.classList.add("category-title");
     h2.textContent = category;
 
     const delBtn = document.createElement("button");
     delBtn.textContent = "カテゴリ削除";
-    delBtn.classList.add("delete-btn");
     delBtn.onclick = () => deleteCategory(category);
 
     const ul = document.createElement("ul");
 
-    // クエスト一覧を表示
     quests[category].forEach((q, i) => {
       const li = document.createElement("li");
       li.textContent = q.text;
@@ -223,7 +204,6 @@ function renderManage() {
 
       const btn = document.createElement("button");
       btn.textContent = "削除";
-      btn.classList.add("delete-btn");
       btn.onclick = () => deleteQuest(category, i);
 
       li.appendChild(btn);
@@ -243,7 +223,7 @@ function renderManage() {
   }
 }
 
-// ===== ホーム画面描画（横スライドカード版） =====
+// ===== ホーム画面（横スライド版） =====
 function renderHome() {
   const container = document.getElementById("homeCategories");
   container.innerHTML = "";
@@ -253,16 +233,15 @@ function renderHome() {
     card.classList.add("category-card");
 
     const h2 = document.createElement("h2");
+    h2.classList.add("category-title");
     h2.textContent = category;
 
     const ul = document.createElement("ul");
     ul.id = "home_" + category;
 
-    // すでに保存されているランダム生成結果の表示
     if (homeGenerated[category]) {
       homeGenerated[category].forEach((obj, i) => {
-        const li = createQuestElement(obj, category, i);
-        ul.appendChild(li);
+        ul.appendChild(createQuestElement(obj, category, i));
       });
     }
 
@@ -272,7 +251,6 @@ function renderHome() {
 
     const resetBtn = document.createElement("button");
     resetBtn.textContent = "リセット";
-    resetBtn.classList.add("reset");
     resetBtn.onclick = () => {
       ul.innerHTML = "";
       homeGenerated[category] = [];
@@ -297,7 +275,6 @@ function showStatus() {
   updateStatusScreen();
 }
 
-// 名前保存
 function saveStatus() {
   const input = document.getElementById("playerNameInput");
   playerData.name = input.value.trim() || "名無し";
@@ -310,12 +287,11 @@ function backHomeFromStatus() {
   document.getElementById("homeScreen").style.display = "block";
 }
 
-// ステータス更新（経験値バーは削除済み）
+// ===== ステータス更新（レーダーチャートのみ） =====
 function updateStatusScreen() {
   const container = document.getElementById("categoryStatus");
   container.innerHTML = "";
 
-  // カテゴリ一覧を画面表示（テキスト部）
   for (const cat in playerData.categories) {
     const div = document.createElement("div");
     div.classList.add("category-rank");
@@ -325,79 +301,63 @@ function updateStatusScreen() {
     const needExp = getExpForRank(data.rank);
 
     label.textContent = `${cat}: ランク${data.rank} / EXP ${data.exp}/${needExp}`;
-
     div.appendChild(label);
+
     container.appendChild(div);
   }
 
-  // レーダーチャート作成
   const ctx = document.getElementById("statusRadar").getContext("2d");
 
-  // 既に描画済みなら削除してから描き直す
-  if (radarChart) {
-    radarChart.destroy();
-  }
+  if (radarChart) radarChart.destroy();
 
   const labels = Object.keys(playerData.categories);
-  const values = labels.map(cat =>
-    rankToNumber(playerData.categories[cat].rank)
-  );
+  const values = labels.map(cat => rankToNumber(playerData.categories[cat].rank));
 
   radarChart = new Chart(ctx, {
     type: "radar",
     data: {
-      labels: labels,
+      labels,
       datasets: [{
         label: "ステータス",
         data: values,
         borderWidth: 2,
-        backgroundColor: "rgba(33, 150, 243, 0.4)", // ← 青いエリア
-        borderColor: "rgb(33, 150, 243)",           // ← 青い線
-        pointBackgroundColor: "rgb(33, 150, 243)"   // ← 青い点
+        backgroundColor: "rgba(33, 150, 243, 0.4)",
+        borderColor: "rgb(33, 150, 243)",
+        pointBackgroundColor: "rgb(33, 150, 243)"
       }]
     },
     options: {
       scales: {
         r: {
           beginAtZero: true,
-          suggestedMin: 0,
-          suggestedMax: 9, // SSS = 9相当
+          suggestedMax: 9,
           grid: { color: "rgba(255,255,255,0.2)" },
           angleLines: { color: "rgba(255,255,255,0.2)" },
-          ticks: { stepSize: 1, display: false },
-          pointLabels: {
-            color: "#fff",
-            font: { size: 14 }
-          }
+          ticks: { display: false },
+          pointLabels: { color: "#fff", font: { size: 14 } }
         }
       },
       plugins: {
-        legend: {
-          labels: { color: "#fff" }
-        }
+        legend: { labels: { color: "#fff" } }
       }
     }
   });
 }
 
-
-// ランクの必要EXP計算
 function getExpForRank(rank) {
   let exp = baseExpPerRank;
   for (let i = 0; i < rankOrder.indexOf(rank); i++) exp *= 2;
   return exp;
 }
 
-//レーダーチャート用ランク変換
 function rankToNumber(rank) {
-  const order = ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS"];
-  return order.indexOf(rank) + 1; // F=1, E=2, D=3 …
+  return rankOrder.indexOf(rank) + 1;
 }
-
 
 // ===== ステータス全リセット =====
 function resetAllStatus() {
   if (!confirm("本当に全てのカテゴリのステータスをリセットしますか？")) return;
+
   for (const cat in playerData.categories) {
     playerData.categories[cat] = { exp: 0, rank: "F" };
   }
