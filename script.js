@@ -208,8 +208,8 @@ function renderManage() {
   container.innerHTML = "";
 
   for (const category in quests) {
-    const section = document.createElement("div");
-    section.classList.add("category");
+    const card = document.createElement("div");
+    card.classList.add("manage-card");
 
     const h2 = document.createElement("h2");
     h2.textContent = category;
@@ -221,7 +221,6 @@ function renderManage() {
 
     const ul = document.createElement("ul");
 
-    // クエスト一覧を表示
     quests[category].forEach((q, i) => {
       const li = document.createElement("li");
       li.textContent = q.text;
@@ -237,15 +236,15 @@ function renderManage() {
     });
 
     const addBtn = document.createElement("button");
-    addBtn.textContent = "追加";
+    addBtn.textContent = "クエスト追加";
     addBtn.onclick = () => addQuestToCategory(category);
 
-    section.appendChild(h2);
-    section.appendChild(delBtn);
-    section.appendChild(ul);
-    section.appendChild(addBtn);
+    card.appendChild(h2);
+    card.appendChild(delBtn);
+    card.appendChild(ul);
+    card.appendChild(addBtn);
 
-    container.appendChild(section);
+    container.appendChild(card);
   }
 }
 
