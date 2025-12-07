@@ -368,6 +368,15 @@ function resetAllStatus(){
   saveData();
 }
 
+//全データ削除
+function resetAllData(){
+  if(!confirm("本当に全データをリセットしますか？")) return;
+  localStorage.removeItem("playerData");
+  localStorage.removeItem("quests");
+  localStorage.removeItem("homeGenerated");
+  location.reload(); // ページを再読み込みして初期状態に
+}
+
 // ===== 画面切替 =====
 function showManage(){
   document.getElementById("homeScreen").style.display="none";
