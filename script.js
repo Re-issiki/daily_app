@@ -243,14 +243,14 @@ function renderManage() {
   }
 }
 
-// ===== ホーム画面描画 =====
+// ===== ホーム画面描画（横スライドカード版） =====
 function renderHome() {
   const container = document.getElementById("homeCategories");
   container.innerHTML = "";
 
   for (const category in quests) {
-    const section = document.createElement("div");
-    section.classList.add("category");
+    const card = document.createElement("div");
+    card.classList.add("category-card");
 
     const h2 = document.createElement("h2");
     h2.textContent = category;
@@ -258,7 +258,7 @@ function renderHome() {
     const ul = document.createElement("ul");
     ul.id = "home_" + category;
 
-    // 保存されたランダム生成結果を表示
+    // すでに保存されているランダム生成結果の表示
     if (homeGenerated[category]) {
       homeGenerated[category].forEach((obj, i) => {
         const li = createQuestElement(obj, category, i);
@@ -279,12 +279,12 @@ function renderHome() {
       saveData();
     };
 
-    section.appendChild(h2);
-    section.appendChild(ul);
-    section.appendChild(genBtn);
-    section.appendChild(resetBtn);
+    card.appendChild(h2);
+    card.appendChild(ul);
+    card.appendChild(genBtn);
+    card.appendChild(resetBtn);
 
-    container.appendChild(section);
+    container.appendChild(card);
   }
 }
 

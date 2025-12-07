@@ -147,3 +147,28 @@ input[type="text"] {
   margin: 0 auto;
 }
 
+/* ===== カテゴリカード：横スライドビュー ===== */
+
+#homeCategories {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 10px;
+}
+
+.category-card {
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 16px;
+  min-width: 85%;         /* 画面の8〜9割 → 1枚ずつ見える */
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.category-card h2 {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 22px;
+}
