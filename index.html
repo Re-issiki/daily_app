@@ -20,6 +20,9 @@
 <div id="statusScreen" style="display:none;">
   <h1>ステータス</h1>
   <label>名前: <input type="text" id="playerNameInput"></label>
+  <div style="text-align:center; margin: 15px 0;">
+    <canvas id="statusRadar" width="300" height="300"></canvas>
+  </div>
   <div id="categoryStatus"></div>
   <button onclick="saveStatus()">保存</button>
   <button onclick="backHomeFromStatus()">← 戻る</button>
@@ -37,9 +40,6 @@
 
   <button id="backBtn" onclick="backHome()">← 戻る</button>
 </div>
-
-<!-- レーダーチャート表示用 -->
-<canvas id="statusRadar" width="300" height="300"></canvas>
 
 <!-- Chart.js 読み込み -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

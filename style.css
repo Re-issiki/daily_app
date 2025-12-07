@@ -127,3 +127,9 @@ input[type="text"] {
   background-color: #1e1e1e;
   border-radius: 6px;
 }
+
+#statusRadar {
+  display: block;
+  margin: 0 auto;
+}
+
