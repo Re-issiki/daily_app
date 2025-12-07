@@ -4,7 +4,16 @@ body {
   max-width: 500px;
   margin: auto;
   padding: 20px;
-  background: #2e3a29 url("https://www.transparenttextures.com/patterns/wood-pattern.png");
+
+  /* ====== 背景：魔術的ダークブルーグラデ ====== */
+  background: radial-gradient(circle at 50% 30%, #1c2340 0%, #0b0f1c 70%, #05060a 100%);
+
+  /* 粒子（魔力のきらめき） */
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.08) 0px, transparent 150px),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.05) 0px, transparent 200px),
+    radial-gradient(circle at 60% 90%, rgba(255,255,255,0.04) 0px, transparent 180px);
+
   color: #f7e9c5;
 }
 
