@@ -46,11 +46,11 @@ function addCategory(){
   const name = input.value.trim();
   if(!name) return;
 
-  weekdays.forEach(day=>{
-    if(!quests[day][name]) quests[day][name]=[];
-    if(!homeGenerated[day][name]) homeGenerated[day][name]=[];
-  });
+  // ✅ 現在管理中の曜日だけに追加
+  if(!quests[currentManageWeekday][name]) quests[currentManageWeekday][name]=[];
+  if(!homeGenerated[currentManageWeekday][name]) homeGenerated[currentManageWeekday][name]=[];
 
+  // ステータス用データは全体で1回だけ
   if(!playerData.categories[name]) playerData.categories[name]={exp:0, rank:"F"};
 
   input.value="";
@@ -61,10 +61,9 @@ function addCategory(){
 
 // ===== カテゴリ削除 =====
 function deleteCategory(name){
-  weekdays.forEach(day=>{
-    delete quests[day][name];
-    delete homeGenerated[day][name];
-  });
+  // ✅ 現在管理中の曜日だけ削除
+  delete quests[currentManageWeekday][name];
+  delete homeGenerated[currentManageWeekday][name];
 
   // 他の曜日にも存在していなければステータスから削除
   const stillExists = weekdays.some(day => quests[day][name] && Object.keys(quests[day]).includes(name));
