@@ -18,7 +18,7 @@ h1, h2 {
 }
 
 /* ==== 青ウィンドウ（透明＋ネオンサイン風） ==== */
-.window, .category-card, .manage-card {
+.window, .category-card, .manage-card, .emergency-card {
   background: rgba(0, 60, 140, 0.35);
   border: 2px solid rgba(180, 220, 255, 0.5);
   backdrop-filter: blur(6px);
@@ -26,6 +26,7 @@ h1, h2 {
   padding: 15px;
   color: white;
   box-shadow: 0 0 12px rgba(0,140,255,0.3);
+  margin-bottom: 12px;
 }
 
 /* ==== 横スライド共通 ==== */
@@ -124,7 +125,7 @@ button:hover {
 }
 
 /* 入力欄 */
-input[type="text"] {
+input[type="text"], input[type="datetime-local"] {
   width: 70%;
   padding: 12px;
   margin: 10px 0;
@@ -148,52 +149,16 @@ input[type="text"] {
   margin: 20px auto;
 }
 
-/* ==== 緊急クエスト横スライド ==== */
-#emergencyList {
-  display: flex;
-  gap: 20px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 10px;
-}
-
+/* 緊急クエストカード */
 .emergency-card {
-  min-width: 80%;
-  flex-shrink: 0;
-  scroll-snap-align: center;
-  background: rgba(200, 30, 30, 0.35);
-  border: 2px solid rgba(255, 120, 120, 0.5);
-  backdrop-filter: blur(6px);
-  border-radius: 12px;
-  padding: 15px;
-  color: white;
-  box-shadow: 0 0 12px rgba(255,80,80,0.3);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .emergency-card span {
+  display: block;
+  margin-bottom: 4px;
   text-align: center;
-  font-weight: bold;
 }
 
-.emergency-card button {
-  width: 100%;
-  padding: 10px;
-  background: rgba(180, 20, 20, 0.4);
-  border: 2px solid rgba(255, 150, 150, 0.6);
-  border-radius: 10px;
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(255, 80, 80, 0.4);
-}
-
-.emergency-card button:hover {
-  background: rgba(220, 40, 40, 0.45);
-  transform: translateY(-2px);
-}
-
-/* 緊急クエストのレア度カラー */
-.emergency-card .bronze { color: #b87333; text-shadow: 1px 1px 2px #7a4b24; }
-.emergency-card .silver { color: #c0c0c0; text-shadow: 1px 1px 2px #7f7f7f; }
-.emergency-card .gold { color: #ffd700; text-shadow: 1px 1px 2px #b38f00; }

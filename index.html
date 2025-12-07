@@ -22,10 +22,15 @@
       <option value="日曜日">日曜日</option>
     </select>
   </div>
+
   <div id="homeCategories"></div>
+
+  <!-- 緊急クエスト一覧ボタン -->
+  <button id="emergencyBtn" onclick="showEmergency()">🆘 緊急クエスト一覧</button>
+
   <button id="manageBtn" onclick="showManage()">⚙ クエスト管理</button>
   <button id="statusBtn" onclick="showStatus()">⚙ ステータス</button>
-</div> 
+</div>
 
 <!-- ===== ステータス画面 ===== --> 
 <div id="statusScreen" style="display:none;"> 
@@ -38,7 +43,7 @@
   <button onclick="saveStatus()">保存</button> 
   <button onclick="backHomeFromStatus()">← 戻る</button> 
   <button onclick="resetAllStatus()" class="resetBtn">ステータスリセット</button>
-</div> 
+</div>
 
 <!-- ===== 管理画面 ===== --> 
 <div id="manageScreen" style="display:none;"> 
@@ -54,11 +59,18 @@
       <option value="日曜日">日曜日</option>
     </select>
   </div>
-  <button onclick="showEmergencyScreen()">🆘 緊急クエスト一覧</button>
+
   <div id="manageCategories"></div> 
+
   <h2>カテゴリ追加</h2> 
   <input type="text" id="newCategoryInput" placeholder="新しいカテゴリ名"> 
   <button onclick="addCategory()">追加</button> 
+
+  <h2>緊急クエスト追加</h2>
+  <input type="text" id="newEmergencyInput" placeholder="緊急クエスト名">
+  <input type="datetime-local" id="newEmergencyDeadline">
+  <button onclick="addEmergencyQuest()">追加</button>
+
   <button id="backBtn" onclick="backHome()">← 戻る</button> 
 </div>
 
@@ -66,16 +78,7 @@
 <div id="emergencyScreen" style="display:none;">
   <h1>緊急クエスト一覧</h1>
   <div id="emergencyList"></div>
-  <h2>緊急クエスト追加</h2>
-  <input type="text" id="emergencyText" placeholder="緊急クエスト内容">
-  <input type="datetime-local" id="emergencyDeadline">
-  <select id="emergencyRarity">
-    <option value="bronze">bronze</option>
-    <option value="silver">silver</option>
-    <option value="gold">gold</option>
-  </select>
-  <button onclick="addEmergencyQuest()">追加</button>
-  <button onclick="backFromEmergency()">← 戻る</button>
+  <button onclick="backHomeFromEmergency()">← ホームに戻る</button>
 </div>
 
 <!-- Chart.js -->

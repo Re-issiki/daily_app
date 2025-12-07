@@ -1,10 +1,10 @@
 // ===== 初期データ =====
 const weekdays = ["月曜日","火曜日","水曜日","木曜日","金曜日","土曜日","日曜日"];
 let playerData = JSON.parse(localStorage.getItem("playerData")) || {name:"名無し", categories:{}};
-let quests = JSON.parse(localStorage.getItem("quests")) || {}; 
+let quests = JSON.parse(localStorage.getItem("quests")) || {};
 let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {};
-let emergencyQuests = JSON.parse(localStorage.getItem("emergencyQuests")) || [];
 let radarChart = null;
+let emergencyQuests = JSON.parse(localStorage.getItem("emergencyQuests")) || [];
 
 // 各曜日の初期化
 weekdays.forEach(day=>{
@@ -16,9 +16,7 @@ const rankOrder = ["F","E","D","C","B","A","S","SS","SSS"];
 const baseExpPerRank = 100;
 
 // ===== ランク変換 =====
-function rankToNumber(rank){
-  return rankOrder.indexOf(rank)+1;
-}
+function rankToNumber(rank){ return rankOrder.indexOf(rank)+1; }
 
 // ===== データ保存 =====
 function saveData(){
@@ -28,19 +26,13 @@ function saveData(){
   localStorage.setItem("emergencyQuests", JSON.stringify(emergencyQuests));
 }
 
-// ===== ホーム画面曜日 =====
+// ===== ホーム曜日切替 =====
 let currentHomeWeekday = "月曜日";
-function changeHomeWeekday(){
-  currentHomeWeekday = document.getElementById("homeWeekdaySelect").value;
-  renderHome();
-}
+function changeHomeWeekday(){ currentHomeWeekday = document.getElementById("homeWeekdaySelect").value; renderHome(); }
 
-// ===== 管理画面曜日 =====
+// ===== 管理曜日切替 =====
 let currentManageWeekday = "月曜日";
-function changeManageWeekday(){
-  currentManageWeekday = document.getElementById("manageWeekdaySelect").value;
-  renderManage();
-}
+function changeManageWeekday(){ currentManageWeekday = document.getElementById("manageWeekdaySelect").value; renderManage(); }
 
 // ===== カテゴリ追加 =====
 function addCategory(){
@@ -65,9 +57,7 @@ function deleteCategory(name){
   delete homeGenerated[currentManageWeekday][name];
 
   const stillExists = weekdays.some(day => quests[day][name] && Object.keys(quests[day]).includes(name));
-  if(!stillExists){
-    delete playerData.categories[name];
-  }
+  if(!stillExists){ delete playerData.categories[name]; }
 
   saveData();
   renderManage();
@@ -112,19 +102,13 @@ function createQuestElement(obj, category, index){
   clearLabel.textContent="CLEAR";
   clearLabel.classList.add("clear-text");
 
-  if(obj.checked){
-    span.style.textDecoration="line-through";
-    clearLabel.style.display="inline";
-  }else{
-    clearLabel.style.display="none";
-  }
+  if(obj.checked){ span.style.textDecoration="line-through"; clearLabel.style.display="inline"; }
+  else{ clearLabel.style.display="none"; }
 
   checkbox.addEventListener("change",()=>{
     if(!checkbox.checked) return;
-    if(!confirm("このクエストをクリアしますか？")){
-      checkbox.checked=false;
-      return;
-    }
+    if(!confirm("このクエストをクリアしますか？")){ checkbox.checked=false; return; }
+
     obj.checked=true;
     span.style.textDecoration="line-through";
     clearLabel.style.display="inline";
@@ -165,10 +149,7 @@ function randomQuests(category){
   ul.appendChild(loading);
 
   let dots=0;
-  const interval=setInterval(()=>{
-    dots=(dots+1)%4;
-    loading.textContent="生成中"+".".repeat(dots);
-  },300);
+  const interval=setInterval(()=>{ dots=(dots+1)%4; loading.textContent="生成中"+".".repeat(dots); },300);
 
   setTimeout(()=>{
     clearInterval(interval);
@@ -179,11 +160,7 @@ function randomQuests(category){
     const shuffled=[...list].sort(()=>Math.random()-0.5);
 
     homeGenerated[currentHomeWeekday][category]=shuffled.slice(0,selectedCount).map(obj=>({...obj, checked:false}));
-
-    homeGenerated[currentHomeWeekday][category].forEach((obj,i)=>{
-      const li=createQuestElement(obj, category,i);
-      ul.appendChild(li);
-    });
+    homeGenerated[currentHomeWeekday][category].forEach((obj,i)=>{ ul.appendChild(createQuestElement(obj, category,i)); });
 
     saveData();
   },1500);
@@ -230,7 +207,6 @@ function renderManage(){
     card.appendChild(delBtn);
     card.appendChild(ul);
     card.appendChild(addBtn);
-
     container.appendChild(card);
   });
 }
@@ -252,8 +228,7 @@ function renderHome(){
     ul.id="home_"+category;
 
     homeGenerated[currentHomeWeekday][category]?.forEach((obj,i)=>{
-      const li=createQuestElement(obj, category,i);
-      ul.appendChild(li);
+      ul.appendChild(createQuestElement(obj, category,i));
     });
 
     const genBtn=document.createElement("button");
@@ -273,32 +248,19 @@ function renderHome(){
     card.appendChild(ul);
     card.appendChild(genBtn);
     card.appendChild(resetBtn);
-
     container.appendChild(card);
   });
 }
 
 // ===== ステータス画面 =====
-function showStatus(){
-  document.getElementById("homeScreen").style.display="none";
-  document.getElementById("statusScreen").style.display="block";
-  document.getElementById("playerNameInput").value=playerData.name;
-  updateStatusScreen();
-}
-
-function saveStatus(){
-  const input=document.getElementById("playerNameInput");
-  playerData.name=input.value.trim()||"名無し";
-  saveData();
-  alert("保存しました");
-}
-
-function backHomeFromStatus(){
-  document.getElementById("statusScreen").style.display="none";
-  document.getElementById("homeScreen").style.display="block";
-}
-
+function showStatus(){ document.getElementById("homeScreen").style.display="none"; document.getElementById("statusScreen").style.display="block"; document.getElementById("playerNameInput").value=playerData.name; updateStatusScreen(); }
+function saveStatus(){ const input=document.getElementById("playerNameInput"); playerData.name=input.value.trim()||"名無し"; saveData(); alert("保存しました"); }
+function backHomeFromStatus(){ document.getElementById("statusScreen").style.display="none"; document.getElementById("homeScreen").style.display="block"; }
 function updateStatusScreen(){
+  for (const cat in playerData.categories) {
+    const exists = weekdays.some(day => quests[day][cat] && Object.keys(quests[day]).includes(cat));
+    if (!exists) delete playerData.categories[cat];
+  }
   const container=document.getElementById("categoryStatus");
   container.innerHTML="";
   for(const cat in playerData.categories){
@@ -306,7 +268,7 @@ function updateStatusScreen(){
     div.classList.add("category-rank");
     const label=document.createElement("span");
     const data=playerData.categories[cat];
-    const needExp=getExpForRank(data.rank);
+    const needExp=baseExpPerRank*(2**rankOrder.indexOf(data.rank));
     label.textContent=`${cat}: ランク${data.rank} / EXP ${data.exp}/${needExp}`;
     div.appendChild(label);
     container.appendChild(div);
@@ -314,7 +276,7 @@ function updateStatusScreen(){
 
   const ctx=document.getElementById("statusRadar").getContext("2d");
   if(radarChart) radarChart.destroy();
-  const labels = Object.keys(playerData.categories);
+  const labels = Object.keys(playerData.categories).filter(cat=>weekdays.some(day=>quests[day][cat]));
   const values = labels.map(cat=>rankToNumber(playerData.categories[cat].rank));
 
   radarChart=new Chart(ctx,{
@@ -346,91 +308,71 @@ function updateStatusScreen(){
     }
   });
 }
-
-function getExpForRank(rank){
-  let exp=baseExpPerRank;
-  for(let i=0;i<rankOrder.indexOf(rank);i++) exp*=2;
-  return exp;
-}
-
-function resetAllStatus(){
-  if(!confirm("本当に全てのカテゴリのステータスをリセットしますか？")) return;
-  for(const cat in playerData.categories) playerData.categories[cat]={exp:0, rank:"F"};
-  updateStatusScreen();
-  saveData();
-}
+function resetAllStatus(){ if(!confirm("本当に全てのカテゴリのステータスをリセットしますか？")) return; for(const cat in playerData.categories) playerData.categories[cat]={exp:0, rank:"F"}; updateStatusScreen(); saveData(); }
 
 // ===== 画面切替 =====
-function showManage(){
-  document.getElementById("homeScreen").style.display="none";
-  document.getElementById("manageScreen").style.display="block";
-  renderManage();
-}
+function showManage(){ document.getElementById("homeScreen").style.display="none"; document.getElementById("manageScreen").style.display="block"; renderManage(); }
+function backHome(){ document.getElementById("manageScreen").style.display="none"; document.getElementById("homeScreen").style.display="block"; renderHome(); }
 
-function backHome(){
-  document.getElementById("manageScreen").style.display="none";
-  document.getElementById("homeScreen").style.display="block";
-  renderHome();
-}
-
-// ===== 緊急クエスト =====
-function showEmergencyScreen(){
-  document.getElementById("manageScreen").style.display="none";
-  document.getElementById("emergencyScreen").style.display="block";
-  renderEmergencyList();
-}
-
-function backFromEmergency(){
-  document.getElementById("emergencyScreen").style.display="none";
-  document.getElementById("manageScreen").style.display="block";
-}
-
+// ===== 緊急クエスト管理 =====
 function addEmergencyQuest(){
-  const text = document.getElementById("emergencyText").value.trim();
-  const deadline = document.getElementById("emergencyDeadline").value;
-  const rarity = document.getElementById("emergencyRarity").value;
-  if(!text || !deadline) return alert("内容と期限を入力してください。");
-  emergencyQuests.push({text, deadline, rarity});
-  document.getElementById("emergencyText").value="";
-  document.getElementById("emergencyDeadline").value="";
+  const text = document.getElementById("newEmergencyInput").value.trim();
+  const deadline = document.getElementById("newEmergencyDeadline").value;
+  if(!text || !deadline){ alert("名前と期限を入力してください"); return; }
+
+  emergencyQuests.push({text, deadline});
+  document.getElementById("newEmergencyInput").value = "";
+  document.getElementById("newEmergencyDeadline").value = "";
   saveData();
-  renderEmergencyList();
+  renderEmergency();
 }
 
-function renderEmergencyList(){
+function showEmergency(){
+  document.getElementById("homeScreen").style.display="none";
+  document.getElementById("emergencyScreen").style.display="block";
+  renderEmergency();
+}
+
+function backHomeFromEmergency(){
+  document.getElementById("emergencyScreen").style.display="none";
+  document.getElementById("homeScreen").style.display="block";
+}
+
+function renderEmergency(){
   const container = document.getElementById("emergencyList");
   container.innerHTML = "";
+  if(emergencyQuests.length===0){
+    const p = document.createElement("p");
+    p.textContent = "現在、緊急クエストはありません";
+    p.style.textAlign = "center";
+    container.appendChild(p);
+    return;
+  }
 
-  const now = new Date();
-
-  emergencyQuests.forEach((q, index) => {
-    const questEnd = new Date(q.deadline);
-    if(questEnd < now) return;
-
+  emergencyQuests.forEach((q,i)=>{
     const card = document.createElement("div");
-    card.classList.add("category-card");
+    card.classList.add("manage-card");
 
-    const span = document.createElement("span");
-    span.textContent = `${q.text} (期限: ${q.deadline})`;
-    span.classList.add(q.rarity);
+    const spanName = document.createElement("span");
+    spanName.textContent = q.text;
+    card.appendChild(spanName);
 
-    const btn = document.createElement("button");
-    btn.textContent = "クリア";
-    btn.onclick = () => {
-      if(confirm("この緊急クエストをクリアしますか？")){
-        emergencyQuests.splice(index,1);
-        saveData();
-        renderEmergencyList();
-      }
-    }
+    const spanDeadline = document.createElement("span");
+    spanDeadline.textContent = `期限: ${q.deadline}`;
+    card.appendChild(spanDeadline);
 
-    card.appendChild(span);
-    card.appendChild(btn);
+    const clearBtn = document.createElement("button");
+    clearBtn.textContent = "クリア";
+    clearBtn.onclick = ()=>{
+      if(!confirm("この緊急クエストをクリアしますか？")) return;
+      emergencyQuests.splice(i,1);
+      saveData();
+      renderEmergency();
+    };
+    card.appendChild(clearBtn);
     container.appendChild(card);
   });
 }
 
 // ===== 初期処理 =====
-document.addEventListener("DOMContentLoaded",()=>{
-  renderHome();
-});
+document.addEventListener("DOMContentLoaded",()=>{ renderHome(); });
