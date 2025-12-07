@@ -93,7 +93,7 @@ input[type="text"] {
   margin-left: 10px;
 }
 
-/*===== レア度背景色 =====*/
+/* レア度カラー */
 .bronze {
   background-color: #8a5c2e;
 }
@@ -108,7 +108,7 @@ input[type="text"] {
   color: #121212;
 }
 
-/*===== ステータス画面 =====*/
+/* ステータス画面 */
 #statusScreen input[type="text"] {
   width: 100%;
   padding: 10px;
@@ -119,11 +119,6 @@ input[type="text"] {
   color: #fff;
 }
 
-#statusScreen p {
-  font-size: 18px;
-  margin: 10px 0;
-}
-
 .category-rank {
   display: flex;
   justify-content: space-between;
@@ -131,17 +126,4 @@ input[type="text"] {
   margin: 5px 0;
   background-color: #1e1e1e;
   border-radius: 6px;
-}
-
-.exp-bar {
-  height: 12px;
-  background-color: #2196f3;
-  border-radius: 6px;
-}
-.exp-container {
-  flex: 1;
-  margin-left: 10px;
-  background-color: #333;
-  border-radius: 6px;
-  overflow: hidden;
 }

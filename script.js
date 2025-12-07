@@ -1,17 +1,18 @@
 // ===== データ読み込み =====
+// localStorage からデータを取得（なければ初期値を作成）
 let playerData = JSON.parse(localStorage.getItem("playerData")) || {
   name: "名無し",
-  categories: {} // カテゴリごとのランク・経験値
+  categories: {} // 各カテゴリごとの経験値・ランク
 };
 
-let quests = JSON.parse(localStorage.getItem("quests")) || {};
-let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {};
+let quests = JSON.parse(localStorage.getItem("quests")) || {}; // クエスト一覧
+let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {}; // ホーム画面に表示するランダム生成結果
 
-// ===== ランク定義 =====
+// ===== ランク関連設定 =====
 const rankOrder = ["F","E","D","C","B","A","S","SS","SSS"];
-const baseExpPerRank = 100; // ランクアップに必要な初期経験値
+const baseExpPerRank = 100; // 最初のランクに必要な経験値
 
-// ===== 保存 =====
+// ===== データ保存 =====
 function saveData() {
   localStorage.setItem("quests", JSON.stringify(quests));
   localStorage.setItem("homeGenerated", JSON.stringify(homeGenerated));
@@ -22,10 +23,13 @@ function saveData() {
 function addCategory() {
   const input = document.getElementById("newCategoryInput");
   const name = input.value.trim();
+
   if (!name || quests[name]) return;
 
   quests[name] = [];
   homeGenerated[name] = [];
+
+  // 新カテゴリにステータスが無い場合は初期化
   if (!playerData.categories[name]) {
     playerData.categories[name] = { exp: 0, rank: "F" };
   }
@@ -41,6 +45,7 @@ function deleteCategory(name) {
   delete quests[name];
   delete homeGenerated[name];
   delete playerData.categories[name];
+
   saveData();
   renderManage();
   renderHome();
@@ -69,7 +74,8 @@ function deleteQuest(category, index) {
   renderManage();
 }
 
-// ===== クエスト要素作成（確認付きチェック） =====
+// ===== クエスト要素生成 =====
+// チェックしたかどうかで取り消し線・CLEARを反映
 function createQuestElement(obj, category, index) {
   const li = document.createElement("li");
   li.classList.add(obj.rarity);
@@ -85,34 +91,48 @@ function createQuestElement(obj, category, index) {
   const clearLabel = document.createElement("span");
   clearLabel.textContent = "CLEAR";
   clearLabel.classList.add("clear-text");
-  clearLabel.style.display = obj.checked ? "inline" : "none";
 
+  // ★ 初期状態で取り消し線と CLEAR を反映
+  if (obj.checked) {
+    span.style.textDecoration = "line-through";
+    clearLabel.style.display = "inline";
+  } else {
+    clearLabel.style.display = "none";
+  }
+
+  // チェック処理
   checkbox.addEventListener("change", () => {
-    if (!checkbox.checked) return; // チェック外す場合は無視
+    // チェックを外す操作は無効
+    if (!checkbox.checked) return;
 
     if (!confirm("このクエストをクリアしますか？")) {
       checkbox.checked = false;
       return;
     }
 
+    // クリア状態に変更
     obj.checked = true;
     span.style.textDecoration = "line-through";
     clearLabel.style.display = "inline";
 
+    // カテゴリの経験値データがない場合は初期化
     if (!playerData.categories[category]) {
       playerData.categories[category] = { exp: 0, rank: "F" };
     }
     let catData = playerData.categories[category];
 
-    // 経験値加算
+    // 経験値加算（レア度による）
     catData.exp += obj.rarity === "bronze" ? 10 : obj.rarity === "silver" ? 20 : 30;
 
-    // ランクアップ判定
+    // ランクアップ処理
     let currentRank = catData.rank;
     let currentExp = catData.exp;
     let expPerRank = baseExpPerRank;
+
+    // 現ランクまでの必要EXPを計算
     for (let i = 0; i < rankOrder.indexOf(currentRank); i++) expPerRank *= 2;
 
+    // ランクアップループ
     while (currentExp >= expPerRank && rankOrder.indexOf(currentRank) < rankOrder.length - 1) {
       currentExp -= expPerRank;
       currentRank = rankOrder[rankOrder.indexOf(currentRank) + 1];
@@ -137,6 +157,7 @@ function randomQuests(category) {
   const ul = document.getElementById("home_" + category);
   ul.innerHTML = "";
 
+  // ローディング演出
   const loading = document.createElement("li");
   loading.textContent = "生成中";
   ul.appendChild(loading);
@@ -147,16 +168,24 @@ function randomQuests(category) {
     loading.textContent = "生成中" + ".".repeat(dots);
   }, 300);
 
+  // 1.5秒後に生成
   setTimeout(() => {
     clearInterval(interval);
     ul.innerHTML = "";
 
     const list = quests[category];
     const selectedCount = Math.min(3, list.length);
+
+    // クエストをシャッフルして3つ選ぶ
     const shuffled = [...list].sort(() => Math.random() - 0.5);
 
-    homeGenerated[category] = shuffled.slice(0, selectedCount).map(obj => ({ ...obj, checked:false }));
+    // ホーム画面用の生成結果を保存
+    homeGenerated[category] = shuffled.slice(0, selectedCount).map(obj => ({
+      ...obj,
+      checked: false
+    }));
 
+    // 生成されたクエストを描画
     homeGenerated[category].forEach((obj, i) => {
       const li = createQuestElement(obj, category, i);
       ul.appendChild(li);
@@ -166,7 +195,7 @@ function randomQuests(category) {
   }, 1500);
 }
 
-// ===== 管理画面 =====
+// ===== 管理画面描画 =====
 function renderManage() {
   const container = document.getElementById("manageCategories");
   container.innerHTML = "";
@@ -177,17 +206,15 @@ function renderManage() {
 
     const h2 = document.createElement("h2");
     h2.textContent = category;
-    section.appendChild(h2);
 
     const delBtn = document.createElement("button");
     delBtn.textContent = "カテゴリ削除";
     delBtn.classList.add("delete-btn");
     delBtn.onclick = () => deleteCategory(category);
-    section.appendChild(delBtn);
 
     const ul = document.createElement("ul");
-    section.appendChild(ul);
 
+    // クエスト一覧を表示
     quests[category].forEach((q, i) => {
       const li = document.createElement("li");
       li.textContent = q.text;
@@ -205,13 +232,17 @@ function renderManage() {
     const addBtn = document.createElement("button");
     addBtn.textContent = "追加";
     addBtn.onclick = () => addQuestToCategory(category);
+
+    section.appendChild(h2);
+    section.appendChild(delBtn);
+    section.appendChild(ul);
     section.appendChild(addBtn);
 
     container.appendChild(section);
   }
 }
 
-// ===== ホーム画面 =====
+// ===== ホーム画面描画 =====
 function renderHome() {
   const container = document.getElementById("homeCategories");
   container.innerHTML = "";
@@ -222,12 +253,11 @@ function renderHome() {
 
     const h2 = document.createElement("h2");
     h2.textContent = category;
-    section.appendChild(h2);
 
     const ul = document.createElement("ul");
     ul.id = "home_" + category;
-    section.appendChild(ul);
 
+    // 保存されたランダム生成結果を表示
     if (homeGenerated[category]) {
       homeGenerated[category].forEach((obj, i) => {
         const li = createQuestElement(obj, category, i);
@@ -238,7 +268,6 @@ function renderHome() {
     const genBtn = document.createElement("button");
     genBtn.textContent = "生成";
     genBtn.onclick = () => randomQuests(category);
-    section.appendChild(genBtn);
 
     const resetBtn = document.createElement("button");
     resetBtn.textContent = "リセット";
@@ -248,6 +277,10 @@ function renderHome() {
       homeGenerated[category] = [];
       saveData();
     };
+
+    section.appendChild(h2);
+    section.appendChild(ul);
+    section.appendChild(genBtn);
     section.appendChild(resetBtn);
 
     container.appendChild(section);
@@ -263,6 +296,7 @@ function showStatus() {
   updateStatusScreen();
 }
 
+// 名前保存
 function saveStatus() {
   const input = document.getElementById("playerNameInput");
   playerData.name = input.value.trim() || "名無し";
@@ -275,9 +309,11 @@ function backHomeFromStatus() {
   document.getElementById("homeScreen").style.display = "block";
 }
 
+// ステータス更新（経験値バーは削除済み）
 function updateStatusScreen() {
   const container = document.getElementById("categoryStatus");
   container.innerHTML = "";
+
   for (const cat in playerData.categories) {
     const data = playerData.categories[cat];
 
@@ -292,13 +328,14 @@ function updateStatusScreen() {
   }
 }
 
+// ランクの必要EXP計算
 function getExpForRank(rank) {
   let exp = baseExpPerRank;
   for (let i = 0; i < rankOrder.indexOf(rank); i++) exp *= 2;
   return exp;
 }
 
-// ===== ステータス一括リセット =====
+// ===== ステータス全リセット =====
 function resetAllStatus() {
   if (!confirm("本当に全てのカテゴリのステータスをリセットしますか？")) return;
   for (const cat in playerData.categories) {
@@ -321,6 +358,7 @@ function backHome() {
   renderHome();
 }
 
+// 初期処理
 document.addEventListener("DOMContentLoaded", () => {
   renderHome();
 });
