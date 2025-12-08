@@ -248,3 +248,25 @@ input[type="text"], input[type="datetime-local"] {
     0 0 28px rgba(255,0,0,0.6),
     0 0 40px rgba(255,0,0,0.4);
 }
+
+#homeBackupArea {
+  position: fixed;
+  right: 8px;
+  bottom: 8px;
+  text-align: right;
+  opacity: 0.4;
+}
+
+#homeBackupArea:hover {
+  opacity: 0.9;
+}
+
+.backupButton.subtle {
+  background: transparent;
+  border: none;
+  color: #88a;
+  font-size: 11px;
+  padding: 0 4px;
+  text-decoration: underline;
+  cursor: pointer;
+}
