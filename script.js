@@ -674,6 +674,59 @@ function renderStatusAchievements() {
   });
 }
 
+// バックアップ保存（JSONダウンロード）
+function downloadBackup() {
+    const data = {};
+
+    // localStorage全体を取り出す
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        data[key] = localStorage.getItem(key);
+    }
+
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "backup_data.json"; // 保存されるファイル名
+    a.click();
+
+    URL.revokeObjectURL(url);
+    alert("バックアップをダウンロードしました！");
+}
+
+
+// バックアップ復元（JSON読み込み）
+function restoreBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+
+            // localStorage をいったん全消去するかは任意
+            // 安全のため、ここでは上書きのみ（消さない）
+            for (const key in data) {
+                localStorage.setItem(key, data[key]);
+            }
+
+            alert("バックアップを復元しました！再読み込みします。");
+            location.reload();
+
+        } catch (err) {
+            alert("バックアップの読み込みに失敗しました。ファイルが壊れている可能性があります。");
+        }
+    };
+
+    reader.readAsText(file);
+}
+
+
 
 // ===== 初期処理 =====
 document.addEventListener("DOMContentLoaded",()=>{

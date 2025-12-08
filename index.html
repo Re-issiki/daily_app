@@ -29,6 +29,10 @@
   <button id="manageBtn" onclick="showManage()">⚙ クエスト管理</button>
   <button id="statusBtn" onclick="showStatus()">⚙ ステータス</button>
   <button id="achievementsBtn" onclick="showAchievements()">⚙ 実績一覧</button>
+  <button onclick="downloadBackup()">バックアップを保存</button>
+  <input type="file" id="backupFile" style="display:none;" onchange="restoreBackup(event)">
+  <button onclick="document.getElementById('backupFile').click()">バックアップを復元</button>
+
 </div>
 
 <!-- ===== ステータス画面 ===== --> 
