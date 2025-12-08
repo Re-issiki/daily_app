@@ -265,6 +265,7 @@ function showStatus(){
   document.getElementById("statusScreen").style.display="block"; 
   document.getElementById("playerNameInput").value=playerData.name; 
   updateStatusScreen(); 
+  renderStatusAchievements();
 }
 function saveStatus(){ 
   const input=document.getElementById("playerNameInput"); 
@@ -644,7 +645,35 @@ function saveSelectedAchievements(){
   saveData();
   alert("実績を保存しました");
   backHomeFromAchievements();
+  renderStatusAchievements();
 }
+
+function renderStatusAchievements() {
+  const selected = JSON.parse(localStorage.getItem("selectedAchievements") || "[]");
+  const all = JSON.parse(localStorage.getItem("achievements") || "[]");
+
+  const container = document.getElementById("statusAchievements");
+  container.innerHTML = "";
+
+  selected.forEach(id => {
+    const ach = all.find(a => a.id === id);
+    if (!ach) return;
+
+    // ランク→クラス名変換
+    let rankClass = "";
+    if (ach.rank === "銅") rankClass = "rank-bronze";
+    if (ach.rank === "銀") rankClass = "rank-silver";
+    if (ach.rank === "金") rankClass = "rank-gold";
+    if (ach.rank === "赤") rankClass = "rank-red";
+
+    const div = document.createElement("div");
+    div.className = `achievement-card ${rankClass}`;
+    div.textContent = ach.name;
+
+    container.appendChild(div);
+  });
+}
+
 
 // ===== 初期処理 =====
 document.addEventListener("DOMContentLoaded",()=>{

@@ -184,3 +184,40 @@ input[type="text"], input[type="datetime-local"] {
   margin-left: 10px;
 }
 
+/* ===== ステータス画面：実績表示 ===== */
+.status-achievements {
+  display: flex;
+  flex-direction: column;   /* ←縦に並べる */
+  gap: 12px;
+  margin: 20px 0;
+  padding: 0 10px;
+}
+
+/* 実績カードの基本スタイル */
+.achievement-card {
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: white;
+  box-shadow: 0 0 8px rgba(0,0,0,0.25);
+}
+
+/* ランクごとの色テーマ */
+.rank-bronze {
+  background: linear-gradient(135deg, #b87333, #d4915d);
+}
+
+.rank-silver {
+  background: linear-gradient(135deg, #c0c0c0, #e0e0e0);
+}
+
+.rank-gold {
+  background: linear-gradient(135deg, #ffcc00, #ffdd55);
+}
+
+.rank-red {
+  background: linear-gradient(135deg, #d40000, #ff4444);
+}
+
