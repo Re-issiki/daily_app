@@ -15,7 +15,7 @@ weekdays.forEach(day=>{
 });
 
 const rankOrder = ["F","E","D","C","B","A","S","SS","SSS"];
-const baseExpPerRank = 100;
+const baseExpPerRank = 250;
 
 // ===== ユーティリティ =====
 function genId(){ return Date.now().toString(36) + Math.floor(Math.random()*1000).toString(36); }
