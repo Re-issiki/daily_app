@@ -184,40 +184,67 @@ input[type="text"], input[type="datetime-local"] {
   margin-left: 10px;
 }
 
-/* ===== ステータス画面：実績表示 ===== */
+/* ===== ステータス画面：実績表示（改良版） ===== */
 .status-achievements {
   display: flex;
-  flex-direction: column;   /* ←縦に並べる */
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
   margin: 20px 0;
-  padding: 0 10px;
+  padding: 0 12px;
 }
 
-/* 実績カードの基本スタイル */
+/* 実績カード自体は控えめに透明青 */
 .achievement-card {
-  padding: 12px;
-  border-radius: 10px;
+  background: rgba(0, 80, 200, 0.15);
+  border: 1px solid rgba(0, 120, 255, 0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+
+  font-size: 1.05rem;
+  font-weight: 700;
   text-align: center;
-  font-weight: bold;
-  font-size: 1.1rem;
+
+  /* カードはあくまで控えめ。影も弱め */
+  box-shadow: 0 0 6px rgba(0, 120, 255, 0.25);
+
+  /* 文字を目立たせるためカードの色は薄く */
   color: white;
-  box-shadow: 0 0 8px rgba(0,0,0,0.25);
 }
 
-/* ランクごとの色テーマ */
+
+/* ===== ランクごとの文字発光エフェクト ===== */
+
+/* 銅：オレンジに光る */
 .rank-bronze {
-  background: linear-gradient(135deg, #b87333, #d4915d);
+  color: #ff8f3a;
+  text-shadow:
+    0 0 6px rgba(255,140,60,0.8),
+    0 0 12px rgba(255,120,40,0.5);
 }
 
+/* 銀：白銀に輝く */
 .rank-silver {
-  background: linear-gradient(135deg, #c0c0c0, #e0e0e0);
+  color: #e7e7e7;
+  text-shadow:
+    0 0 6px rgba(230,230,230,0.8),
+    0 0 14px rgba(200,200,200,0.6);
 }
 
+/* 金：黄金に強めの輝き */
 .rank-gold {
-  background: linear-gradient(135deg, #ffcc00, #ffdd55);
+  color: #ffdf3d;
+  text-shadow:
+    0 0 8px rgba(255,220,80,0.9),
+    0 0 16px rgba(255,200,40,0.7),
+    0 0 24px rgba(255,190,20,0.5);
 }
 
+/* 赤（最高）：燃え盛る光演出 */
 .rank-red {
-  background: linear-gradient(135deg, #d40000, #ff4444);
+  color: #ff4b4b;
+  text-shadow:
+    0 0 8px rgba(255,60,60,0.9),
+    0 0 16px rgba(255,40,40,0.8),
+    0 0 28px rgba(255,0,0,0.6),
+    0 0 40px rgba(255,0,0,0.4);
 }
-
