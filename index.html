@@ -25,11 +25,10 @@
 
   <div id="homeCategories"></div>
 
-  <!-- 緊急クエスト一覧ボタン -->
   <button id="emergencyBtn" onclick="showEmergency()">⚙ 緊急クエスト</button>
-
   <button id="manageBtn" onclick="showManage()">⚙ クエスト管理</button>
   <button id="statusBtn" onclick="showStatus()">⚙ ステータス</button>
+  <button id="achievementsBtn" onclick="showAchievements()">⚙ 実績一覧</button>
 </div>
 
 <!-- ===== ステータス画面 ===== --> 
@@ -80,6 +79,30 @@
   <div id="emergencyList"></div>
   <button onclick="backHomeFromEmergency()">← ホームに戻る</button>
 </div>
+
+<!-- ===== 実績一覧 ===== -->
+<div id="achievementScreen" style="display:none;">
+  <h1>実績一覧</h1>
+
+  <div id="achievementList"></div>
+
+  <h2>新しい実績を追加</h2>
+  <input type="text" id="newAchievementName" placeholder="実績名（例：英検準1級）">
+  <select id="newAchievementRank">
+    <option value="銅">銅</option>
+    <option value="銀">銀</option>
+    <option value="金">金</option>
+    <option value="赤">赤（最高）</option>
+  </select>
+  <button onclick="addAchievement()">追加</button>
+
+  <h2>ステータスに表示する実績（3つまで）</h2>
+  <div id="achievementSelect"></div>
+
+  <button onclick="saveSelectedAchievements()">保存</button>
+  <button onclick="backHomeFromAchievements()">← 戻る</button>
+</div>
+
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
