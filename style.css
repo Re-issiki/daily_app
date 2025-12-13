@@ -279,3 +279,9 @@ input[type="text"], input[type="datetime-local"] {
     0 0 22px rgba(40,180,255,0.5);
 }
 
+.manage-card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
