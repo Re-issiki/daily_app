@@ -3,6 +3,8 @@ const weekdays = ["月曜日","火曜日","水曜日","木曜日","金曜日","�
 let playerData = JSON.parse(localStorage.getItem("playerData")) || {name:"名無し", categories:{}};
 let quests = JSON.parse(localStorage.getItem("quests")) || {};
 let homeGenerated = JSON.parse(localStorage.getItem("homeGenerated")) || {};
+let categoryOrder =
+  JSON.parse(localStorage.getItem("categoryOrder")) || {};
 let emergencyQuests = JSON.parse(localStorage.getItem("emergencyQuests")) || [];
 let achievements = JSON.parse(localStorage.getItem("achievements")) || []; // {id, name, rank}
 let selectedAchievements = JSON.parse(localStorage.getItem("selectedAchievements")) || []; // array of achievement ids
@@ -12,6 +14,7 @@ let radarChart = null;
 weekdays.forEach(day=>{
   if(!quests[day]) quests[day]={};
   if(!homeGenerated[day]) homeGenerated[day]={};
+  if(!categoryOrder[day]) categoryOrder[day]=[];
 });
 
 const rankOrder = ["F","E","D","C","B","A","S","SS","SSS"];
@@ -26,6 +29,18 @@ const rarityExp = {
 // ===== ユーティリティ =====
 function genId(){ return Date.now().toString(36) + Math.floor(Math.random()*1000).toString(36); }
 function rankToNumber(rank){ return rankOrder.indexOf(rank)+1; }
+function moveCategory(day, index, direction){
+  const order = categoryOrder[day];
+  const newIndex = index + direction;
+  if(newIndex < 0 || newIndex >= order.length) return;
+
+  [order[index], order[newIndex]] =
+    [order[newIndex], order[index]];
+
+  saveData();
+  renderManage();
+  renderHome();
+}
 
 // ===== データ保存 =====
 function saveData(){
@@ -35,6 +50,7 @@ function saveData(){
   localStorage.setItem("emergencyQuests", JSON.stringify(emergencyQuests));
   localStorage.setItem("achievements", JSON.stringify(achievements));
   localStorage.setItem("selectedAchievements", JSON.stringify(selectedAchievements));
+  localStorage.setItem("categoryOrder", JSON.stringify(categoryOrder));
 }
 
 // ===== ホーム曜日切替 =====
@@ -57,6 +73,9 @@ function addCategory(){
   if(!name) return;
 
   if(!quests[currentManageWeekday][name]) quests[currentManageWeekday][name]=[];
+  if(!categoryOrder[currentManageWeekday].includes(name)){
+    categoryOrder[currentManageWeekday].push(name);
+  }
   if(!homeGenerated[currentManageWeekday][name]) homeGenerated[currentManageWeekday][name]=[];
 
   if(!playerData.categories[name]) playerData.categories[name]={exp:0, rank:"F"};
@@ -70,6 +89,8 @@ function addCategory(){
 // ===== カテゴリ削除 =====
 function deleteCategory(name){
   delete quests[currentManageWeekday][name];
+  categoryOrder[currentManageWeekday] =
+  categoryOrder[currentManageWeekday].filter(c=>c!==name);
   delete homeGenerated[currentManageWeekday][name];
 
   const stillExists = weekdays.some(day => quests[day][name] && Object.keys(quests[day]).includes(name));
@@ -267,14 +288,20 @@ function randomQuests(category){
 function renderManage(){
   const container=document.getElementById("manageCategories");
   container.innerHTML="";
-  const categories=Object.keys(quests[currentManageWeekday]||{});
+  const categories = categoryOrder[currentManageWeekday] || [];
 
-  categories.forEach(category=>{
+  categories.forEach((category, index)=>{
     const card=document.createElement("div");
     card.classList.add("manage-card");
 
     const h2=document.createElement("h2");
     h2.textContent=category;
+    const upBtn = document.createElement("button");
+    upBtn.textContent = "↑";
+    upBtn.onclick = ()=>moveCategory(currentManageWeekday, index, -1);
+    const downBtn = document.createElement("button");
+    downBtn.textContent = "↓";
+    downBtn.onclick = ()=>moveCategory(currentManageWeekday, index, 1);
 
     const delBtn=document.createElement("button");
     delBtn.textContent="カテゴリ削除";
@@ -304,6 +331,8 @@ function renderManage(){
     addBtn.onclick=()=>addQuestToCategory(category);
 
     card.appendChild(h2);
+    card.appendChild(upBtn);
+    card.appendChild(downBtn);
     card.appendChild(delBtn);
     card.appendChild(copyBtn);
     card.appendChild(ul);
@@ -316,7 +345,7 @@ function renderManage(){
 function renderHome(){
   const container=document.getElementById("homeCategories");
   container.innerHTML="";
-  const categories=Object.keys(quests[currentHomeWeekday]||{});
+  const categories = categoryOrder[currentHomeWeekday] || [];
 
   categories.forEach(category=>{
     const card=document.createElement("div");
