@@ -38,8 +38,13 @@ function saveData(){
 }
 
 // ===== ホーム曜日切替 =====
-let currentHomeWeekday = "月曜日";
-function changeHomeWeekday(){ currentHomeWeekday = document.getElementById("homeWeekdaySelect").value; renderHome(); }
+let currentHomeWeekday =
+  localStorage.getItem("currentHomeWeekday") || "月曜日";
+function changeHomeWeekday(){ 
+  currentHomeWeekday = document.getElementById("homeWeekdaySelect").value;
+  localStorage.setItem("currentHomeWeekday", currentHomeWeekday); 
+  renderHome(); 
+}
 
 // ===== 管理曜日切替 =====
 let currentManageWeekday = "月曜日";
