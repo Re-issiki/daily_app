@@ -182,6 +182,10 @@ function copyCategoryToAnotherDay(fromDay, category){
   quests[targetDay][category] =
     quests[fromDay][category].map(q => ({ ...q, checked:false }));
 
+  if(!categoryOrder[targetDay].includes(category)){
+    categoryOrder[targetDay].push(category);
+  }
+
   // homeGenerated も初期化
   homeGenerated[targetDay][category] = [];
 
