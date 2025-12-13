@@ -9,7 +9,6 @@ let emergencyQuests = JSON.parse(localStorage.getItem("emergencyQuests")) || [];
 let achievements = JSON.parse(localStorage.getItem("achievements")) || []; // {id, name, rank}
 let selectedAchievements = JSON.parse(localStorage.getItem("selectedAchievements")) || []; // array of achievement ids
 let radarChart = null;
-let habits = JSON.parse(localStorage.getItem("habits")) || [];
 
 // 各曜日の初期化
 weekdays.forEach(day=>{
@@ -58,7 +57,6 @@ function saveData(){
   localStorage.setItem("achievements", JSON.stringify(achievements));
   localStorage.setItem("selectedAchievements", JSON.stringify(selectedAchievements));
   localStorage.setItem("categoryOrder", JSON.stringify(categoryOrder));
-  localStorage.setItem("habits", JSON.stringify(habits));
 }
 
 // ===== ホーム曜日切替 =====
@@ -416,105 +414,7 @@ function renderHome(){
     card.appendChild(resetBtn);
     container.appendChild(card);
   });
- 
-  
-  // ===== 生活改善（習慣） =====
-  const habitCard = document.createElement("div");
-  habitCard.classList.add("category-card");
-  const h2 = document.createElement("h2");
-  h2.textContent = "生活改善";
-  const ul = document.createElement("ul");
-  ul.id = "habitList";
-  // 今は表示だけ（中身は⑤でやる）
-  habits.forEach(h=>{
-    const li = document.createElement("li");
-    const chk = document.createElement("input");
-    chk.type = "checkbox";
-    // 今日すでにやってたらチェック済み
-    chk.checked = h.lastDone === todayStr();
-    chk.onchange = ()=>{
-      handleHabitCheck(h.id);
-    };
-    const span = document.createElement("span");
-    const title = habitTitle(h.streak);
-    span.textContent =
-    `${h.name}（${h.streak}日） ${title}`;
-    li.appendChild(chk);
-    li.appendChild(span);
-    ul.appendChild(li);
-  });
-
-  const addBtn = document.createElement("button");
-  addBtn.textContent = "習慣を追加";
-  addBtn.onclick = ()=>addHabit(); // ⑤で作る
-  habitCard.appendChild(h2);
-  habitCard.appendChild(ul);
-  habitCard.appendChild(addBtn);
-  container.appendChild(habitCard);
 }
-
-function addHabit(){
-  const name = prompt("継続したい習慣を入力してください");
-  if(!name) return;
-
-  habits.push({
-    id: genId(),
-    name: name.trim(),
-    streak: 0,
-    lastDone: null
-  });
-
-  saveData();
-  renderHome();
-}
-
-function todayStr(){
-  const d = new Date();
-  return d.toISOString().split("T")[0];
-}
-
-function handleHabitCheck(id){
-  const habit = habits.find(h=>h.id===id);
-  if(!habit) return;
-
-  const today = todayStr();
-
-  // 同じ日に2回はカウントしない
-  if(habit.lastDone === today) return;
-
-  // 昨日の日付を作る
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yStr = yesterday.toISOString().split("T")[0];
-
-  if(habit.lastDone === yStr){
-    // 連続成功
-    habit.streak += 1;
-  } else {
-    // 途切れた
-    habit.streak = 1;
-  }
-
-  habit.lastDone = today;
-  const title = habitTitle(habit.streak);
-
-  if(title){
-    setTimeout(()=>{
-      alert(`${habit.name}\n${habit.streak}日達成！\n${title}`);
-    }, 100);
-  }
-  saveData();
-  renderHome();
-}
-
-function habitTitle(streak){
-  if(streak >= 30) return "👑 生活の一部";
-  if(streak >= 14) return "💎 定着";
-  if(streak >= 7)  return "🔥 習慣化";
-  if(streak >= 3)  return "🌱 芽生え";
-  return "";
-}
-
 
 // ===== ステータス画面 =====
 function showStatus(){ 
@@ -905,12 +805,6 @@ function saveSelectedAchievements(){
   renderStatusAchievements();
 }
 
-function todayStr(){
-  return new Date().toISOString().slice(0,10);
-}
-
-
-
 // バックアップ保存（JSONダウンロード）
 function downloadBackup() {
     const data = {};
@@ -962,6 +856,8 @@ function restoreBackup(event) {
 
     reader.readAsText(file);
 }
+
+
 
 // ===== 初期処理 =====
 document.addEventListener("DOMContentLoaded",()=>{
