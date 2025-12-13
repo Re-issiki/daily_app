@@ -270,3 +270,12 @@ input[type="text"], input[type="datetime-local"] {
   text-decoration: underline;
   cursor: pointer;
 }
+
+.diamond {
+  color: #4deaff;
+  text-shadow:
+    0 0 6px rgba(80,220,255,0.9),
+    0 0 14px rgba(60,200,255,0.7),
+    0 0 22px rgba(40,180,255,0.5);
+}
+

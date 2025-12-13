@@ -16,6 +16,12 @@ weekdays.forEach(day=>{
 
 const rankOrder = ["F","E","D","C","B","A","S","SS","SSS"];
 const baseExpPerRank = 250;
+const rarityExp = {
+  bronze: 10,
+  silver: 20,
+  gold: 30,
+  diamond: 50
+};
 
 // ===== ユーティリティ =====
 function genId(){ return Date.now().toString(36) + Math.floor(Math.random()*1000).toString(36); }
@@ -72,17 +78,64 @@ function deleteCategory(name){
 
 // ===== クエスト追加 =====
 function addQuestToCategory(category){
-  const text = prompt("クエストを入力:");
+  const text = prompt("クエスト名を入力");
   if(!text) return;
-  const rarity = prompt("レア度を入力（bronze / silver / gold）");
-  if(!["bronze","silver","gold"].includes(rarity)){
-    alert("bronze / silver / gold のどれかを入力してください。");
-    return;
-  }
-  quests[currentManageWeekday][category].push({text, rarity});
-  saveData();
-  renderManage();
+
+  // レア度選択用の簡易UI
+  const wrapper = document.createElement("div");
+  wrapper.style.position = "fixed";
+  wrapper.style.top = "0";
+  wrapper.style.left = "0";
+  wrapper.style.width = "100%";
+  wrapper.style.height = "100%";
+  wrapper.style.background = "rgba(0,0,0,0.6)";
+  wrapper.style.display = "flex";
+  wrapper.style.alignItems = "center";
+  wrapper.style.justifyContent = "center";
+  wrapper.style.zIndex = "9999";
+
+  const box = document.createElement("div");
+  box.style.background = "rgba(0,60,140,0.95)";
+  box.style.padding = "20px";
+  box.style.borderRadius = "12px";
+  box.style.width = "80%";
+  box.style.maxWidth = "300px";
+  box.style.textAlign = "center";
+
+  const label = document.createElement("div");
+  label.textContent = "レア度を選択";
+  label.style.marginBottom = "10px";
+
+  const select = document.createElement("select");
+  ["bronze","silver","gold","diamond"].forEach(r=>{
+    const opt = document.createElement("option");
+    opt.value = r;
+    opt.textContent = r;
+    select.appendChild(opt);
+  });
+
+  select.style.width = "100%";
+  select.style.padding = "10px";
+  select.style.marginBottom = "12px";
+
+  const okBtn = document.createElement("button");
+  okBtn.textContent = "追加";
+
+  okBtn.onclick = ()=>{
+    quests[currentManageWeekday][category].push({
+      text: text.trim(),
+      rarity: select.value
+    });
+    document.body.removeChild(wrapper);
+    saveData();
+    renderManage();
+  };
+
+  box.append(label, select, okBtn);
+  wrapper.appendChild(box);
+  document.body.appendChild(wrapper);
 }
+
 
 // ===== クエスト削除 =====
 function deleteQuest(category, index){
@@ -121,7 +174,7 @@ function createQuestElement(obj, category, index){
 
     if(!playerData.categories[category]) playerData.categories[category]={exp:0, rank:"F"};
     let catData = playerData.categories[category];
-    catData.exp += obj.rarity==="bronze"?10:obj.rarity==="silver"?20:30;
+    catData.exp += rarityExp[obj.rarity] || 0;
 
     let currentRank = catData.rank;
     let currentExp = catData.exp;
