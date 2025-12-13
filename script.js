@@ -136,6 +136,38 @@ function addQuestToCategory(category){
   document.body.appendChild(wrapper);
 }
 
+//カテゴリコピー機能
+function copyCategoryToAnotherDay(fromDay, category){
+  const targetDay = prompt(
+    "コピー先の曜日を入力してください\n" + weekdays.join(" / "),
+    "火曜日"
+  );
+  if(!targetDay || !weekdays.includes(targetDay)) return;
+
+  // コピー元が存在しない場合は中止
+  if(!quests[fromDay] || !quests[fromDay][category]) return;
+
+  // すでに同名カテゴリがある場合は確認
+  if(quests[targetDay][category]){
+    if(!confirm("コピー先に同じカテゴリがあります。上書きしますか？")) return;
+  }
+
+  // 深いコピー（参照切り）
+  quests[targetDay][category] =
+    quests[fromDay][category].map(q => ({ ...q, checked:false }));
+
+  // homeGenerated も初期化
+  homeGenerated[targetDay][category] = [];
+
+  // ステータス用カテゴリがなければ作る
+  if(!playerData.categories[category]){
+    playerData.categories[category] = { exp:0, rank:"F" };
+  }
+
+  saveData();
+  alert(`${category} を ${targetDay} にコピーしました`);
+}
+
 
 // ===== クエスト削除 =====
 function deleteQuest(category, index){
@@ -241,6 +273,9 @@ function renderManage(){
 
     const delBtn=document.createElement("button");
     delBtn.textContent="カテゴリ削除";
+    const copyBtn = document.createElement("button");
+    copyBtn.textContent = "他の曜日にコピー";
+    copyBtn.onclick = ()=>copyCategoryToAnotherDay(currentManageWeekday, category);
     delBtn.classList.add("delete-btn");
     delBtn.onclick=()=>deleteCategory(category);
 
@@ -265,6 +300,7 @@ function renderManage(){
 
     card.appendChild(h2);
     card.appendChild(delBtn);
+    card.appendChild(copyBtn);
     card.appendChild(ul);
     card.appendChild(addBtn);
     container.appendChild(card);
