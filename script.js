@@ -824,5 +824,9 @@ function restoreBackup(event) {
 
 // ===== 初期処理 =====
 document.addEventListener("DOMContentLoaded",()=>{
+  const select = document.getElementById("homeWeekdaySelect");
+  if(select){
+    select.value = currentHomeWeekday;
+  }
   renderHome();
 });
