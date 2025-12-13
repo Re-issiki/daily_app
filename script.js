@@ -21,9 +21,15 @@ const rankOrder = ["F","E","D","C","B","A","S","SS","SSS"];
 const baseExpPerRank = 250;
 const rarityExp = {
   bronze: 10,
-  silver: 20,
-  gold: 30,
-  diamond: 50
+  silver: 30,
+  gold: 50,
+  diamond: 100
+};
+const questGenerateRate = {
+  bronze: 6,
+  silver: 3,
+  gold: 1,
+  diamond: 0.3
 };
 
 // ===== ユーティリティ =====
@@ -261,6 +267,21 @@ function createQuestElement(obj, category, index){
   return li;
 }
 
+//抽選確率
+function pickQuestByRarity(list){
+  const weighted = [];
+
+  list.forEach(q=>{
+    const weight = questGenerateRate[q.rarity] || 0;
+    for(let i=0;i<weight*10;i++){ // 精度調整（×10）
+      weighted.push(q);
+    }
+  });
+
+  if(weighted.length === 0) return null;
+  return weighted[Math.floor(Math.random()*weighted.length)];
+}
+
 // ===== ランダム生成 =====
 function randomQuests(category){
   const ul=document.getElementById("home_"+category);
@@ -279,9 +300,18 @@ function randomQuests(category){
 
     const list = quests[currentHomeWeekday][category] || [];
     const selectedCount=Math.min(3,list.length);
-    const shuffled=[...list].sort(()=>Math.random()-0.5);
+    const generated = [];
+    const pool = [...list];
 
-    homeGenerated[currentHomeWeekday][category]=shuffled.slice(0,selectedCount).map(obj=>({...obj, checked:false}));
+    while(generated.length < selectedCount && pool.length > 0){
+      const q = pickQuestByRarity(pool);
+      if(!q) break;
+      generated.push({ ...q, checked:false });
+      // 同じクエストを連続で出さない
+      const idx = pool.indexOf(q);
+      if(idx !== -1) pool.splice(idx,1);
+    }
+    homeGenerated[currentHomeWeekday][category] = generated;
     (homeGenerated[currentHomeWeekday][category]||[]).forEach((obj,i)=>{ ul.appendChild(createQuestElement(obj, category,i)); });
 
     saveData();
