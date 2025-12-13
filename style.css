@@ -39,8 +39,8 @@ h1, h2 {
 }
 
 .category-card, .manage-card {
-  min-width: 80%;
-  flex-shrink: 0;
+  flex: 0 0 80%;
+  box-sizing: border-box;
   scroll-snap-align: center;
 }
 
