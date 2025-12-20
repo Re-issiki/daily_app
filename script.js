@@ -3,7 +3,7 @@ const home = document.getElementById("home");
 const status = document.getElementById("status");
 const edit = document.getElementById("edit");
 
-const viewName = viewName = document.getElementById("viewName");
+const viewName = document.getElementById("viewName");
 const viewSchool = document.getElementById("viewSchool");
 const ach1 = document.getElementById("ach1");
 const ach2 = document.getElementById("ach2");
@@ -25,7 +25,7 @@ const inputAch2 = document.getElementById("inputAch2");
 const inputAch3 = document.getElementById("inputAch3");
 const newStatusName = document.getElementById("newStatusName");
 
-let chart;
+let chart = null;
 let currentKey = "";
 
 // ===== データ =====
@@ -56,10 +56,14 @@ function minutesToRank(m) {
 }
 
 // ===== 初期化 =====
-for (let i = 0; i <= 24; i++) hourSelect.innerHTML += `<option>${i}</option>`;
-for (let i = 0; i <= 60; i++) minuteSelect.innerHTML += `<option>${i}</option>`;
+for (let i = 0; i <= 24; i++) {
+  hourSelect.innerHTML += `<option value="${i}">${i}</option>`;
+}
+for (let i = 0; i <= 60; i++) {
+  minuteSelect.innerHTML += `<option value="${i}">${i}</option>`;
+}
 
-// ===== 表示 =====
+// ===== ホーム =====
 function renderHome() {
   viewName.textContent = `名前：${profile.name}`;
   viewSchool.textContent = `所属：${profile.school}`;
@@ -69,7 +73,10 @@ function renderHome() {
 
   statusButtons.innerHTML = "";
   Object.keys(statusData).forEach(k => {
-    statusButtons.innerHTML += `<button onclick="openStatus('${k}')">${statusData[k].title}</button>`;
+    const btn = document.createElement("button");
+    btn.textContent = statusData[k].title;
+    btn.onclick = () => openStatus(k);
+    statusButtons.appendChild(btn);
   });
 }
 
@@ -92,31 +99,46 @@ function updateItemSelect() {
 }
 
 function addItem() {
-  if (!newItemName.value) return;
-  statusData[currentKey].items.push({ name: newItemName.value, minutes: 0 });
+  if (!currentKey || !newItemName.value) return;
+
+  statusData[currentKey].items.push({
+    name: newItemName.value,
+    minutes: 0
+  });
+
   newItemName.value = "";
   updateItemSelect();
   drawChart();
 }
 
 function addStudy() {
-  const idx = itemSelect.value;
-  const m = hourSelect.value * 60 + Number(minuteSelect.value);
-  if (!m) return;
-  statusData[currentKey].items[idx].minutes += m;
+  if (itemSelect.value === "") return;
+
+  const m =
+    Number(hourSelect.value) * 60 +
+    Number(minuteSelect.value);
+
+  if (m <= 0) return;
+
+  statusData[currentKey].items[itemSelect.value].minutes += m;
   drawChart();
 }
 
 // ===== チャート =====
 function drawChart() {
   const items = statusData[currentKey].items;
+
   if (chart) chart.destroy();
+  if (items.length === 0) return;
 
   chart = new Chart(radarChart, {
     type: "radar",
     data: {
       labels: items.map(i => i.name),
-      datasets: [{ data: items.map(i => minutesToRank(i.minutes)) }]
+      datasets: [{
+        data: items.map(i => minutesToRank(i.minutes)),
+        fill: true
+      }]
     },
     options: {
       scales: {
@@ -146,15 +168,25 @@ function openEdit() {
 
 function addStatus() {
   if (!newStatusName.value) return;
+
   const key = "s" + Date.now();
-  statusData[key] = { title: newStatusName.value, items: [] };
+  statusData[key] = {
+    title: newStatusName.value,
+    items: []
+  };
+
   newStatusName.value = "";
+  renderHome();
 }
 
 function saveData() {
   profile.name = inputName.value;
   profile.school = inputSchool.value;
-  profile.achievements = [inputAch1.value, inputAch2.value, inputAch3.value];
+  profile.achievements = [
+    inputAch1.value,
+    inputAch2.value,
+    inputAch3.value
+  ];
   backHome();
 }
 
