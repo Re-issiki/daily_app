@@ -9,10 +9,9 @@
 </head>
 <body>
 
-<!-- ホーム画面 -->
+<!-- ホーム -->
 <div id="home" class="screen">
   <h1>プロフィール</h1>
-
   <div class="card">
     <p id="viewName"></p>
     <p id="viewSchool"></p>
@@ -26,10 +25,7 @@
   </div>
 
   <h2>ステータス</h2>
-  <div class="card">
-    <button onclick="openStatus('body')">身体能力</button>
-    <button onclick="openStatus('math')">数学</button>
-  </div>
+  <div class="card" id="statusButtons"></div>
 
   <button class="edit" onclick="openEdit()">＋ データ入力</button>
 </div>
@@ -42,9 +38,16 @@
   <canvas id="radarChart"></canvas>
 
   <div class="card">
+    <h2>項目追加</h2>
+    <input id="newItemName" placeholder="項目名">
+    <button onclick="addItem()">追加</button>
+  </div>
+
+  <div class="card">
     <h2>勉強時間を追加</h2>
     <select id="itemSelect"></select>
-    <input type="number" id="addHours" placeholder="時間">
+    <select id="hourSelect"></select> 時間
+    <select id="minuteSelect"></select> 分
     <button onclick="addStudy()">追加</button>
   </div>
 </div>
@@ -57,21 +60,18 @@
   <div class="card">
     <label>名前</label>
     <input id="inputName">
-
     <label>所属</label>
     <input id="inputSchool">
-
-    <label>実績1</label>
-    <input id="inputAch1">
-    <label>実績2</label>
-    <input id="inputAch2">
-    <label>実績3</label>
-    <input id="inputAch3">
+    <label>実績1</label><input id="inputAch1">
+    <label>実績2</label><input id="inputAch2">
+    <label>実績3</label><input id="inputAch3">
   </div>
 
-  <h2>数学ステータス項目</h2>
-  <div class="card" id="editItems"></div>
-  <button onclick="addItem()">＋ 項目追加</button>
+  <h2>ステータス追加</h2>
+  <div class="card">
+    <input id="newStatusName" placeholder="例：英語">
+    <button onclick="addStatus()">追加</button>
+  </div>
 
   <button onclick="saveData()">保存</button>
 </div>

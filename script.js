@@ -3,23 +3,27 @@ const home = document.getElementById("home");
 const status = document.getElementById("status");
 const edit = document.getElementById("edit");
 
-const viewName = document.getElementById("viewName");
+const viewName = viewName = document.getElementById("viewName");
 const viewSchool = document.getElementById("viewSchool");
 const ach1 = document.getElementById("ach1");
 const ach2 = document.getElementById("ach2");
 const ach3 = document.getElementById("ach3");
+
+const statusButtons = document.getElementById("statusButtons");
+const statusTitle = document.getElementById("statusTitle");
+const radarChart = document.getElementById("radarChart");
+
+const itemSelect = document.getElementById("itemSelect");
+const hourSelect = document.getElementById("hourSelect");
+const minuteSelect = document.getElementById("minuteSelect");
+const newItemName = document.getElementById("newItemName");
 
 const inputName = document.getElementById("inputName");
 const inputSchool = document.getElementById("inputSchool");
 const inputAch1 = document.getElementById("inputAch1");
 const inputAch2 = document.getElementById("inputAch2");
 const inputAch3 = document.getElementById("inputAch3");
-
-const statusTitle = document.getElementById("statusTitle");
-const radarChart = document.getElementById("radarChart");
-const itemSelect = document.getElementById("itemSelect");
-const addHoursInput = document.getElementById("addHours");
-const editItems = document.getElementById("editItems");
+const newStatusName = document.getElementById("newStatusName");
 
 let chart;
 let currentKey = "";
@@ -32,38 +36,28 @@ const profile = {
 };
 
 const statusData = {
-  math: {
-    title: "数学",
-    items: [
-      { name: "計算力", hours: 0 },
-      { name: "発想力", hours: 0 },
-      { name: "理解力", hours: 0 }
-    ]
-  },
-  body: {
-    title: "身体能力",
-    items: [
-      { name: "筋力", hours: 0 },
-      { name: "持久力", hours: 0 },
-      { name: "柔軟性", hours: 0 }
-    ]
-  }
+  body: { title: "身体能力", items: [] },
+  math: { title: "数学", items: [] }
 };
 
 // ===== ランク =====
 const rankTable = [
-  { h: 250, r: 7 },
-  { h: 120, r: 6 },
-  { h: 60, r: 5 },
-  { h: 30, r: 4 },
-  { h: 15, r: 3 },
-  { h: 5, r: 2 },
-  { h: 0, r: 1 }
+  { m: 15000, r: 7 },
+  { m: 7200, r: 6 },
+  { m: 3600, r: 5 },
+  { m: 1800, r: 4 },
+  { m: 900, r: 3 },
+  { m: 300, r: 2 },
+  { m: 0, r: 1 }
 ];
 
-function hoursToRank(h) {
-  return rankTable.find(t => h >= t.h).r;
+function minutesToRank(m) {
+  return rankTable.find(t => m >= t.m).r;
 }
+
+// ===== 初期化 =====
+for (let i = 0; i <= 24; i++) hourSelect.innerHTML += `<option>${i}</option>`;
+for (let i = 0; i <= 60; i++) minuteSelect.innerHTML += `<option>${i}</option>`;
 
 // ===== 表示 =====
 function renderHome() {
@@ -72,6 +66,11 @@ function renderHome() {
   ach1.textContent = "1. " + profile.achievements[0];
   ach2.textContent = "2. " + profile.achievements[1];
   ach3.textContent = "3. " + profile.achievements[2];
+
+  statusButtons.innerHTML = "";
+  Object.keys(statusData).forEach(k => {
+    statusButtons.innerHTML += `<button onclick="openStatus('${k}')">${statusData[k].title}</button>`;
+  });
 }
 
 // ===== ステータス =====
@@ -80,37 +79,44 @@ function openStatus(key) {
   hideAll();
   status.classList.remove("hidden");
 
-  const data = statusData[key];
-  statusTitle.textContent = data.title;
+  statusTitle.textContent = statusData[key].title;
+  updateItemSelect();
+  drawChart();
+}
 
+function updateItemSelect() {
   itemSelect.innerHTML = "";
-  data.items.forEach((i, idx) => {
+  statusData[currentKey].items.forEach((i, idx) => {
     itemSelect.innerHTML += `<option value="${idx}">${i.name}</option>`;
   });
+}
 
+function addItem() {
+  if (!newItemName.value) return;
+  statusData[currentKey].items.push({ name: newItemName.value, minutes: 0 });
+  newItemName.value = "";
+  updateItemSelect();
   drawChart();
 }
 
 function addStudy() {
   const idx = itemSelect.value;
-  const h = Number(addHoursInput.value);
-  if (!h) return;
-  statusData[currentKey].items[idx].hours += h;
-  addHoursInput.value = "";
+  const m = hourSelect.value * 60 + Number(minuteSelect.value);
+  if (!m) return;
+  statusData[currentKey].items[idx].minutes += m;
   drawChart();
 }
 
+// ===== チャート =====
 function drawChart() {
-  const data = statusData[currentKey];
-  const labels = data.items.map(i => i.name);
-  const values = data.items.map(i => hoursToRank(i.hours));
-
+  const items = statusData[currentKey].items;
   if (chart) chart.destroy();
+
   chart = new Chart(radarChart, {
     type: "radar",
     data: {
-      labels,
-      datasets: [{ data: values }]
+      labels: items.map(i => i.name),
+      datasets: [{ data: items.map(i => minutesToRank(i.minutes)) }]
     },
     options: {
       scales: {
@@ -136,29 +142,19 @@ function openEdit() {
   inputAch1.value = profile.achievements[0];
   inputAch2.value = profile.achievements[1];
   inputAch3.value = profile.achievements[2];
-
-  editItems.innerHTML = "";
-  statusData.math.items.forEach((item, i) => {
-    editItems.innerHTML += `
-      <input value="${item.name}"
-        onchange="statusData.math.items[${i}].name=this.value">
-    `;
-  });
 }
 
-function addItem() {
-  statusData.math.items.push({ name: "新項目", hours: 0 });
-  openEdit();
+function addStatus() {
+  if (!newStatusName.value) return;
+  const key = "s" + Date.now();
+  statusData[key] = { title: newStatusName.value, items: [] };
+  newStatusName.value = "";
 }
 
 function saveData() {
   profile.name = inputName.value;
   profile.school = inputSchool.value;
-  profile.achievements = [
-    inputAch1.value,
-    inputAch2.value,
-    inputAch3.value
-  ];
+  profile.achievements = [inputAch1.value, inputAch2.value, inputAch3.value];
   backHome();
 }
 
