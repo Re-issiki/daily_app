@@ -38,7 +38,9 @@
   <canvas id="radarChart"></canvas>
 
   <div class="card">
-    <h2>項目追加</h2>
+    <h2>項目管理</h2>
+    <div id="itemList"></div>
+
     <input id="newItemName" placeholder="項目名">
     <button onclick="addItem()">追加</button>
   </div>
@@ -67,7 +69,9 @@
     <label>実績3</label><input id="inputAch3">
   </div>
 
-  <h2>ステータス追加</h2>
+  <h2>ステータス管理</h2>
+  <div class="card" id="statusManage"></div>
+
   <div class="card">
     <input id="newStatusName" placeholder="例：英語">
     <button onclick="addStatus()">追加</button>

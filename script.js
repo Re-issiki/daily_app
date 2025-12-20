@@ -17,6 +17,7 @@ const itemSelect = document.getElementById("itemSelect");
 const hourSelect = document.getElementById("hourSelect");
 const minuteSelect = document.getElementById("minuteSelect");
 const newItemName = document.getElementById("newItemName");
+const itemList = document.getElementById("itemList");
 
 const inputName = document.getElementById("inputName");
 const inputSchool = document.getElementById("inputSchool");
@@ -24,9 +25,23 @@ const inputAch1 = document.getElementById("inputAch1");
 const inputAch2 = document.getElementById("inputAch2");
 const inputAch3 = document.getElementById("inputAch3");
 const newStatusName = document.getElementById("newStatusName");
+const statusManage = document.getElementById("statusManage");
 
 let chart = null;
 let currentKey = "";
+
+// ===== 永続化 =====
+function saveStorage() {
+  localStorage.setItem("profile", JSON.stringify(profile));
+  localStorage.setItem("statusData", JSON.stringify(statusData));
+}
+
+function loadStorage() {
+  const p = localStorage.getItem("profile");
+  const s = localStorage.getItem("statusData");
+  if (p) Object.assign(profile, JSON.parse(p));
+  if (s) Object.assign(statusData, JSON.parse(s));
+}
 
 // ===== データ =====
 const profile = {
@@ -51,17 +66,14 @@ const rankTable = [
   { m: 0, r: 1 }
 ];
 
-function minutesToRank(m) {
-  return rankTable.find(t => m >= t.m).r;
-}
+const rankLabel = ["","F","E","D","C","B","A","S"];
+const minutesToRank = m => rankTable.find(t => m >= t.m).r;
 
 // ===== 初期化 =====
-for (let i = 0; i <= 24; i++) {
-  hourSelect.innerHTML += `<option value="${i}">${i}</option>`;
-}
-for (let i = 0; i <= 60; i++) {
-  minuteSelect.innerHTML += `<option value="${i}">${i}</option>`;
-}
+for (let i = 0; i <= 24; i++) hourSelect.innerHTML += `<option>${i}</option>`;
+for (let i = 0; i <= 60; i++) minuteSelect.innerHTML += `<option>${i}</option>`;
+
+loadStorage();
 
 // ===== ホーム =====
 function renderHome() {
@@ -88,6 +100,7 @@ function openStatus(key) {
 
   statusTitle.textContent = statusData[key].title;
   updateItemSelect();
+  renderItemList();
   drawChart();
 }
 
@@ -98,56 +111,65 @@ function updateItemSelect() {
   });
 }
 
-function addItem() {
-  if (!currentKey || !newItemName.value) return;
+function renderItemList() {
+  itemList.innerHTML = "";
+  statusData[currentKey].items.forEach((i, idx) => {
+    const row = document.createElement("div");
+    row.style.display = "flex";
 
-  statusData[currentKey].items.push({
-    name: newItemName.value,
-    minutes: 0
+    row.innerHTML = `
+      <span style="flex:1">${i.name}</span>
+      <button style="background:#dc2626" onclick="deleteItem(${idx})">削除</button>
+    `;
+    itemList.appendChild(row);
   });
+}
 
+function addItem() {
+  if (!newItemName.value) return;
+  statusData[currentKey].items.push({ name: newItemName.value, minutes: 0 });
   newItemName.value = "";
+  saveStorage();
   updateItemSelect();
+  renderItemList();
+  drawChart();
+}
+
+function deleteItem(idx) {
+  statusData[currentKey].items.splice(idx, 1);
+  saveStorage();
+  updateItemSelect();
+  renderItemList();
   drawChart();
 }
 
 function addStudy() {
   if (itemSelect.value === "") return;
-
-  const m =
-    Number(hourSelect.value) * 60 +
-    Number(minuteSelect.value);
-
+  const m = hourSelect.value * 60 + Number(minuteSelect.value);
   if (m <= 0) return;
-
   statusData[currentKey].items[itemSelect.value].minutes += m;
+  saveStorage();
   drawChart();
 }
 
 // ===== チャート =====
 function drawChart() {
   const items = statusData[currentKey].items;
-
   if (chart) chart.destroy();
-  if (items.length === 0) return;
+  if (!items.length) return;
 
   chart = new Chart(radarChart, {
     type: "radar",
     data: {
       labels: items.map(i => i.name),
-      datasets: [{
-        data: items.map(i => minutesToRank(i.minutes)),
-        fill: true
-      }]
+      datasets: [{ data: items.map(i => minutesToRank(i.minutes)) }]
     },
     options: {
       scales: {
         r: {
           min: 1,
           max: 7,
-          ticks: {
-            callback: v => ["","F","E","D","C","B","A","S"][v]
-          }
+          ticks: { callback: v => rankLabel[v] }
         }
       }
     }
@@ -164,33 +186,48 @@ function openEdit() {
   inputAch1.value = profile.achievements[0];
   inputAch2.value = profile.achievements[1];
   inputAch3.value = profile.achievements[2];
+
+  renderStatusManage();
+}
+
+function renderStatusManage() {
+  statusManage.innerHTML = "";
+  Object.keys(statusData).forEach(k => {
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.innerHTML = `
+      <span style="flex:1">${statusData[k].title}</span>
+      <button style="background:#dc2626" onclick="deleteStatus('${k}')">削除</button>
+    `;
+    statusManage.appendChild(row);
+  });
 }
 
 function addStatus() {
   if (!newStatusName.value) return;
-
-  const key = "s" + Date.now();
-  statusData[key] = {
-    title: newStatusName.value,
-    items: []
-  };
-
+  statusData["s" + Date.now()] = { title: newStatusName.value, items: [] };
   newStatusName.value = "";
+  saveStorage();
+  renderStatusManage();
   renderHome();
 }
 
-function saveData() {
-  profile.name = inputName.value;
-  profile.school = inputSchool.value;
-  profile.achievements = [
-    inputAch1.value,
-    inputAch2.value,
-    inputAch3.value
-  ];
+function deleteStatus(key) {
+  if (!confirm("削除しますか？")) return;
+  delete statusData[key];
+  saveStorage();
   backHome();
 }
 
 // ===== 画面 =====
+function saveData() {
+  profile.name = inputName.value;
+  profile.school = inputSchool.value;
+  profile.achievements = [inputAch1.value, inputAch2.value, inputAch3.value];
+  saveStorage();
+  backHome();
+}
+
 function backHome() {
   hideAll();
   home.classList.remove("hidden");
