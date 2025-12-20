@@ -2,21 +2,33 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>ロードマップ生成</title>
+  <title>Roadmap App</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="app">
-  <div class="form">
-    <h2>ロードマップ作成</h2>
-    <input id="goalInput" type="text" placeholder="最終目標">
-    <textarea id="stepsInput" placeholder="Stepを1行ずつ入力"></textarea>
-    <button id="generateBtn">生成</button>
-  </div>
+<header>
+  <h1 id="headerTitle">Roadmap App</h1>
+  <button id="newBtn" class="btn">＋ New</button>
+</header>
 
+<!-- ホーム画面 -->
+<main id="homeView">
+  <ul id="roadmapList" class="list"></ul>
+</main>
+
+<!-- 作成画面 -->
+<main id="createView" class="hidden">
+  <input id="titleInput" placeholder="タイトル">
+  <input id="goalInput" placeholder="最終目標">
+  <textarea id="stepsInput" placeholder="Stepを1行ずつ入力"></textarea>
+  <button id="saveBtn" class="btn">保存</button>
+</main>
+
+<!-- 表示画面 -->
+<main id="viewView" class="hidden">
   <div id="tree" class="tree"></div>
-</div>
+</main>
 
 <script src="script.js"></script>
 </body>
