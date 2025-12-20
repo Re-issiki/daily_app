@@ -1,3 +1,23 @@
+// ===== DOM参照 =====
+const home = document.getElementById("home");
+const status = document.getElementById("status");
+const edit = document.getElementById("edit");
+
+const viewName = document.getElementById("viewName");
+const viewSchool = document.getElementById("viewSchool");
+const ach1 = document.getElementById("ach1");
+const ach2 = document.getElementById("ach2");
+const ach3 = document.getElementById("ach3");
+
+const inputName = document.getElementById("inputName");
+const inputSchool = document.getElementById("inputSchool");
+const inputAch1 = document.getElementById("inputAch1");
+const inputAch2 = document.getElementById("inputAch2");
+const inputAch3 = document.getElementById("inputAch3");
+
+const statusTitle = document.getElementById("statusTitle");
+const radarChart = document.getElementById("radarChart");
+
 let chart;
 
 const profile = {
