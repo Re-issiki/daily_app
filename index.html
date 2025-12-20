@@ -31,7 +31,6 @@
     <button onclick="openStatus('math')">数学</button>
   </div>
 
-  <!-- 入力ボタン -->
   <button class="edit" onclick="openEdit()">＋ データ入力</button>
 </div>
 
@@ -39,7 +38,15 @@
 <div id="status" class="screen hidden">
   <button class="back" onclick="backHome()">← 戻る</button>
   <h1 id="statusTitle"></h1>
+
   <canvas id="radarChart"></canvas>
+
+  <div class="card">
+    <h2>勉強時間を追加</h2>
+    <select id="itemSelect"></select>
+    <input type="number" id="addHours" placeholder="時間">
+    <button onclick="addStudy()">追加</button>
+  </div>
 </div>
 
 <!-- 編集画面 -->
@@ -61,6 +68,10 @@
     <label>実績3</label>
     <input id="inputAch3">
   </div>
+
+  <h2>数学ステータス項目</h2>
+  <div class="card" id="editItems"></div>
+  <button onclick="addItem()">＋ 項目追加</button>
 
   <button onclick="saveData()">保存</button>
 </div>
