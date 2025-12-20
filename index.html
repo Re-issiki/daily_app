@@ -2,39 +2,40 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Roadmap App</title>
+  <title>Status App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<header>
-  <button id="backBtn" class="btn hidden">← Back</button>
-  <h1 id="headerTitle">Roadmap App</h1>
-  <button id="newBtn" class="btn">＋ New</button>
-</header>
+<div id="home" class="screen">
+  <h1>プロフィール</h1>
 
-<!-- HOME -->
-<main id="homeView">
-  <ul id="roadmapList" class="list"></ul>
-</main>
+  <div class="card">
+    <p>名前：Re</p>
+    <p>所属：〇〇学校</p>
+  </div>
 
-<!-- CREATE -->
-<main id="createView" class="hidden">
-  <input id="titleInput" placeholder="タイトル">
-  <input id="goalInput" placeholder="最終目標">
-  <textarea id="stepsInput" placeholder="例：
-基礎
-- HTML
-- CSS
-応用
-- JavaScript"></textarea>
-  <button id="saveBtn" class="btn">保存</button>
-</main>
+  <h2>実績</h2>
+  <div class="card">
+    <p>1. 毎日勉強30分を30日継続</p>
+    <p>2. 数学模試 偏差値+8</p>
+    <p>3. 腕立て100回達成</p>
+  </div>
 
-<!-- VIEW -->
-<main id="viewView" class="hidden">
-  <div id="tree" class="tree"></div>
-</main>
+  <h2>ステータス</h2>
+  <div class="card">
+    <button onclick="openStatus('body')">身体能力</button>
+    <button onclick="openStatus('math')">数学</button>
+  </div>
+</div>
+
+<div id="status" class="screen hidden">
+  <button class="back" onclick="backHome()">← 戻る</button>
+  <h1 id="statusTitle"></h1>
+  <canvas id="radarChart"></canvas>
+</div>
 
 <script src="script.js"></script>
 </body>

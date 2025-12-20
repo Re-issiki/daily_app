@@ -1,169 +1,56 @@
-const homeView = document.getElementById("homeView");
-const createView = document.getElementById("createView");
-const viewView = document.getElementById("viewView");
+let chart;
 
-const headerTitle = document.getElementById("headerTitle");
-const newBtn = document.getElementById("newBtn");
-const backBtn = document.getElementById("backBtn");
-
-const roadmapList = document.getElementById("roadmapList");
-const titleInput = document.getElementById("titleInput");
-const goalInput = document.getElementById("goalInput");
-const stepsInput = document.getElementById("stepsInput");
-const saveBtn = document.getElementById("saveBtn");
-
-const tree = document.getElementById("tree");
-
-let roadmaps = JSON.parse(localStorage.getItem("roadmaps") || "[]");
-let currentIndex = null;
-
-/* ---------- 画面制御 ---------- */
-
-function show(view) {
-  [homeView, createView, viewView].forEach(v => v.classList.add("hidden"));
-  view.classList.remove("hidden");
-
-  backBtn.classList.toggle("hidden", view === homeView);
-}
-
-backBtn.onclick = renderHome;
-
-/* ---------- HOME ---------- */
-
-function renderHome() {
-  headerTitle.textContent = "Roadmap App";
-  show(homeView);
-  roadmapList.innerHTML = "";
-
-  roadmaps.forEach((rm, i) => {
-    const li = document.createElement("li");
-    li.textContent = rm.title || "No Title";
-    li.onclick = () => {
-      currentIndex = i;
-      renderView();
-    };
-    roadmapList.appendChild(li);
-  });
-}
-
-newBtn.onclick = () => {
-  headerTitle.textContent = "Create";
-  show(createView);
+const statusData = {
+  body: {
+    title: "身体能力",
+    labels: ["筋力", "持久力", "柔軟性", "瞬発力", "回復力"],
+    hours: [30, 40, 15, 20, 25]
+  },
+  math: {
+    title: "数学",
+    labels: ["計算力", "発想力", "理解力", "問題解決", "スピード"],
+    hours: [50, 35, 40, 30, 45]
+  }
 };
 
-/* ---------- CREATE ---------- */
-
-saveBtn.onclick = () => {
-  const roadmap = {
-    title: titleInput.value,
-    goal: goalInput.value,
-    tree: parseSteps(stepsInput.value),
-    done: {}
-  };
-
-  roadmaps.push(roadmap);
-  localStorage.setItem("roadmaps", JSON.stringify(roadmaps));
-
-  titleInput.value = "";
-  goalInput.value = "";
-  stepsInput.value = "";
-
-  renderHome();
-};
-
-/* ---------- VIEW ---------- */
-
-function renderView() {
-  const rm = roadmaps[currentIndex];
-  headerTitle.textContent = rm.title;
-  show(viewView);
-  drawTree(rm);
+function calcStatus(hours) {
+  return hours.map(h => Math.min(100, Math.log(h + 1) * 20));
 }
 
-function drawTree(rm) {
-  tree.innerHTML = "";
+function openStatus(key) {
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("status").classList.remove("hidden");
 
-  const width = Math.max(900, rm.tree.length * 300);
-  const height = 500;
+  const data = statusData[key];
+  document.getElementById("statusTitle").textContent = data.title;
 
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("width", width);
-  svg.setAttribute("height", height);
-  tree.appendChild(svg);
+  const values = calcStatus(data.hours);
 
-  // ルート
-  const rootX = 40;
-  const rootY = height / 2 - 20;
-  const root = createNode(rm.goal, rootX, rootY, "root", rm);
-  tree.appendChild(root);
+  if (chart) chart.destroy();
 
-  rm.tree.forEach((phase, i) => {
-    const px = 240 + i * 260;
-    const py = height / 2 - 20;
-
-    const pNode = createNode(phase.text, px, py, `p${i}`, rm);
-    tree.appendChild(pNode);
-    svg.appendChild(createLine(rootX + 120, rootY + 20, px, py + 20));
-
-    phase.children.forEach((child, j) => {
-      const cx = px;
-      const cy = py + 70 + j * 60;
-
-      const cNode = createNode(child, cx, cy, `p${i}c${j}`, rm);
-      tree.appendChild(cNode);
-      svg.appendChild(createLine(px + 40, py + 40, cx + 40, cy));
-    });
-  });
-}
-
-
-/* ---------- ノード ---------- */
-
-function createNode(text, x, y, id, rm) {
-  const div = document.createElement("div");
-  div.className = "node";
-  div.textContent = text;
-  div.style.left = x + "px";
-  div.style.top = y + "px";
-
-  if (rm.done[id]) div.classList.add("done");
-
-  div.onclick = () => {
-    div.classList.toggle("done");
-    rm.done[id] = div.classList.contains("done");
-    localStorage.setItem("roadmaps", JSON.stringify(roadmaps));
-  };
-
-  return div;
-}
-
-function createLine(x1, y1, x2, y2) {
-  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-  line.setAttribute("x1", x1);
-  line.setAttribute("y1", y1);
-  line.setAttribute("x2", x2);
-  line.setAttribute("y2", y2);
-  return line;
-}
-
-/* ---------- パース（多段化） ---------- */
-
-function parseSteps(text) {
-  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
-  const result = [];
-  let current = null;
-
-  lines.forEach(line => {
-    if (!line.startsWith("-")) {
-      current = { text: line, children: [] };
-      result.push(current);
-    } else if (current) {
-      current.children.push(line.replace("-", "").trim());
+  chart = new Chart(document.getElementById("radarChart"), {
+    type: "radar",
+    data: {
+      labels: data.labels,
+      datasets: [{
+        label: "ステータス",
+        data: values,
+        fill: true
+      }]
+    },
+    options: {
+      scales: {
+        r: {
+          min: 0,
+          max: 100,
+          ticks: { display: false }
+        }
+      }
     }
   });
-
-  return result;
 }
 
-/* 初期 */
-renderHome();
+function backHome() {
+  document.getElementById("status").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
+}
