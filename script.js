@@ -77,6 +77,12 @@ const rankTable = [
 
 const rankLabel = ["","F","E","D","C","B","A","S"];
 const minutesToRank = m => rankTable.find(t => m >= t.m).r;
+function minutesToHM(m) {
+  const h = Math.floor(m / 60);
+  const min = m % 60;
+  return `${h}時間${min}分`;
+}
+
 
 // ===== 初期化 =====
 for (let i = 0; i <= 24; i++) hourSelect.innerHTML += `<option>${i}</option>`;
@@ -122,17 +128,27 @@ function updateItemSelect() {
 
 function renderItemList() {
   itemList.innerHTML = "";
+
   statusData[currentKey].items.forEach((i, idx) => {
     const row = document.createElement("div");
-    row.style.display = "flex";
+    row.className = "card";
+    row.style.padding = "8px";
 
     row.innerHTML = `
-      <span style="flex:1">${i.name}</span>
-      <button style="background:#dc2626" onclick="deleteItem(${idx})">削除</button>
+      <div style="display:flex; align-items:center;">
+        <span style="flex:1; font-weight:600;">${i.name}</span>
+        <button class="small" style="background:#dc2626"
+          onclick="deleteItem(${idx})">削除</button>
+      </div>
+      <div style="font-size:13px; color:#555; margin-top:4px;">
+        総時間：${minutesToHM(i.minutes)}
+      </div>
     `;
+
     itemList.appendChild(row);
   });
 }
+
 
 function addItem() {
   if (!newItemName.value) return;
