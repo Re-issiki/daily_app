@@ -127,6 +127,15 @@ function updateItemSelect() {
   });
 }
 
+function resetItemTime(idx) {
+  if (!confirm("この項目の勉強時間をリセットしますか？")) return;
+  statusData[currentKey].items[idx].minutes = 0;
+  saveStorage();
+  renderItemList();
+  drawChart();
+}
+
+
 function renderItemList() {
   itemList.innerHTML = "";
 
@@ -136,11 +145,16 @@ function renderItemList() {
     row.style.padding = "8px";
 
     row.innerHTML = `
-      <div style="display:flex; align-items:center;">
+      <div style="display:flex; align-items:center; gap:6px;">
         <span style="flex:1; font-weight:600;">${i.name}</span>
+
+        <button class="small"
+          onclick="resetItemTime(${idx})">リセット</button>
+
         <button class="small" style="background:#dc2626"
           onclick="deleteItem(${idx})">削除</button>
       </div>
+
       <div style="font-size:13px; color:#555; margin-top:4px;">
         総時間：${minutesToHM(i.minutes)}
       </div>
@@ -149,6 +163,7 @@ function renderItemList() {
     itemList.appendChild(row);
   });
 }
+
 
 
 function addItem() {
@@ -162,12 +177,14 @@ function addItem() {
 }
 
 function deleteItem(idx) {
+  if (!confirm("この項目を削除しますか？")) return;
   statusData[currentKey].items.splice(idx, 1);
   saveStorage();
   updateItemSelect();
   renderItemList();
   drawChart();
 }
+
 
 function addStudy() {
   if (itemSelect.value === "") return;
