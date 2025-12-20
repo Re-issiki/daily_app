@@ -1,287 +1,70 @@
-/* ==== 全体 ==== */
 body {
-  background: linear-gradient(135deg, rgba(0,40,90,1), rgba(0,10,30,1));
-  color: #ffffff;
-  font-family: Arial, Helvetica, sans-serif;
-  max-width: 500px;
-  margin: auto;
-  padding: 20px;
-  line-height: 1.5;
-}
-
-/* ===== タイトル ===== */
-h1, h2 {
-  text-align: center;
-  color: #cfe8ff;
-  margin-bottom: 15px;
-  text-shadow: 0 0 6px rgba(0,140,255,0.8);
-}
-
-/* ==== 青ウィンドウ（透明＋ネオンサイン風） ==== */
-.window, .category-card, .manage-card, .emergency-card {
-  background: rgba(0, 60, 140, 0.35);
-  border: 2px solid rgba(180, 220, 255, 0.5);
-  backdrop-filter: blur(6px);
-  border-radius: 12px;
-  padding: 15px;
-  color: white;
-  box-shadow: 0 0 12px rgba(0,140,255,0.3);
-  margin-bottom: 12px;
-}
-
-/* ==== 横スライド共通 ==== */
-#homeCategories, #manageCategories {
+  font-family: sans-serif;
+  background: #111;
+  color: #eee;
   display: flex;
-  gap: 20px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 10px;
+  justify-content: center;
+  padding-top: 40px;
 }
 
-.category-card, .manage-card {
-  flex: 0 0 80%;
-  box-sizing: border-box;
-  scroll-snap-align: center;
+.tree {
+  position: relative;
+  width: 600px;
 }
 
-/* カードタイトル */
-.category-card h2, .manage-card h2 {
-  text-align: center;
-  margin-bottom: 12px;
-  color: #cfe8ff;
-  text-shadow: 0 0 6px rgba(0,140,255,0.7);
-}
-
-/* クエストリスト */
-ul {
-  padding-left: 20px;
-}
-
-li {
-  margin: 6px 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-/* チェックボックス */
-.quest-check {
-  margin-right: 12px;
-  transform: scale(1.3);
-  cursor: pointer;
-}
-
-/* レア度カラー */
-.bronze {
-  color: #b87333;
-  text-shadow: 1px 1px 2px #7a4b24;
-}
-.silver {
-  color: #c0c0c0;
-  text-shadow: 1px 1px 2px #7f7f7f;
-}
-.gold {
-  color: #ffd700;
-  text-shadow: 1px 1px 2px #b38f00;
-}
-
-/* ボタン */
-button {
-  width: 100%;
-  margin-top: 12px;
-  padding: 12px;
-  border: 2px solid rgba(180, 220, 255, 0.5);
-  background: rgba(0, 60, 140, 0.35);
-  color: white;
-  border-radius: 10px;
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(0,140,255,0.4);
-}
-
-button:hover {
-  background: rgba(0, 90, 180, 0.45);
-  transform: translateY(-3px);
-}
-
-/* 赤いボタン（リセット） */
-.resetBtn {
-  background: rgba(140, 20, 20, 0.4);
-  border: 2px solid rgba(255, 150, 150, 0.6);
-}
-
-.resetBtn:hover {
-  background: rgba(180, 40, 40, 0.45);
-}
-
-/* 削除ボタン */
-.delete-btn {
-  background: rgba(140, 20, 20, 0.4);
-  border: 2px solid rgba(255, 150, 150, 0.6);
-  padding: 6px 10px;
-  margin-left: auto;
-  color: white;
-  cursor: pointer;
-  width: auto;
-}
-
-/* 入力欄 */
-input[type="text"], input[type="datetime-local"] {
-  width: 70%;
-  padding: 12px;
-  margin: 10px 0;
-  background: rgba(0, 0, 20, 0.7);
-  border: 2px solid rgba(180, 220, 255, 0.5);
-  color: #ffffff;
-  border-radius: 10px;
-}
-
-/* ステータス画面 */
-.category-rank {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px;
-  margin: 6px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-}
-
-#statusRadar {
-  display: block;
-  margin: 20px auto;
-}
-
-/* 緊急クエストカード */
-.emergency-card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.emergency-card span {
-  display: block;
-  margin-bottom: 4px;
-  text-align: center;
-}
-
-.achievement-card {
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 10px;
-  color: white;
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.rank-bronze { background: #cd7f32; }
-.rank-silver { background: #c0c0c0; color: black; }
-.rank-gold   { background: #ffd700; color: black; }
-.rank-red    { background: #ff3b3b; }
-
-.achievement-card button {
-  width: auto;
-  padding: 6px 10px;
-  margin-left: 10px;
-}
-
-/* ===== ステータス画面：実績表示（改良版） ===== */
-.status-achievements {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin: 20px 0;
-  padding: 0 12px;
-}
-
-/* 実績カード自体は控えめに透明青 */
-.achievement-card {
-  background: rgba(0, 80, 200, 0.15);
-  border: 1px solid rgba(0, 120, 255, 0.3);
+.node {
+  position: absolute;
+  background: #222;
+  border: 2px solid #555;
   border-radius: 8px;
-  padding: 8px 12px;
-
-  font-size: 1.05rem;
-  font-weight: 700;
+  padding: 10px 16px;
   text-align: center;
-
-  /* カードはあくまで控えめ。影も弱め */
-  box-shadow: 0 0 6px rgba(0, 120, 255, 0.25);
-
-  /* 文字を目立たせるためカードの色は薄く */
-  color: white;
-}
-
-
-/* ===== ランクごとの文字発光エフェクト ===== */
-
-/* 銅：オレンジに光る */
-.rank-bronze {
-  color: #ff8f3a;
-  text-shadow:
-    0 0 6px rgba(255,140,60,0.8),
-    0 0 12px rgba(255,120,40,0.5);
-}
-
-/* 銀：白銀に輝く */
-.rank-silver {
-  color: #e7e7e7;
-  text-shadow:
-    0 0 6px rgba(230,230,230,0.8),
-    0 0 14px rgba(200,200,200,0.6);
-}
-
-/* 金：黄金に強めの輝き */
-.rank-gold {
-  color: #ffdf3d;
-  text-shadow:
-    0 0 8px rgba(255,220,80,0.9),
-    0 0 16px rgba(255,200,40,0.7),
-    0 0 24px rgba(255,190,20,0.5);
-}
-
-/* 赤（最高）：燃え盛る光演出 */
-.rank-red {
-  color: #ff4b4b;
-  text-shadow:
-    0 0 8px rgba(255,60,60,0.9),
-    0 0 16px rgba(255,40,40,0.8),
-    0 0 28px rgba(255,0,0,0.6),
-    0 0 40px rgba(255,0,0,0.4);
-}
-
-#homeBackupArea {
-  position: fixed;
-  right: 8px;
-  bottom: 8px;
-  text-align: right;
-  opacity: 0.4;
-}
-
-#homeBackupArea:hover {
-  opacity: 0.9;
-}
-
-.backupButton.subtle {
-  background: transparent;
-  border: none;
-  color: #88a;
-  font-size: 11px;
-  padding: 0 4px;
-  text-decoration: underline;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.diamond {
-  color: #4deaff;
-  text-shadow:
-    0 0 6px rgba(80,220,255,0.9),
-    0 0 14px rgba(60,200,255,0.7),
-    0 0 22px rgba(40,180,255,0.5);
+.node.done {
+  border-color: #00ffcc;
+  color: #00ffcc;
+  box-shadow: 0 0 15px #00ffcc;
 }
 
-.manage-card {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
+/* ノードの位置 */
+#root {
+  top: 0;
+  left: 240px;
 }
 
+#step1 {
+  top: 120px;
+  left: 40px;
+}
+
+#step2 {
+  top: 120px;
+  left: 240px;
+}
+
+#step3 {
+  top: 120px;
+  left: 440px;
+}
+
+/* 線 */
+svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+line {
+  stroke: #555;
+  stroke-width: 2;
+  transition: stroke 0.3s;
+}
+
+line.done {
+  stroke: #00ffcc;
+  filter: drop-shadow(0 0 6px #00ffcc);
+}

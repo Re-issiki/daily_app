@@ -1,121 +1,25 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head> 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>自由カテゴリクエスト</title>
-<link rel="stylesheet" href="style.css"> 
-</head> 
-<body> 
+<head>
+  <meta charset="UTF-8">
+  <title>ロードマップツリー</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-<!-- ===== ホーム画面 ===== --> 
-<div id="homeScreen">
-  <div style="display:flex; justify-content: space-between; align-items:center;">
-    <h1 id="title">クエスト一覧</h1>
-    <select id="homeWeekdaySelect" onchange="changeHomeWeekday()">
-      <option value="月曜日">月曜日</option>
-      <option value="火曜日">火曜日</option>
-      <option value="水曜日">水曜日</option>
-      <option value="木曜日">木曜日</option>
-      <option value="金曜日">金曜日</option>
-      <option value="土曜日">土曜日</option>
-      <option value="日曜日">日曜日</option>
-    </select>
+  <div class="tree">
+    <svg width="600" height="300">
+      <line id="line1" x1="300" y1="50" x2="120" y2="120" />
+      <line id="line2" x1="300" y1="50" x2="300" y2="120" />
+      <line id="line3" x1="300" y1="50" x2="480" y2="120" />
+    </svg>
+
+    <div class="node" id="root">最終目標</div>
+    <div class="node" id="step1">Step 1</div>
+    <div class="node" id="step2">Step 2</div>
+    <div class="node" id="step3">Step 3</div>
   </div>
 
-  <div id="homeCategories"></div>
-
-  <button id="emergencyBtn" onclick="showEmergency()">⚙ 緊急クエスト</button>
-  <button id="manageBtn" onclick="showManage()">⚙ クエスト管理</button>
-  <button id="statusBtn" onclick="showStatus()">⚙ ステータス</button>
-  <button id="achievementsBtn" onclick="showAchievements()">⚙ 実績一覧</button>
-
-  <div id="homeBackupArea">
-  <input type="file" id="backupFile" style="display:none;" onchange="restoreBackup(event)">
-  <button class="backupButton subtle" onclick="downloadBackup()">バックアップ</button>
-  <button class="backupButton subtle" onclick="document.getElementById('backupFile').click()">復元</button>
-  </div>
-
-</div>
-
-<!-- ===== ステータス画面 ===== --> 
-<div id="statusScreen" style="display:none;"> 
-  <h1>ステータス</h1> 
-  <label><input type="text" id="playerNameInput"></label> 
-  <!-- ステータスに表示する実績 -->
-  <div id="statusAchievements" class="status-achievements"></div>
-
-  <div style="text-align:center; margin: 15px 0;">
-      <canvas id="statusRadar" width="300" height="300"></canvas>
-  </div>
-  <div id="categoryStatus"></div>
-  <button onclick="saveStatus()">保存</button> 
-  <button onclick="backHomeFromStatus()">← 戻る</button> 
-  <button onclick="resetAllStatus()" class="resetBtn">ステータスリセット</button>
-</div>
-
-<!-- ===== 管理画面 ===== --> 
-<div id="manageScreen" style="display:none;"> 
-  <div style="display:flex; justify-content: space-between; align-items:center;">
-    <h1>クエスト管理</h1>
-    <select id="manageWeekdaySelect" onchange="changeManageWeekday()">
-      <option value="月曜日">月曜日</option>
-      <option value="火曜日">火曜日</option>
-      <option value="水曜日">水曜日</option>
-      <option value="木曜日">木曜日</option>
-      <option value="金曜日">金曜日</option>
-      <option value="土曜日">土曜日</option>
-      <option value="日曜日">日曜日</option>
-    </select>
-  </div>
-
-  <div id="manageCategories"></div> 
-
-  <h2>カテゴリ追加</h2> 
-  <input type="text" id="newCategoryInput" placeholder="新しいカテゴリ名"> 
-  <button onclick="addCategory()">追加</button> 
-
-  <h2>緊急クエスト追加</h2>
-  <input type="text" id="newEmergencyInput" placeholder="緊急クエスト名">
-  <input type="datetime-local" id="newEmergencyDeadline">
-  <button onclick="addEmergencyQuest()">追加</button>
-
-  <button id="backBtn" onclick="backHome()">← 戻る</button> 
-</div>
-
-<!-- ===== 緊急クエスト画面 ===== -->
-<div id="emergencyScreen" style="display:none;">
-  <h1>緊急クエスト一覧</h1>
-  <div id="emergencyList"></div>
-  <button onclick="backHomeFromEmergency()">← ホームに戻る</button>
-</div>
-
-<!-- ===== 実績一覧 ===== -->
-<div id="achievementScreen" style="display:none;">
-  <h1>実績一覧</h1>
-
-  <div id="achievementList"></div>
-
-  <h2>新しい実績を追加</h2>
-  <input type="text" id="newAchievementName" placeholder="実績名（例：英検準1級）">
-  <select id="newAchievementRank">
-    <option value="銅">銅</option>
-    <option value="銀">銀</option>
-    <option value="金">金</option>
-    <option value="赤">赤（最高）</option>
-  </select>
-  <button onclick="addAchievement()">追加</button>
-
-  <h2>ステータスに表示する実績（3つまで）</h2>
-  <div id="achievementSelect"></div>
-
-  <button onclick="saveSelectedAchievements()">保存</button>
-  <button onclick="backHomeFromAchievements()">← 戻る</button>
-</div>
-
-
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="script.js"></script> 
-</body> 
+  <script src="script.js"></script>
+</body>
 </html>
