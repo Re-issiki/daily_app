@@ -95,9 +95,24 @@ loadStorage();
 function renderHome() {
   viewName.textContent = `名前：${profile.name}`;
   viewSchool.textContent = `所属：${profile.school}`;
-  ach1.textContent = "1. " + profile.achievements[0];
-  ach2.textContent = "2. " + profile.achievements[1];
-  ach3.textContent = "3. " + profile.achievements[2];
+
+  const achEls = [ach1, ach2, ach3];
+
+  achEls.forEach((el, i) => {
+    const a = profile.achievements[i];
+
+    if (!a || !a.text) {
+      el.innerHTML = `${i + 1}.`;
+      return;
+    }
+
+    el.innerHTML = `
+      <div>実績${i + 1}　ランク:${rankToJP(a.rank)}</div>
+      <div class="achievement-text ${a.rank}">
+        ${a.text}
+      </div>
+    `;
+  });
 
   statusButtons.innerHTML = "";
   Object.keys(statusData).forEach(k => {
@@ -107,6 +122,16 @@ function renderHome() {
     statusButtons.appendChild(btn);
   });
 }
+
+function rankToJP(rank) {
+  return {
+    bronze: "銅",
+    silver: "銀",
+    gold: "金",
+    red: "赤"
+  }[rank];
+}
+
 
 // ===== ステータス =====
 function openStatus(key) {

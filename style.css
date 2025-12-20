@@ -44,3 +44,31 @@ button.small {
   font-size: 12px;
   border-radius: 6px;
 }
+
+.achievement-text {
+  font-size: 1.1em;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+/* 銅 */
+.achievement-text.bronze {
+  color: #b87333;
+}
+
+/* 銀 */
+.achievement-text.silver {
+  color: #9ca3af;
+}
+
+/* 金 */
+.achievement-text.gold {
+  color: #facc15;
+  text-shadow: 0 0 4px rgba(250,204,21,0.6);
+}
+
+/* 赤 */
+.achievement-text.red {
+  color: #ef4444;
+  text-shadow: 0 0 6px rgba(239,68,68,0.7);
+}
