@@ -2,22 +2,20 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>ロードマップツリー</title>
+  <title>ロードマップ生成</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="tree">
-    <svg width="600" height="300">
-      <line id="line1" x1="300" y1="50" x2="120" y2="120" />
-      <line id="line2" x1="300" y1="50" x2="300" y2="120" />
-      <line id="line3" x1="300" y1="50" x2="480" y2="120" />
-    </svg>
+  <div class="app">
+    <div class="form">
+      <h2>ロードマップ作成</h2>
+      <input id="goalInput" type="text" placeholder="最終目標">
+      <textarea id="stepsInput" placeholder="Stepを1行ずつ入力"></textarea>
+      <button id="generateBtn">生成</button>
+    </div>
 
-    <div class="node" id="root">最終目標</div>
-    <div class="node" id="step1">Step 1</div>
-    <div class="node" id="step2">Step 2</div>
-    <div class="node" id="step3">Step 3</div>
+    <div id="tree" class="tree"></div>
   </div>
 
   <script src="script.js"></script>

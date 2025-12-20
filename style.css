@@ -1,15 +1,36 @@
 body {
-  font-family: sans-serif;
   background: #111;
   color: #eee;
+  font-family: sans-serif;
+}
+
+.app {
   display: flex;
-  justify-content: center;
-  padding-top: 40px;
+  gap: 40px;
+  padding: 30px;
+}
+
+.form {
+  width: 260px;
+}
+
+input, textarea, button {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: #222;
+  border: 1px solid #555;
+  color: #eee;
+}
+
+button {
+  cursor: pointer;
 }
 
 .tree {
   position: relative;
-  width: 600px;
+  width: 700px;
+  height: 300px;
 }
 
 .node {
@@ -17,10 +38,10 @@ body {
   background: #222;
   border: 2px solid #555;
   border-radius: 8px;
-  padding: 10px 16px;
-  text-align: center;
+  padding: 8px 14px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: 0.3s;
+  text-align: center;
 }
 
 .node.done {
@@ -29,28 +50,6 @@ body {
   box-shadow: 0 0 15px #00ffcc;
 }
 
-/* ノードの位置 */
-#root {
-  top: 0;
-  left: 240px;
-}
-
-#step1 {
-  top: 120px;
-  left: 40px;
-}
-
-#step2 {
-  top: 120px;
-  left: 240px;
-}
-
-#step3 {
-  top: 120px;
-  left: 440px;
-}
-
-/* 線 */
 svg {
   position: absolute;
   top: 0;
@@ -61,7 +60,6 @@ svg {
 line {
   stroke: #555;
   stroke-width: 2;
-  transition: stroke 0.3s;
 }
 
 line.done {
