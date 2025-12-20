@@ -54,8 +54,9 @@ input, textarea {
 
 .tree {
   position: relative;
-  width: 900px;
-  height: 500px;
+  min-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .node {
@@ -89,4 +90,26 @@ line {
 line.done {
   stroke: #00ffcc;
   filter: drop-shadow(0 0 6px #00ffcc);
+}
+
+/* スマホ対応 */
+@media (max-width: 768px) {
+  .app {
+    flex-direction: column;
+  }
+
+  header {
+    flex-wrap: wrap;
+  }
+
+  .tree {
+    width: 100%;
+    height: 100vh;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  main {
+    padding: 16px;
+  }
 }

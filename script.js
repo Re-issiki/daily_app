@@ -83,32 +83,39 @@ function renderView() {
 function drawTree(rm) {
   tree.innerHTML = "";
 
+  const width = Math.max(900, rm.tree.length * 300);
+  const height = 500;
+
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("width", "900");
-  svg.setAttribute("height", "500");
+  svg.setAttribute("width", width);
+  svg.setAttribute("height", height);
   tree.appendChild(svg);
 
-  const root = createNode(rm.goal, 400, 20, "root", rm);
+  // ルート
+  const rootX = 40;
+  const rootY = height / 2 - 20;
+  const root = createNode(rm.goal, rootX, rootY, "root", rm);
   tree.appendChild(root);
 
-  rm.tree.forEach((parent, i) => {
-    const px = 200 + i * 300;
-    const py = 120;
+  rm.tree.forEach((phase, i) => {
+    const px = 240 + i * 260;
+    const py = height / 2 - 20;
 
-    const pNode = createNode(parent.text, px, py, `p${i}`, rm);
+    const pNode = createNode(phase.text, px, py, `p${i}`, rm);
     tree.appendChild(pNode);
-    svg.appendChild(createLine(450, 60, px + 40, py));
+    svg.appendChild(createLine(rootX + 120, rootY + 20, px, py + 20));
 
-    parent.children.forEach((child, j) => {
+    phase.children.forEach((child, j) => {
       const cx = px;
-      const cy = py + 80 + j * 60;
+      const cy = py + 70 + j * 60;
 
       const cNode = createNode(child, cx, cy, `p${i}c${j}`, rm);
       tree.appendChild(cNode);
-      svg.appendChild(createLine(px + 40, py + 30, cx + 40, cy));
+      svg.appendChild(createLine(px + 40, py + 40, cx + 40, cy));
     });
   });
 }
+
 
 /* ---------- ノード ---------- */
 
