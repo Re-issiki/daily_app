@@ -50,6 +50,14 @@ function loadStorage() {
     // 初回起動時だけ初期データを入れる
     statusData = {};
   }
+
+  // 旧形式（文字列）→ 新形式（オブジェクト）に変換
+  profile.achievements = profile.achievements.map(a => {
+    if (typeof a === "string") {
+      return { text: a, rank: "bronze" };
+    }
+    return a;
+  });
 }
 
 
@@ -57,8 +65,13 @@ function loadStorage() {
 let profile = {
   name: "Re",
   school: "〇〇学校",
-  achievements: ["", "", ""]
+  achievements: [
+    { text: "", rank: "bronze" },
+    { text: "", rank: "bronze" },
+    { text: "", rank: "bronze" }
+  ]
 };
+
 
 
 let statusData = {};
@@ -255,6 +268,10 @@ function openEdit() {
   inputAch2.value = profile.achievements[1];
   inputAch3.value = profile.achievements[2];
 
+  document.getElementById("rankAch1").value = profile.achievements[0].rank;
+  document.getElementById("rankAch2").value = profile.achievements[1].rank;
+  document.getElementById("rankAch3").value = profile.achievements[2].rank;
+
   renderStatusManage();
 }
 
@@ -291,10 +308,26 @@ function deleteStatus(key) {
 function saveData() {
   profile.name = inputName.value;
   profile.school = inputSchool.value;
-  profile.achievements = [inputAch1.value, inputAch2.value, inputAch3.value];
+
+  profile.achievements = [
+    {
+      text: inputAch1.value,
+      rank: document.getElementById("rankAch1").value
+    },
+    {
+      text: inputAch2.value,
+      rank: document.getElementById("rankAch2").value
+    },
+    {
+      text: inputAch3.value,
+      rank: document.getElementById("rankAch3").value
+    }
+  ];
+
   saveStorage();
   backHome();
 }
+
 
 function backHome() {
   hideAll();
