@@ -39,21 +39,30 @@ function saveStorage() {
 function loadStorage() {
   const p = localStorage.getItem("profile");
   const s = localStorage.getItem("statusData");
-  if (p) Object.assign(profile, JSON.parse(p));
-  if (s) Object.assign(statusData, JSON.parse(s));
+
+  if (p) {
+    profile = JSON.parse(p);
+  }
+
+  if (s) {
+    statusData = JSON.parse(s);
+  } else {
+    // 初回起動時だけ初期データを入れる
+    statusData = {};
+  }
 }
 
+
 // ===== データ =====
-const profile = {
+let profile = {
   name: "Re",
   school: "〇〇学校",
   achievements: ["", "", ""]
 };
 
-const statusData = {
-  body: { title: "身体能力", items: [] },
-  math: { title: "数学", items: [] }
-};
+
+let statusData = {};
+
 
 // ===== ランク =====
 const rankTable = [
