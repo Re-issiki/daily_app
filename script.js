@@ -4,6 +4,7 @@ const viewView = document.getElementById("viewView");
 
 const headerTitle = document.getElementById("headerTitle");
 const newBtn = document.getElementById("newBtn");
+const backBtn = document.getElementById("backBtn");
 
 const roadmapList = document.getElementById("roadmapList");
 const titleInput = document.getElementById("titleInput");
@@ -16,14 +17,16 @@ const tree = document.getElementById("tree");
 let roadmaps = JSON.parse(localStorage.getItem("roadmaps") || "[]");
 let currentIndex = null;
 
-/* ---------- 共通：画面切り替え ---------- */
+/* ---------- 画面制御 ---------- */
 
 function show(view) {
-  homeView.classList.add("hidden");
-  createView.classList.add("hidden");
-  viewView.classList.add("hidden");
+  [homeView, createView, viewView].forEach(v => v.classList.add("hidden"));
   view.classList.remove("hidden");
+
+  backBtn.classList.toggle("hidden", view === homeView);
 }
+
+backBtn.onclick = renderHome;
 
 /* ---------- HOME ---------- */
 
@@ -44,7 +47,7 @@ function renderHome() {
 }
 
 newBtn.onclick = () => {
-  headerTitle.textContent = "Create Roadmap";
+  headerTitle.textContent = "Create";
   show(createView);
 };
 
@@ -54,7 +57,8 @@ saveBtn.onclick = () => {
   const roadmap = {
     title: titleInput.value,
     goal: goalInput.value,
-    steps: stepsInput.value.split("\n").filter(Boolean)
+    tree: parseSteps(stepsInput.value),
+    done: {}
   };
 
   roadmaps.push(roadmap);
@@ -73,45 +77,56 @@ function renderView() {
   const rm = roadmaps[currentIndex];
   headerTitle.textContent = rm.title;
   show(viewView);
-  generateTree(rm.goal, rm.steps);
+  drawTree(rm);
 }
 
-function generateTree(goal, steps) {
+function drawTree(rm) {
   tree.innerHTML = "";
 
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("width", "700");
-  svg.setAttribute("height", "320");
+  svg.setAttribute("width", "900");
+  svg.setAttribute("height", "500");
   tree.appendChild(svg);
 
-  const root = createNode(goal || "最終目標", 300, 20);
+  const root = createNode(rm.goal, 400, 20, "root", rm);
   tree.appendChild(root);
 
-  const spacing = 700 / (steps.length + 1);
+  rm.tree.forEach((parent, i) => {
+    const px = 200 + i * 300;
+    const py = 120;
 
-  steps.forEach((text, i) => {
-    const x = spacing * (i + 1) - 40;
-    const y = 160;
+    const pNode = createNode(parent.text, px, py, `p${i}`, rm);
+    tree.appendChild(pNode);
+    svg.appendChild(createLine(450, 60, px + 40, py));
 
-    const node = createNode(text, x, y);
-    tree.appendChild(node);
+    parent.children.forEach((child, j) => {
+      const cx = px;
+      const cy = py + 80 + j * 60;
 
-    const line = createLine(350, 60, x + 40, y);
-    svg.appendChild(line);
-
-    node.onclick = () => {
-      node.classList.toggle("done");
-      line.classList.toggle("done");
-    };
+      const cNode = createNode(child, cx, cy, `p${i}c${j}`, rm);
+      tree.appendChild(cNode);
+      svg.appendChild(createLine(px + 40, py + 30, cx + 40, cy));
+    });
   });
 }
 
-function createNode(text, x, y) {
+/* ---------- ノード ---------- */
+
+function createNode(text, x, y, id, rm) {
   const div = document.createElement("div");
   div.className = "node";
   div.textContent = text;
   div.style.left = x + "px";
   div.style.top = y + "px";
+
+  if (rm.done[id]) div.classList.add("done");
+
+  div.onclick = () => {
+    div.classList.toggle("done");
+    rm.done[id] = div.classList.contains("done");
+    localStorage.setItem("roadmaps", JSON.stringify(roadmaps));
+  };
+
   return div;
 }
 
@@ -124,5 +139,24 @@ function createLine(x1, y1, x2, y2) {
   return line;
 }
 
-/* 初期表示 */
+/* ---------- パース（多段化） ---------- */
+
+function parseSteps(text) {
+  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+  const result = [];
+  let current = null;
+
+  lines.forEach(line => {
+    if (!line.startsWith("-")) {
+      current = { text: line, children: [] };
+      result.push(current);
+    } else if (current) {
+      current.children.push(line.replace("-", "").trim());
+    }
+  });
+
+  return result;
+}
+
+/* 初期 */
 renderHome();

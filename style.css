@@ -7,8 +7,8 @@ body {
 
 header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 12px;
   padding: 20px 30px;
   border-bottom: 1px solid #222;
 }
@@ -22,12 +22,12 @@ header {
   cursor: pointer;
 }
 
-main {
-  padding: 30px;
-}
-
 .hidden {
   display: none;
+}
+
+main {
+  padding: 30px;
 }
 
 .list {
@@ -50,12 +50,12 @@ input, textarea {
   color: #fff;
 }
 
-/* ロードマップ */
+/* roadmap */
 
 .tree {
   position: relative;
-  width: 700px;
-  height: 320px;
+  width: 900px;
+  height: 500px;
 }
 
 .node {
@@ -63,15 +63,16 @@ input, textarea {
   background: #333;
   border: 2px solid #666;
   border-radius: 8px;
-  padding: 8px 14px;
+  padding: 6px 12px;
   cursor: pointer;
   transition: 0.3s;
+  font-size: 14px;
 }
 
 .node.done {
   border-color: #00ffcc;
   color: #00ffcc;
-  box-shadow: 0 0 15px #00ffcc;
+  box-shadow: 0 0 12px #00ffcc;
 }
 
 svg {

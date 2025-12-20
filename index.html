@@ -8,24 +8,30 @@
 <body>
 
 <header>
+  <button id="backBtn" class="btn hidden">← Back</button>
   <h1 id="headerTitle">Roadmap App</h1>
   <button id="newBtn" class="btn">＋ New</button>
 </header>
 
-<!-- ホーム画面 -->
+<!-- HOME -->
 <main id="homeView">
   <ul id="roadmapList" class="list"></ul>
 </main>
 
-<!-- 作成画面 -->
+<!-- CREATE -->
 <main id="createView" class="hidden">
   <input id="titleInput" placeholder="タイトル">
   <input id="goalInput" placeholder="最終目標">
-  <textarea id="stepsInput" placeholder="Stepを1行ずつ入力"></textarea>
+  <textarea id="stepsInput" placeholder="例：
+基礎
+- HTML
+- CSS
+応用
+- JavaScript"></textarea>
   <button id="saveBtn" class="btn">保存</button>
 </main>
 
-<!-- 表示画面 -->
+<!-- VIEW -->
 <main id="viewView" class="hidden">
   <div id="tree" class="tree"></div>
 </main>
