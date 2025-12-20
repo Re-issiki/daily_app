@@ -100,7 +100,7 @@ function minutesToHM(m) {
 
 // ===== 初期化 =====
 for (let i = 0; i <= 24; i++) hourSelect.innerHTML += `<option>${i}</option>`;
-for (let i = 0; i <= 60; i++) minuteSelect.innerHTML += `<option>${i}</option>`;
+for (let i = 0; i <= 59; i++) minuteSelect.innerHTML += `<option>${i}</option>`;
 
 loadStorage();
 
@@ -264,9 +264,10 @@ function openEdit() {
 
   inputName.value = profile.name;
   inputSchool.value = profile.school;
-  inputAch1.value = profile.achievements[0];
-  inputAch2.value = profile.achievements[1];
-  inputAch3.value = profile.achievements[2];
+  inputAch1.value = profile.achievements[0].text;
+  inputAch2.value = profile.achievements[1].text;
+  inputAch3.value = profile.achievements[2].text;
+
 
   document.getElementById("rankAch1").value = profile.achievements[0].rank;
   document.getElementById("rankAch2").value = profile.achievements[1].rank;
