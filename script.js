@@ -66,14 +66,15 @@ let statusData = {};
 
 // ===== ランク =====
 const rankTable = [
-  { m: 15000, r: 7 },
-  { m: 7200, r: 6 },
-  { m: 3600, r: 5 },
-  { m: 1800, r: 4 },
-  { m: 900, r: 3 },
-  { m: 300, r: 2 },
-  { m: 0, r: 1 }
+  { m: 2160 * 60, r: 7 }, // S
+  { m: 720  * 60, r: 6 }, // A
+  { m: 504  * 60, r: 5 }, // B
+  { m: 168  * 60, r: 4 }, // C
+  { m: 72   * 60, r: 3 }, // D
+  { m: 24   * 60, r: 2 }, // E
+  { m: 0,           r: 1 } // F
 ];
+
 
 const rankLabel = ["","F","E","D","C","B","A","S"];
 const minutesToRank = m => rankTable.find(t => m >= t.m).r;
