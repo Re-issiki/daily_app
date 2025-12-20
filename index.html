@@ -9,19 +9,20 @@
 </head>
 <body>
 
+<!-- ホーム画面 -->
 <div id="home" class="screen">
   <h1>プロフィール</h1>
 
   <div class="card">
-    <p>名前：Re</p>
-    <p>所属：〇〇学校</p>
+    <p id="viewName"></p>
+    <p id="viewSchool"></p>
   </div>
 
   <h2>実績</h2>
   <div class="card">
-    <p>1. 毎日勉強30分を30日継続</p>
-    <p>2. 数学模試 偏差値+8</p>
-    <p>3. 腕立て100回達成</p>
+    <p id="ach1"></p>
+    <p id="ach2"></p>
+    <p id="ach3"></p>
   </div>
 
   <h2>ステータス</h2>
@@ -29,12 +30,39 @@
     <button onclick="openStatus('body')">身体能力</button>
     <button onclick="openStatus('math')">数学</button>
   </div>
+
+  <!-- 入力ボタン -->
+  <button class="edit" onclick="openEdit()">＋ データ入力</button>
 </div>
 
+<!-- ステータス詳細 -->
 <div id="status" class="screen hidden">
   <button class="back" onclick="backHome()">← 戻る</button>
   <h1 id="statusTitle"></h1>
   <canvas id="radarChart"></canvas>
+</div>
+
+<!-- 編集画面 -->
+<div id="edit" class="screen hidden">
+  <button class="back" onclick="backHome()">← 戻る</button>
+  <h1>データ入力</h1>
+
+  <div class="card">
+    <label>名前</label>
+    <input id="inputName">
+
+    <label>所属</label>
+    <input id="inputSchool">
+
+    <label>実績1</label>
+    <input id="inputAch1">
+    <label>実績2</label>
+    <input id="inputAch2">
+    <label>実績3</label>
+    <input id="inputAch3">
+  </div>
+
+  <button onclick="saveData()">保存</button>
 </div>
 
 <script src="script.js"></script>
