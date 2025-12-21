@@ -29,6 +29,8 @@ const statusManage = document.getElementById("statusManage");
 const achievementList = document.getElementById("achievementList");
 const newAchText = document.getElementById("newAchText");
 const newAchRank = document.getElementById("newAchRank");
+const achievementCards = document.getElementById("achievementCards");
+
 
 
 let chart = null;
@@ -44,28 +46,25 @@ function loadStorage() {
   const p = localStorage.getItem("profile");
   const s = localStorage.getItem("statusData");
 
-  if (p) {
-    profile = JSON.parse(p);
+  profile = p ? JSON.parse(p) : {
+    name: "Re",
+    school: "〇〇学校",
+    achievements: [],
+    displayAchievements: []
+  };
+
+  statusData = s ? JSON.parse(s) : {};
+
+  // achievements が無い or 壊れてても必ず配列にする
+  if (!Array.isArray(profile.achievements)) {
+    profile.achievements = [];
   }
 
-  if (s) {
-    statusData = JSON.parse(s);
-  } else {
-    // 初回起動時だけ初期データを入れる
-    statusData = {};
+  if (!Array.isArray(profile.displayAchievements)) {
+    profile.displayAchievements = [];
   }
-
-  // 旧形式（文字列）→ 新形式（オブジェクト）に変換
-  profile.achievements = profile.achievements.map(a => {
-    if (typeof a === "string") {
-      return { text: a, rank: "c" };
-    }
-    if (!["c","b","a","s","ss"].includes(a.rank)) {
-      return { ...a, rank: "c" };
-    }
-    return a;
-  });
 }
+
 
 
 // ===== データ =====
@@ -193,8 +192,7 @@ function openAchievementList() {
 }
 
 function renderAchievementList() {
-  const area = document.getElementById("achievementCards");
-  area.innerHTML = "";
+  achievementCards.innerHTML = "";
 
   profile.achievements.forEach((a, i) => {
     if (!a.text) return;
