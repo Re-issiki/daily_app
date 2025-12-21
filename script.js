@@ -200,6 +200,12 @@ function renderAchievementList() {
 
     const card = document.createElement("div");
     card.className = "achievement-card";
+    card.draggable = true;
+    card.dataset.id = a.id;
+    card.addEventListener("dragstart", handleDragStart);
+    card.addEventListener("dragover", handleDragOver);
+    card.addEventListener("drop", handleDrop);
+
 
     const selected = profile.displayAchievements.includes(a.id);
 
@@ -228,6 +234,38 @@ function renderAchievementList() {
     achievementCards.appendChild(card);
   });
 }
+
+let dragId = null;
+
+function handleDragStart(e) {
+  dragId = Number(e.currentTarget.dataset.id);
+}
+
+function handleDragOver(e) {
+  e.preventDefault(); // これ必須
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+
+  const dropId = Number(e.currentTarget.dataset.id);
+  if (dragId === dropId) return;
+
+  const list = profile.achievements;
+
+  const from = list.findIndex(a => a.id === dragId);
+  const to   = list.findIndex(a => a.id === dropId);
+
+  if (from === -1 || to === -1) return;
+
+  const [moved] = list.splice(from, 1);
+  list.splice(to, 0, moved);
+
+  saveStorage();
+  renderAchievementList();
+  renderHome();
+}
+
 
 function deleteAchievement(id) {
   if (!confirm("この実績を削除しますか？")) return;
