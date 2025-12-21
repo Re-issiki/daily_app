@@ -198,3 +198,12 @@ input:focus, select:focus {
 canvas {
   margin: 10px 0 20px;
 }
+
+.achievement-card {
+  cursor: grab;
+}
+
+.achievement-card:active {
+  cursor: grabbing;
+  opacity: 0.7;
+}
