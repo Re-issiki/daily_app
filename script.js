@@ -129,11 +129,19 @@ function renderHome() {
   });
 
   statusButtons.innerHTML = "";
+ 
   Object.keys(statusData).forEach(k => {
-    const btn = document.createElement("button");
-    btn.textContent = statusData[k].title;
-    btn.onclick = () => openStatus(k);
-    statusButtons.appendChild(btn);
+    const total = getStatusTotalMinutes(k);
+    const card = document.createElement("div");
+    card.className = "status-card";
+    card.innerHTML = `
+    <div class="status-title">${statusData[k].title}</div>
+    <div class="status-time">
+    総時間：${minutesToHM(total)}
+    </div>
+    `;
+    card.onclick = () => openStatus(k);
+    statusButtons.appendChild(card);
   });
 }
 
@@ -290,6 +298,13 @@ function renderStatusManage() {
     statusManage.appendChild(row);
   });
 }
+
+function getStatusTotalMinutes(key) {
+  return statusData[key].items.reduce((sum, item) => {
+    return sum + item.minutes;
+  }, 0);
+}
+
 
 function addStatus() {
   if (!newStatusName.value) return;

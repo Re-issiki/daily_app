@@ -121,3 +121,23 @@ input, select {
 canvas {
   margin: 10px 0 20px;
 }
+
+.status-card {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.status-title {
+  font-weight: 700;
+  font-size: 1.05em;
+}
+
+.status-time {
+  font-size: 0.9em;
+  color: #4b5563;
+  margin-top: 4px;
+}
