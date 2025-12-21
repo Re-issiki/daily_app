@@ -26,6 +26,7 @@ const inputAch2 = document.getElementById("inputAch2");
 const inputAch3 = document.getElementById("inputAch3");
 const newStatusName = document.getElementById("newStatusName");
 const statusManage = document.getElementById("statusManage");
+const achievementList = document.getElementById("achievementList");
 
 let chart = null;
 let currentKey = "";
@@ -356,6 +357,18 @@ function deleteStatus(key) {
   backHome();
 }
 
+function openAchievementList() {
+  hideAll();
+  achievementList.classList.remove("hidden");
+  renderAchievementList();
+}
+
+function backHome() {
+  hideAll();
+  home.classList.remove("hidden");
+}
+
+
 // ===== 画面 =====
 function saveData() {
   profile.name = inputName.value;
@@ -391,6 +404,7 @@ function hideAll() {
   home.classList.add("hidden");
   status.classList.add("hidden");
   edit.classList.add("hidden");
+  achievementList.classList.add("hidden");
 }
 
 renderHome();
