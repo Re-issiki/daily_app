@@ -111,7 +111,7 @@ function minutesToHM(m) {
 for (let i = 0; i <= 24; i++) hourSelect.innerHTML += `<option>${i}</option>`;
 for (let i = 0; i <= 59; i++) minuteSelect.innerHTML += `<option>${i}</option>`;
 
-loadStorage();
+
 if (!profile.achievements) {
   profile.achievements = [];
 }
