@@ -217,6 +217,10 @@ function renderAchievementList() {
     onclick="toggleDisplayAchievement(${a.id})">
     ${selected ? "表示中" : "ホーム表示"}
     </button>
+    <button class="small" style="background:#dc2626"
+    onclick="deleteAchievement(${a.id})">
+    削除
+    </button>
     </div>
     `;
 
@@ -224,6 +228,22 @@ function renderAchievementList() {
     achievementCards.appendChild(card);
   });
 }
+
+function deleteAchievement(id) {
+  if (!confirm("この実績を削除しますか？")) return;
+
+  // 実績本体を削除
+  profile.achievements = profile.achievements.filter(a => a.id !== id);
+
+  // ホーム表示IDからも削除
+  profile.displayAchievements =
+    profile.displayAchievements.filter(x => x !== id);
+
+  saveStorage();
+  renderAchievementList();
+  renderHome();
+}
+
 
 function toggleDisplayAchievement(id) {
   const idx = profile.displayAchievements.indexOf(id);
