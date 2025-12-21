@@ -112,6 +112,16 @@ for (let i = 0; i <= 24; i++) hourSelect.innerHTML += `<option>${i}</option>`;
 for (let i = 0; i <= 59; i++) minuteSelect.innerHTML += `<option>${i}</option>`;
 
 loadStorage();
+if (!profile.achievements) {
+  profile.achievements = [];
+}
+if (!profile.displayAchievements) {
+  profile.displayAchievements = [];
+}
+if (!statusData) {
+  statusData = {};
+}
+
 
 // ===== ホーム =====
 function renderHome() {
@@ -170,17 +180,21 @@ function addAchievement() {
   const rank = newAchRank.value;
   if (!text) return;
 
-  profile.achievements.push({
-    id: Date.now(),
-    text,
-    rank
-  });
+  const id = Date.now();
+
+  profile.achievements.push({ id, text, rank });
+
+  // ★ 3つまでは自動でホーム表示
+  if (profile.displayAchievements.length < 3) {
+    profile.displayAchievements.push(id);
+  }
 
   newAchText.value = "";
   saveStorage();
   renderAchievementList();
   renderHome();
 }
+
 
 
 
@@ -389,12 +403,20 @@ function getStatusTotalMinutes(key) {
 
 function addStatus() {
   if (!newStatusName.value) return;
-  statusData["s" + Date.now()] = { title: newStatusName.value, items: [] };
+
+  const key = "s" + Date.now();
+
+  statusData[key] = {
+    title: newStatusName.value,
+    items: []
+  };
+
   newStatusName.value = "";
   saveStorage();
   renderStatusManage();
-  renderHome();
+  renderHome(); // ← これ超重要
 }
+
 
 function deleteStatus(key) {
   if (!confirm("削除しますか？")) return;
@@ -426,4 +448,6 @@ function hideAll() {
   achievementList.classList.add("hidden");
 }
 
+loadStorage();
 renderHome();
+
