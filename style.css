@@ -95,28 +95,6 @@ input, select {
   margin-top: 6px;
 }
 
-/* 銅 */
-.achievement-text.bronze {
-  color: #b87333;
-}
-
-/* 銀 */
-.achievement-text.silver {
-  color: #9ca3af;
-}
-
-/* 金 */
-.achievement-text.gold {
-  color: #facc15;
-  text-shadow: 0 0 4px rgba(250,204,21,0.6);
-}
-
-/* 赤 */
-.achievement-text.red {
-  color: #ef4444;
-  text-shadow: 0 0 6px rgba(239,68,68,0.7);
-}
-
 /* ===== チャート ===== */
 canvas {
   margin: 10px 0 20px;
@@ -140,4 +118,56 @@ canvas {
   font-size: 0.9em;
   color: #4b5563;
   margin-top: 4px;
+}
+
+.achievement-text.c {
+  color: #b87333;
+}
+
+.achievement-text.b {
+  color: #9ca3af;
+}
+
+.achievement-text.a {
+  color: #facc15;
+  text-shadow: 0 0 4px rgba(250,204,21,0.6);
+}
+
+.achievement-text.s {
+  color: #3b82f6;
+  text-shadow: 0 0 6px rgba(59,130,246,0.7);
+}
+
+.achievement-text.ss {
+  color: #ef4444;
+  text-shadow: 0 0 6px rgba(239,68,68,0.8);
+}
+
+.achievement-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.achievement-rank {
+  min-width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: white;
+}
+
+.achievement-rank.c { background: #b87333; }
+.achievement-rank.b { background: #9ca3af; }
+.achievement-rank.a { background: #facc15; color:#333; }
+.achievement-rank.s { background: #3b82f6; }
+.achievement-rank.ss { background: #ef4444; }
+
+.achievement-title {
+  font-size: 0.85em;
+  color: #6b7280;
 }

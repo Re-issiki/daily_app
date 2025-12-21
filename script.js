@@ -147,11 +147,44 @@ function renderHome() {
 
 function rankToJP(rank) {
   return {
-    bronze: "銅",
-    silver: "銀",
-    gold: "金",
-    red: "赤"
+    c: "C",
+    b: "B",
+    a: "A",
+    s: "S",
+    ss: "SS"
   }[rank];
+}
+
+function openAchievementList() {
+  hideAll();
+  document.getElementById("achievementList").classList.remove("hidden");
+  renderAchievementList();
+}
+
+function renderAchievementList() {
+  const area = document.getElementById("achievementCards");
+  area.innerHTML = "";
+
+  profile.achievements.forEach((a, i) => {
+    if (!a.text) return;
+
+    const card = document.createElement("div");
+    card.className = "achievement-card";
+
+    card.innerHTML = `
+      <div class="achievement-rank ${a.rank}">
+        ${rankToJP(a.rank)}
+      </div>
+      <div class="achievement-content">
+        <div class="achievement-title">実績${i + 1}</div>
+        <div class="achievement-text ${a.rank}">
+          ${a.text}
+        </div>
+      </div>
+    `;
+
+    area.appendChild(card);
+  });
 }
 
 

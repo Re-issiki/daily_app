@@ -73,31 +73,46 @@
 
     <label>実績1</label>
     <select id="rankAch1">
-      <option value="bronze">銅</option>
-      <option value="silver">銀</option>
-      <option value="gold">金</option>
-      <option value="red">赤</option>
+      <option value="c">C</option>
+      <option value="b">B</option>
+      <option value="a">A</option>
+      <option value="s">S</option>
+      <option value="ss">SS</option>
     </select>
+
     <input id="inputAch1" placeholder="実績内容">
 
     <label>実績2</label>
     <select id="rankAch2">
-      <option value="bronze">銅</option>
-      <option value="silver">銀</option>
-      <option value="gold">金</option>
-      <option value="red">赤</option>
+      <option value="c">C</option>
+      <option value="b">B</option>
+      <option value="a">A</option>
+      <option value="s">S</option>
+      <option value="ss">SS</option>
     </select>
+
     <input id="inputAch2" placeholder="実績内容">
 
     <label>実績3</label>
     <select id="rankAch3">
-      <option value="bronze">銅</option>
-      <option value="silver">銀</option>
-      <option value="gold">金</option>
-      <option value="red">赤</option>
+      <option value="c">C</option>
+      <option value="b">B</option>
+      <option value="a">A</option>
+      <option value="s">S</option>
+      <option value="ss">SS</option>
     </select>
     <input id="inputAch3" placeholder="実績内容">
   </div>
+  <button onclick="openAchievementList()">実績一覧を見る</button>
+
+
+  <!-- 実績一覧 -->
+  <div id="achievementList" class="screen hidden">
+    <button class="back" onclick="backHome()">← 戻る</button>
+    <h1>実績一覧</h1>
+    <div class="card" id="achievementCards"></div>
+  </div>
+
 
   <h2>ステータス管理</h2>
   <div class="card" id="statusManage"></div>
