@@ -92,6 +92,7 @@ const rankTable = [
 const rankLabel = ["","F","E","D","C","B","A","S"];
 const minutesToRank = m => rankTable.find(t => m >= t.m).r;
 function minutesToHM(m) {
+  if (m <= 0) return "未学習";
   const h = Math.floor(m / 60);
   const min = m % 60;
   return `${h}時間${min}分`;
@@ -230,6 +231,7 @@ function addStudy() {
   if (m <= 0) return;
   statusData[currentKey].items[itemSelect.value].minutes += m;
   saveStorage();
+  renderItemList();
   drawChart();
 }
 
