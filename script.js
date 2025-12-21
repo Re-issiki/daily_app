@@ -357,18 +357,6 @@ function deleteStatus(key) {
   backHome();
 }
 
-function openAchievementList() {
-  hideAll();
-  achievementList.classList.remove("hidden");
-  renderAchievementList();
-}
-
-function backHome() {
-  hideAll();
-  home.classList.remove("hidden");
-}
-
-
 // ===== 画面 =====
 function saveData() {
   profile.name = inputName.value;
