@@ -1,8 +1,8 @@
 body {
   font-family: system-ui, sans-serif;
-  background: #f5f5f5;
+  background: linear-gradient(180deg, #f8fafc, #eef2ff);
   margin: 0;
-  padding: 10px;
+  padding: 14px;
 }
 
 .screen {
@@ -10,45 +10,89 @@ body {
   margin: auto;
 }
 
-.hidden { display: none; }
-
-.card {
-  background: white;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 12px;
+.hidden {
+  display: none;
 }
 
+/* ===== 見出し ===== */
+h1 {
+  font-size: 1.4rem;
+  margin: 12px 0;
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin: 18px 0 8px;
+  color: #374151;
+}
+
+/* ===== カード ===== */
+.card {
+  background: white;
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+/* ===== ボタン ===== */
 button {
   width: 100%;
   padding: 12px;
   margin-top: 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: none;
   background: #4f46e5;
   color: white;
+  font-weight: 600;
 }
 
-button.edit { background: #16a34a; }
-button.back { background: none; color: #333; }
+button.edit {
+  background: #16a34a;
+}
 
-input, select {
-  width: 100%;
-  padding: 8px;
-  margin: 6px 0 12px;
+button.back {
+  background: none;
+  color: #374151;
+  text-align: left;
+  padding: 6px 0;
 }
 
 button.small {
   width: auto;
-  padding: 4px 10px;
+  padding: 6px 10px;
   font-size: 12px;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
+button.danger {
+  background: #dc2626;
+}
+
+/* ===== フォーム ===== */
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
+}
+
+.time-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ===== 実績 ===== */
 .achievement-text {
-  font-size: 1.1em;
-  font-weight: 700;
-  margin-top: 4px;
+  font-size: 1.15em;
+  font-weight: 800;
+  padding: 8px;
+  border-radius: 10px;
+  background: #f9fafb;
+  margin-top: 6px;
 }
 
 /* 銅 */
@@ -71,4 +115,9 @@ button.small {
 .achievement-text.red {
   color: #ef4444;
   text-shadow: 0 0 6px rgba(239,68,68,0.7);
+}
+
+/* ===== チャート ===== */
+canvas {
+  margin: 10px 0 20px;
 }

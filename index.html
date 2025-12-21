@@ -12,6 +12,7 @@
 <!-- ホーム -->
 <div id="home" class="screen">
   <h1>プロフィール</h1>
+
   <div class="card">
     <p id="viewName"></p>
     <p id="viewSchool"></p>
@@ -35,7 +36,9 @@
   <button class="back" onclick="backHome()">← 戻る</button>
   <h1 id="statusTitle"></h1>
 
-  <canvas id="radarChart"></canvas>
+  <div class="card">
+    <canvas id="radarChart"></canvas>
+  </div>
 
   <div class="card">
     <h2>項目管理</h2>
@@ -48,8 +51,10 @@
   <div class="card">
     <h2>勉強時間を追加</h2>
     <select id="itemSelect"></select>
-    <select id="hourSelect"></select> 時間
-    <select id="minuteSelect"></select> 分
+    <div class="time-row">
+      <select id="hourSelect"></select> 時間
+      <select id="minuteSelect"></select> 分
+    </div>
     <button onclick="addStudy()">追加</button>
   </div>
 </div>
@@ -62,9 +67,11 @@
   <div class="card">
     <label>名前</label>
     <input id="inputName">
+
     <label>所属</label>
     <input id="inputSchool">
-    <label>実績1　ランク:</label>
+
+    <label>実績1</label>
     <select id="rankAch1">
       <option value="bronze">銅</option>
       <option value="silver">銀</option>
@@ -73,7 +80,7 @@
     </select>
     <input id="inputAch1" placeholder="実績内容">
 
-    <label>実績2　ランク:</label>
+    <label>実績2</label>
     <select id="rankAch2">
       <option value="bronze">銅</option>
       <option value="silver">銀</option>
@@ -82,7 +89,7 @@
     </select>
     <input id="inputAch2" placeholder="実績内容">
 
-    <label>実績3　ランク:</label>
+    <label>実績3</label>
     <select id="rankAch3">
       <option value="bronze">銅</option>
       <option value="silver">銀</option>
