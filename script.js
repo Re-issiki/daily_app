@@ -54,7 +54,10 @@ function loadStorage() {
   // 旧形式（文字列）→ 新形式（オブジェクト）に変換
   profile.achievements = profile.achievements.map(a => {
     if (typeof a === "string") {
-      return { text: a, rank: "bronze" };
+      return { text: a, rank: "c" };
+    }
+    if (!["c","b","a","s","ss"].includes(a.rank)) {
+      return { ...a, rank: "c" };
     }
     return a;
   });
@@ -66,13 +69,11 @@ let profile = {
   name: "Re",
   school: "〇〇学校",
   achievements: [
-    { text: "", rank: "bronze" },
-    { text: "", rank: "bronze" },
-    { text: "", rank: "bronze" }
+    { text: "", rank: "c" },
+    { text: "", rank: "c" },
+    { text: "", rank: "c" }
   ]
 };
-
-
 
 let statusData = {};
 
