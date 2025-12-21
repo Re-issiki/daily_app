@@ -111,18 +111,6 @@ function minutesToHM(m) {
 for (let i = 0; i <= 24; i++) hourSelect.innerHTML += `<option>${i}</option>`;
 for (let i = 0; i <= 59; i++) minuteSelect.innerHTML += `<option>${i}</option>`;
 
-
-if (!profile.achievements) {
-  profile.achievements = [];
-}
-if (!profile.displayAchievements) {
-  profile.displayAchievements = [];
-}
-if (!statusData) {
-  statusData = {};
-}
-
-
 // ===== ホーム =====
 function renderHome() {
   viewName.textContent = `名前：${profile.name}`;
