@@ -44,7 +44,6 @@
   <div class="card">
     <h2>項目管理</h2>
     <div id="itemList"></div>
-
     <input id="newItemName" placeholder="項目名">
     <button onclick="addItem()">追加</button>
   </div>
@@ -71,40 +70,7 @@
 
     <label>所属</label>
     <input id="inputSchool">
-
-    <label>実績1</label>
-    <select id="rankAch1">
-      <option value="c">C</option>
-      <option value="b">B</option>
-      <option value="a">A</option>
-      <option value="s">S</option>
-      <option value="ss">SS</option>
-    </select>
-
-    <input id="inputAch1" placeholder="実績内容">
-
-    <label>実績2</label>
-    <select id="rankAch2">
-      <option value="c">C</option>
-      <option value="b">B</option>
-      <option value="a">A</option>
-      <option value="s">S</option>
-      <option value="ss">SS</option>
-    </select>
-
-    <input id="inputAch2" placeholder="実績内容">
-
-    <label>実績3</label>
-    <select id="rankAch3">
-      <option value="c">C</option>
-      <option value="b">B</option>
-      <option value="a">A</option>
-      <option value="s">S</option>
-      <option value="ss">SS</option>
-    </select>
-    <input id="inputAch3" placeholder="実績内容">
   </div>
-
 
   <h2>ステータス管理</h2>
   <div class="card" id="statusManage"></div>
@@ -116,12 +82,32 @@
 
   <button onclick="saveData()">保存</button>
 </div>
+
 <!-- 実績一覧 -->
-  <div id="achievementList" class="screen hidden">
-    <button class="back" onclick="backHome()">← 戻る</button>
-    <h1>実績一覧</h1>
-    <div class="card" id="achievementCards"></div>
+<div id="achievementList" class="screen hidden">
+  <button class="back" onclick="backHome()">← 戻る</button>
+  <h1>実績一覧</h1>
+
+  <div class="card" id="achievementCards"></div>
+
+  <div class="card">
+    <h2>実績を追加</h2>
+
+    <label>実績内容</label>
+    <input id="newAchText" placeholder="実績内容">
+
+    <label>ランク</label>
+    <select id="newAchRank">
+      <option value="c">C</option>
+      <option value="b">B</option>
+      <option value="a">A</option>
+      <option value="s">S</option>
+      <option value="ss">SS</option>
+    </select>
+
+    <button onclick="addAchievement()">実績を追加</button>
   </div>
+</div>
 
 <script src="script.js"></script>
 </body>

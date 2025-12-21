@@ -27,6 +27,9 @@ const inputAch3 = document.getElementById("inputAch3");
 const newStatusName = document.getElementById("newStatusName");
 const statusManage = document.getElementById("statusManage");
 const achievementList = document.getElementById("achievementList");
+const newAchText = document.getElementById("newAchText");
+const newAchRank = document.getElementById("newAchRank");
+
 
 let chart = null;
 let currentKey = "";
@@ -69,12 +72,15 @@ function loadStorage() {
 let profile = {
   name: "Re",
   school: "〇〇学校",
-  achievements: [
-    { text: "", rank: "c" },
-    { text: "", rank: "c" },
-    { text: "", rank: "c" }
-  ]
+
+  // 実績データ（無制限）
+  achievements: [],
+
+  // ホームに表示する実績ID（最大3つ）
+  displayAchievements: []
 };
+
+
 
 let statusData = {};
 
@@ -115,7 +121,9 @@ function renderHome() {
   const achEls = [ach1, ach2, ach3];
 
   achEls.forEach((el, i) => {
-    const a = profile.achievements[i];
+    const id = profile.displayAchievements[i];
+    const a = profile.achievements.find(x => x.id === id);
+
 
     if (!a || !a.text) {
       el.innerHTML = `${i + 1}.`;
@@ -157,6 +165,25 @@ function rankToJP(rank) {
   }[rank];
 }
 
+function addAchievement() {
+  const text = newAchText.value.trim();
+  const rank = newAchRank.value;
+  if (!text) return;
+
+  profile.achievements.push({
+    id: Date.now(),
+    text,
+    rank
+  });
+
+  newAchText.value = "";
+  saveStorage();
+  renderAchievementList();
+  renderHome();
+}
+
+
+
 function openAchievementList() {
   hideAll();
   document.getElementById("achievementList").classList.remove("hidden");
@@ -173,21 +200,48 @@ function renderAchievementList() {
     const card = document.createElement("div");
     card.className = "achievement-card";
 
+    const selected = profile.displayAchievements.includes(a.id);
+
+   
     card.innerHTML = `
-      <div class="achievement-rank ${a.rank}">
-        ${rankToJP(a.rank)}
-      </div>
-      <div class="achievement-content">
-        <div class="achievement-title">実績${i + 1}</div>
-        <div class="achievement-text ${a.rank}">
-          ${a.text}
-        </div>
-      </div>
+    <div class="achievement-rank ${a.rank}">
+    ${rankToJP(a.rank)}
+    </div>
+    <div class="achievement-content">
+    <div class="achievement-text ${a.rank}">
+    ${a.text}
+    </div>
+    <button class="small"
+    style="background:${selected ? '#2563eb' : '#555'}"
+    onclick="toggleDisplayAchievement(${a.id})">
+    ${selected ? "表示中" : "ホーム表示"}
+    </button>
+    </div>
     `;
+
 
     area.appendChild(card);
   });
 }
+
+function toggleDisplayAchievement(id) {
+  const idx = profile.displayAchievements.indexOf(id);
+
+  if (idx >= 0) {
+    profile.displayAchievements.splice(idx, 1);
+  } else {
+    if (profile.displayAchievements.length >= 3) {
+      alert("表示できるのは3つまで");
+      return;
+    }
+    profile.displayAchievements.push(id);
+  }
+
+  saveStorage();
+  renderAchievementList();
+  renderHome();
+}
+
 
 
 // ===== ステータス =====
@@ -309,14 +363,6 @@ function openEdit() {
 
   inputName.value = profile.name;
   inputSchool.value = profile.school;
-  inputAch1.value = profile.achievements[0].text;
-  inputAch2.value = profile.achievements[1].text;
-  inputAch3.value = profile.achievements[2].text;
-
-
-  document.getElementById("rankAch1").value = profile.achievements[0].rank;
-  document.getElementById("rankAch2").value = profile.achievements[1].rank;
-  document.getElementById("rankAch3").value = profile.achievements[2].rank;
 
   renderStatusManage();
 }
@@ -361,21 +407,6 @@ function deleteStatus(key) {
 function saveData() {
   profile.name = inputName.value;
   profile.school = inputSchool.value;
-
-  profile.achievements = [
-    {
-      text: inputAch1.value,
-      rank: document.getElementById("rankAch1").value
-    },
-    {
-      text: inputAch2.value,
-      rank: document.getElementById("rankAch2").value
-    },
-    {
-      text: inputAch3.value,
-      rank: document.getElementById("rankAch3").value
-    }
-  ];
 
   saveStorage();
   backHome();

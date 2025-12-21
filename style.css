@@ -45,6 +45,16 @@ button {
   background: #4f46e5;
   color: white;
   font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s;
+}
+
+button:hover {
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+button:active {
+  transform: translateY(1px);
 }
 
 button.edit {
@@ -55,7 +65,8 @@ button.back {
   background: none;
   color: #374151;
   text-align: left;
-  padding: 6px 0;
+  padding: 8px 0;
+  font-weight: 600;
 }
 
 button.small {
@@ -63,6 +74,7 @@ button.small {
   padding: 6px 10px;
   font-size: 12px;
   border-radius: 8px;
+  background: #6b7280;
 }
 
 button.danger {
@@ -77,6 +89,13 @@ input, select {
   border-radius: 10px;
   border: 1px solid #e5e7eb;
   background: #fafafa;
+  font-size: 0.95em;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
 }
 
 .time-row {
@@ -86,6 +105,21 @@ input, select {
 }
 
 /* ===== 実績 ===== */
+.achievement-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 6px;
+  border-radius: 12px;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.achievement-card:hover {
+  background: #f3f4f6;
+  transform: translateY(-1px);
+}
+
 .achievement-text {
   font-size: 1.15em;
   font-weight: 800;
@@ -95,59 +129,20 @@ input, select {
   margin-top: 6px;
 }
 
-/* ===== チャート ===== */
-canvas {
-  margin: 10px 0 20px;
-}
-
-.status-card {
-  background: #f9fafb;
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.status-title {
-  font-weight: 700;
-  font-size: 1.05em;
-}
-
-.status-time {
-  font-size: 0.9em;
-  color: #4b5563;
-  margin-top: 4px;
-}
-
-.achievement-text.c {
-  color: #b87333;
-}
-
-.achievement-text.b {
-  color: #9ca3af;
-}
-
+/* ===== ランク色 ===== */
+.achievement-text.c { color: #b87333; }
+.achievement-text.b { color: #9ca3af; }
 .achievement-text.a {
   color: #facc15;
   text-shadow: 0 0 4px rgba(250,204,21,0.6);
 }
-
 .achievement-text.s {
   color: #3b82f6;
   text-shadow: 0 0 6px rgba(59,130,246,0.7);
 }
-
 .achievement-text.ss {
   color: #ef4444;
   text-shadow: 0 0 6px rgba(239,68,68,0.8);
-}
-
-.achievement-card {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 12px;
 }
 
 .achievement-rank {
@@ -170,4 +165,36 @@ canvas {
 .achievement-title {
   font-size: 0.85em;
   color: #6b7280;
+}
+
+/* ===== ステータス ===== */
+.status-card {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.status-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+}
+
+.status-title {
+  font-weight: 700;
+  font-size: 1.05em;
+}
+
+.status-time {
+  font-size: 0.9em;
+  color: #4b5563;
+  margin-top: 4px;
+}
+
+/* ===== チャート ===== */
+canvas {
+  margin: 10px 0 20px;
 }
