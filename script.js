@@ -187,9 +187,10 @@ function addAchievement() {
 
 function openAchievementList() {
   hideAll();
-  document.getElementById("achievementList").classList.remove("hidden");
+  achievementList.classList.remove("hidden");
   renderAchievementList();
 }
+
 
 function renderAchievementList() {
   achievementCards.innerHTML = "";
@@ -220,7 +221,7 @@ function renderAchievementList() {
     `;
 
 
-    area.appendChild(card);
+    achievementCards.appendChild(card);
   });
 }
 
