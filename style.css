@@ -242,3 +242,9 @@ body.has-bg .card {
 .card {
   background: rgba(255,255,255,var(--card-bg-alpha));
 }
+
+.screen {
+  max-width: 480px;
+  margin: auto;
+  padding: 0 6px;
+}
