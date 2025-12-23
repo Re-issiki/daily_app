@@ -487,10 +487,13 @@ function applyBackground() {
   const bg = localStorage.getItem("bgImage");
   if (bg) {
     document.body.style.backgroundImage = `url(${bg})`;
+    document.body.classList.add("has-bg");
   } else {
     document.body.style.backgroundImage = "";
+    document.body.classList.remove("has-bg");
   }
 }
+
 
 function clearBackground() {
   if (!confirm("背景画像をリセットしますか？")) return;
