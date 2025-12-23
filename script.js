@@ -494,12 +494,23 @@ function applyBackground() {
   }
 }
 
-
 function clearBackground() {
   if (!confirm("背景画像をリセットしますか？")) return;
   localStorage.removeItem("bgImage");
   applyBackground();
 }
+
+function setCardOpacity(value) {
+  localStorage.setItem("cardOpacity", value);
+  applyCardOpacity();
+}
+
+function applyCardOpacity() {
+  const v = localStorage.getItem("cardOpacity") || 1;
+  document.documentElement.style
+    .setProperty("--card-bg-alpha", v);
+}
+
 
 
 // ===== 画面 =====
@@ -527,5 +538,6 @@ function hideAll() {
 
 loadStorage();
 applyBackground();
+applyCardOpacity();
 renderHome();
 

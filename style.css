@@ -232,3 +232,18 @@ body.has-bg button.back {
 body.has-bg .card {
   border: 1px solid rgba(255,255,255,0.35);
 }
+
+/*背景透明化*/
+:root {
+  --card-bg-alpha: 1;
+}
+.card {
+  background: rgba(255,255,255,var(--card-bg-alpha));
+}
+body.has-bg .card,
+body.has-bg .status-card,
+body.has-bg .achievement-card {
+  background: rgba(255,255,255,var(--card-bg-alpha));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
