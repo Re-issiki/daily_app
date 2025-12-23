@@ -433,7 +433,7 @@ function renderStatusManage() {
     row.style.display = "flex";
     row.innerHTML = `
       <span style="flex:1">${statusData[k].title}</span>
-      <button style="background:#dc2626" onclick="deleteStatus('${k}')">削除</button>
+      <button class="small danger" onclick="deleteStatus('${statusName}')">削除</button>
     `;
     statusManage.appendChild(row);
   });
