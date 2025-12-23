@@ -507,9 +507,14 @@ function setCardOpacity(value) {
 
 function applyCardOpacity() {
   const v = localStorage.getItem("cardOpacity") || 1;
-  document.documentElement.style
-    .setProperty("--card-bg-alpha", v);
+
+  document.documentElement
+    .style.setProperty("--card-bg-alpha", v);
+
+  const slider = document.getElementById("cardOpacitySlider");
+  if (slider) slider.value = v;
 }
+
 
 
 
