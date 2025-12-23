@@ -470,6 +470,35 @@ function deleteStatus(key) {
   backHome();
 }
 
+function setBackgroundImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const base64 = reader.result;
+    localStorage.setItem("bgImage", base64);
+    applyBackground();
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyBackground() {
+  const bg = localStorage.getItem("bgImage");
+  if (bg) {
+    document.body.style.backgroundImage = `url(${bg})`;
+  } else {
+    document.body.style.backgroundImage = "";
+  }
+}
+
+function clearBackground() {
+  if (!confirm("背景画像をリセットしますか？")) return;
+  localStorage.removeItem("bgImage");
+  applyBackground();
+}
+
+
 // ===== 画面 =====
 function saveData() {
   profile.name = inputName.value;
@@ -494,5 +523,6 @@ function hideAll() {
 }
 
 loadStorage();
+applyBackground();
 renderHome();
 

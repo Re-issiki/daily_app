@@ -1,9 +1,13 @@
 body {
   font-family: system-ui, sans-serif;
-  background: linear-gradient(180deg, #f8fafc, #eef2ff);
+  background-color: #f8fafc;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   margin: 0;
   padding: 14px;
 }
+
 
 .screen {
   max-width: 480px;
