@@ -94,7 +94,9 @@ input, select {
   border: 1px solid #e5e7eb;
   background: #fafafa;
   font-size: 0.95em;
+  box-sizing: border-box;
 }
+
 
 input:focus, select:focus {
   outline: none;
