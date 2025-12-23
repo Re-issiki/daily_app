@@ -217,8 +217,6 @@ body.has-bg .card,
 body.has-bg .status-card,
 body.has-bg .achievement-card {
   background: rgba(255,255,255,var(--card-bg-alpha));
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
 }
 body.has-bg h1,
 body.has-bg h2 {
