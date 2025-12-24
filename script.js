@@ -433,11 +433,14 @@ function renderStatusManage() {
     row.style.display = "flex";
     row.innerHTML = `
       <span style="flex:1">${statusData[k].title}</span>
-      <button class="small danger" onclick="deleteStatus('${statusName}')">削除</button>
+      <button class="small danger" onclick="deleteStatus('${k}')">
+        削除
+      </button>
     `;
     statusManage.appendChild(row);
   });
 }
+
 
 function getStatusTotalMinutes(key) {
   return statusData[key].items.reduce((sum, item) => {
