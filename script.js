@@ -383,13 +383,26 @@ function deleteItem(idx) {
 
 function addStudy() {
   if (itemSelect.value === "") return;
-  const m = hourSelect.value * 60 + Number(minuteSelect.value);
+
+  const h = Number(hourSelect.value);
+  const min = Number(minuteSelect.value);
+  const m = h * 60 + min;
+
   if (m <= 0) return;
+
+  // 追加確認ダイアログ
+  const targetName = statusData[currentKey].items[itemSelect.value].name;
+  const message =
+    `${targetName} に「${h}時間${min}分」を追加します。\n本当によろしいですか？`;
+
+  if (!confirm(message)) return;
+
   statusData[currentKey].items[itemSelect.value].minutes += m;
   saveStorage();
   renderItemList();
   drawChart();
 }
+
 
 // ===== チャート =====
 function drawChart() {
