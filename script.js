@@ -414,9 +414,14 @@ function drawChart() {
     type: "radar",
     data: {
       labels: items.map(i => i.name),
-      datasets: [{ data: items.map(i => minutesToRank(i.minutes)) }]
+      datasets: [{
+        data: items.map(i => minutesToRank(i.minutes))
+      }]
     },
     options: {
+      plugins: {
+        legend: { display: false } // ← ここで表示を止める
+      },
       scales: {
         r: {
           min: 1,
