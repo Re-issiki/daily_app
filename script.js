@@ -1130,60 +1130,86 @@ window.addEventListener("load", () => {
   hideAll();
   document.getElementById(scr).classList.remove("hidden");
 
-  // ホームは再描画必須
-  if (scr === "home") renderHome();
+  switch(scr) {
+    case "home":
+      renderHome();
+      break;
 
-  // ステータス画面を復元
-  if (scr === "status") {
-  currentKey = loadCurrentKey();
+    case "status":
+      currentKey = loadCurrentKey();
+      if (!currentKey || !statusData[currentKey]) {
+        backHome();
+        return;
+      }
+      const st = statusData[currentKey];
+      if (!st || !Array.isArray(st.items)) {
+        backHome();
+        return;
+      }
+      statusTitle.textContent = st.title;
+      updateItemSelect();
+      renderItemList();
+      drawChart();
+      break;
 
-  // currentKey が壊れてたらホームへ退避
-  if (!currentKey || !statusData[currentKey]) {
-    backHome();
-    return;
-  }
-  const st = statusData[currentKey];
+    case "edit":
+      edit.classList.remove("hidden");
+      inputName.value   = localStorage.getItem("editName")   || profile.name;
+      inputSchool.value = localStorage.getItem("editSchool") || profile.school;
+      renderStatusManage();
+      break;
 
-  // あり得ない壊れ方をした場合の保険
-  if (!st || !Array.isArray(st.items)) {
-    backHome();
-    return;
-  }
- 
-  statusTitle.textContent = st.title;
-  updateItemSelect();
-  renderItemList();
-  drawChart();
-  }
-  // ポモドーロ画面の復元
-  if (scr === "pomodoro") {
-    fillPomodoroSubjectSelect();
-    fillPomodoroItemSelect(pomodoroSubject.value);
-    // 入力値の復元
-    pomodoroWork.value  = localStorage.getItem("pomodoroWork")  || 25;
-    pomodoroBreak.value = localStorage.getItem("pomodoroBreak") || 5;
-    if (localStorage.getItem("pomodoroSubjectSel"))
-      pomodoroSubject.value = localStorage.getItem("pomodoroSubjectSel");
+    case "achievementList":
+      achievementList.classList.remove("hidden");
+      renderAchievementList();
+      break;
+
+    case "pomodoro":
+      pomodoro.classList.remove("hidden");
+
+      // 入力値復元
+      pomodoroWork.value  = localStorage.getItem("pomodoroWork")  || 25;
+      pomodoroBreak.value = localStorage.getItem("pomodoroBreak") || 5;
+      if (localStorage.getItem("pomodoroSubjectSel"))
+        pomodoroSubject.value = localStorage.getItem("pomodoroSubjectSel");
+
+      fillPomodoroSubjectSelect();
       fillPomodoroItemSelect(pomodoroSubject.value);
+
       if (localStorage.getItem("pomodoroItemSel"))
         pomodoroItem.value = localStorage.getItem("pomodoroItemSel");
-        renderPomodoroStats();
-        // タイマーが動いていたら復元
-        if (timerState) {
-          const elapsed = Math.floor((Date.now() - timerState.startedAt)/1000);
-          remaining = Math.max(0, timerState.sessionTotal - elapsed);
-          mode = timerState.mode;
-          runTimer(timerState.work, timerState.brk);
-        }
 
+      renderPomodoroStats();
 
+      // ★タイマー復元
+      if (timerState) {
+        const elapsed = Math.floor((Date.now() - timerState.startedAt) / 1000);
+        remaining = Math.max(0, timerState.sessionTotal - elapsed);
+        mode = timerState.mode;
+
+        // 元のワーク・ブレイク時間を保持
+        const work = timerState.work;
+        const brk  = timerState.brk;
+
+        // 残り時間を sessionTotal にセットし、開始時間を更新
+        timerState.sessionTotal = remaining;
+        timerState.startedAt = Date.now();
+
+        runTimer(work, brk);
+      }
+      break;
+
+    case "pomodoroHistoryScreen":
+      pomodoroHistoryScreen.classList.remove("hidden");
+      renderPomodoroHistoryScreen();
+      break;
+
+    default:
+      backHome();
+      break;
   }
-
-
-
-  if (scr === "achievementList") renderAchievementList();
-  if (scr === "pomodoroHistoryScreen") renderPomodoroHistoryScreen();
 });
+
 
 applyBackground();
 applyCardOpacity();
