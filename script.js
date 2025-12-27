@@ -309,6 +309,10 @@ function toggleDisplayAchievement(id) {
 // ===== ステータス =====
 function openStatus(key) {
   currentKey = key;
+  localStorage.setItem("currentStatusKey", key);
+
+
+
   hideAll();
   status.classList.remove("hidden");
   setCurrentScreen("status");
@@ -1046,11 +1050,24 @@ window.addEventListener("load", () => {
   hideAll();
   document.getElementById(scr).classList.remove("hidden");
 
-  // 画面ごとに再描画が必要なら追記
-  if (scr === "status") drawChart();
+  // ホームは再描画必須
+  if (scr === "home") renderHome();
+
+  // ステータス画面を復元
+  if (scr === "status") {
+    currentKey = localStorage.getItem("currentStatusKey");
+    if (currentKey && statusData[currentKey]) {
+      statusTitle.textContent = statusData[currentKey].title;
+      updateItemSelect();
+      renderItemList();
+      drawChart();
+    }
+  }
+
   if (scr === "achievementList") renderAchievementList();
   if (scr === "pomodoroHistoryScreen") renderPomodoroHistoryScreen();
 });
+
 applyBackground();
 applyCardOpacity();
 renderHome();
