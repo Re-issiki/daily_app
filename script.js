@@ -36,6 +36,14 @@ const achievementCards = document.getElementById("achievementCards");
 let chart = null;
 let currentKey = "";
 
+function saveCurrentKey(key){
+  localStorage.setItem("currentStatusKey", key);
+}
+function loadCurrentKey(){
+  return localStorage.getItem("currentStatusKey") || "";
+}
+
+
 // ===== 永続化 =====
 function saveStorage() {
   localStorage.setItem("profile", JSON.stringify(profile));
@@ -309,6 +317,7 @@ function toggleDisplayAchievement(id) {
 // ===== ステータス =====
 function openStatus(key) {
   currentKey = key;
+  saveCurrentKey(key);
   localStorage.setItem("currentStatusKey", key);
 
 
@@ -1055,14 +1064,21 @@ window.addEventListener("load", () => {
 
   // ステータス画面を復元
   if (scr === "status") {
-    currentKey = localStorage.getItem("currentStatusKey");
-    if (currentKey && statusData[currentKey]) {
-      statusTitle.textContent = statusData[currentKey].title;
-      updateItemSelect();
-      renderItemList();
-      drawChart();
-    }
+  currentKey = loadCurrentKey();
+
+  // currentKey が壊れてたらホームへ退避
+  if (!currentKey || !statusData[currentKey]) {
+    backHome();
+    return;
   }
+  statusTitle.textContent = statusData[currentKey].title;
+  
+  updateItemSelect();
+  renderItemList();
+  drawChart();
+
+}
+
 
   if (scr === "achievementList") renderAchievementList();
   if (scr === "pomodoroHistoryScreen") renderPomodoroHistoryScreen();
