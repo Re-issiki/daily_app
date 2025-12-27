@@ -518,6 +518,75 @@ function applyCardOpacity() {
   if (slider) slider.value = v;
 }
 
+//ポモドーロタイマー
+let pomodoroTimer = null;
+let pomodoroSeconds = 25 * 60; // 25分
+let pomodoroRemaining = pomodoroSeconds;
+
+function openPomodoro() {
+  hideAll();
+  document.getElementById("pomodoro").classList.remove("hidden");
+  drawPomodoro();
+}
+
+function drawPomodoro() {
+  const canvas = document.getElementById("pomodoroCanvas");
+  const ctx = canvas.getContext("2d");
+  const radius = canvas.width / 2 - 10;
+  const center = canvas.width / 2;
+
+  // 背景円
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.beginPath();
+  ctx.arc(center, center, radius, 0, 2 * Math.PI);
+  ctx.strokeStyle = "#e5e7eb";
+  ctx.lineWidth = 10;
+  ctx.stroke();
+
+  // 進捗円
+  const progress = (pomodoroSeconds - pomodoroRemaining) / pomodoroSeconds;
+  ctx.beginPath();
+  ctx.arc(center, center, radius, -Math.PI/2, -Math.PI/2 + 2 * Math.PI * progress);
+  ctx.strokeStyle = "#4f46e5";
+  ctx.lineWidth = 10;
+  ctx.stroke();
+
+  // 中心に残り時間表示
+  ctx.fillStyle = "#374151";
+  ctx.font = "20px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  const m = Math.floor(pomodoroRemaining / 60);
+  const s = pomodoroRemaining % 60;
+  ctx.fillText(`${m}:${s.toString().padStart(2,"0")}`, center, center);
+}
+
+function startPomodoro() {
+  if (pomodoroTimer) return;
+  pomodoroTimer = setInterval(() => {
+    pomodoroRemaining--;
+    if (pomodoroRemaining <= 0) {
+      clearInterval(pomodoroTimer);
+      pomodoroTimer = null;
+      alert("ポモドーロ終了！");
+      pomodoroRemaining = pomodoroSeconds;
+    }
+    drawPomodoro();
+  }, 1000);
+}
+
+function pausePomodoro() {
+  if (pomodoroTimer) {
+    clearInterval(pomodoroTimer);
+    pomodoroTimer = null;
+  }
+}
+
+function resetPomodoro() {
+  pausePomodoro();
+  pomodoroRemaining = pomodoroSeconds;
+  drawPomodoro();
+}
 
 
 

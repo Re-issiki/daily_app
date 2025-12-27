@@ -30,6 +30,7 @@
   <div class="card" id="statusButtons"></div>
 
   <button class="edit" onclick="openEdit()">＋ データ入力</button>
+  <button onclick="openPomodoro()">✎勉強をする</button>
 </div>
 
 <!-- ステータス詳細 -->
@@ -124,6 +125,18 @@
     <button onclick="addAchievement()">実績を追加</button>
   </div>
 </div>
+
+<div id="pomodoro" class="screen hidden">
+  <button class="back" onclick="backHome()">← 戻る</button>
+  <h1>ポモドーロタイマー</h1>
+  <canvas id="pomodoroCanvas" width="200" height="200"></canvas>
+  <div style="text-align:center; margin-top:10px;">
+    <button onclick="startPomodoro()">スタート</button>
+    <button onclick="pausePomodoro()">一時停止</button>
+    <button onclick="resetPomodoro()">リセット</button>
+  </div>
+</div>
+
 
 <script src="script.js"></script>
 </body>
