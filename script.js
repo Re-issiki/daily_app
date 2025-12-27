@@ -485,6 +485,7 @@ function openEdit() {
   edit.classList.remove("hidden");
   setCurrentScreen("edit");
 
+  // profile の値を入力欄に反映
   inputName.value = profile.name;
   inputSchool.value = profile.school;
 
@@ -1081,10 +1082,14 @@ function drawPomodoroChart() {
 
 // ===== 画面 =====
 function saveData() {
-  profile.name = inputName.value;
-  profile.school = inputSchool.value;
+  // 空白トリムして profile に反映
+  profile.name = inputName.value.trim() || profile.name;
+  profile.school = inputSchool.value.trim() || profile.school;
 
+  // localStorage に保存
   saveStorage();
+
+  // ホーム描画して戻る
   backHome();
 }
 
@@ -1093,6 +1098,8 @@ function backHome() {
   hideAll();
   home.classList.remove("hidden");
   setCurrentScreen("home");
+
+  // profile の値を使って描画
   renderHome();
 }
 
