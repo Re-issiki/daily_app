@@ -340,13 +340,15 @@ function openStatus(key) {
   const savedHour = localStorage.getItem("status_hour");
   const savedMin  = localStorage.getItem("status_min");
 
-  if (savedItem !== null) itemSelect.value = savedItem;
+  if (savedItem !== null && statusData[currentKey].items[savedItem]) {
+    itemSelect.value = savedItem;
+  } else {
+    itemSelect.value = 0;
+  }
+
   if (savedHour !== null) hourSelect.value = savedHour;
   if (savedMin  !== null) minuteSelect.value = savedMin;
 }
-itemSelect.addEventListener("change", saveStatusFormState);
-hourSelect.addEventListener("change", saveStatusFormState);
-minuteSelect.addEventListener("change", saveStatusFormState);
 
 
 
@@ -420,6 +422,10 @@ function saveStatusFormState() {
   localStorage.setItem("status_hour", hourSelect.value);
   localStorage.setItem("status_min",  minuteSelect.value);
 }
+itemSelect.addEventListener("change", saveStatusFormState);
+hourSelect.addEventListener("change", saveStatusFormState);
+minuteSelect.addEventListener("change", saveStatusFormState);
+
 
 
 function addStudy() {
@@ -731,8 +737,9 @@ function showUndoToast(min) {
 function undoPomodoro() {
   if (!lastPomodoroAdd) return;
 
-  const { key, amount } = lastPomodoroAdd;
-  pomodoroLog[key] = Math.max(0, (pomodoroLog[key] || 0) - amount);
+  const { date, minutes } = lastPomodoroAdd;
+  pomodoroLog[date] = Math.max(0, (pomodoroLog[date] || 0) - minutes);
+
 
   savePomodoroLog();
   lastPomodoroAdd = null;
@@ -748,7 +755,7 @@ function getTotalForDate(key) {
     .reduce((a,b)=>a+b.minutes, 0);
 }
 
-function getWeekTotal() {
+function getWeekTotalFromSessions() {
   const now = new Date();
   let sum = 0;
 
@@ -761,7 +768,7 @@ function getWeekTotal() {
 }
 
 function renderPomodoroHistory() {
-  const box = document.getElementById("pomodoroHistory");
+  const box = document.getElementById("pomodoroHistoryList");
   box.innerHTML = "";
 
   // 新しい順に
@@ -1123,11 +1130,32 @@ window.addEventListener("load", () => {
     backHome();
     return;
   }
+ 
   statusTitle.textContent = st.title;
   updateItemSelect();
   renderItemList();
   drawChart();
-}
+  }
+  // ポモドーロ画面の復元
+  if (scr === "pomodoro") {
+    fillPomodoroSubjectSelect();
+    fillPomodoroItemSelect(pomodoroSubject.value);
+    // 入力値の復元
+    pomodoroWork.value  = localStorage.getItem("pomodoroWork")  || 25;
+    pomodoroBreak.value = localStorage.getItem("pomodoroBreak") || 5;
+    if (localStorage.getItem("pomodoroSubjectSel"))
+      pomodoroSubject.value = localStorage.getItem("pomodoroSubjectSel");
+      fillPomodoroItemSelect(pomodoroSubject.value);
+      if (localStorage.getItem("pomodoroItemSel"))
+        pomodoroItem.value = localStorage.getItem("pomodoroItemSel");
+        renderPomodoroStats();
+        // タイマーが動いていたら復元
+        if (timerState) {
+          mode = timerState.mode;
+          runTimer(timerState.work, timerState.brk);
+        }
+  }
+
 
 
   if (scr === "achievementList") renderAchievementList();
