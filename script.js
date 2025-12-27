@@ -572,8 +572,23 @@ let mode = "work"; // work / break
 function openPomodoro() {
   hideAll();
   pomodoro.classList.remove("hidden");
+
+  fillPomodoroSubjectSelect();
   renderPomodoroStats();
 }
+
+function fillPomodoroSubjectSelect() {
+  const sel = document.getElementById("pomodoroSubject");
+  sel.innerHTML = "";
+
+  statusData.forEach(st => {
+    const opt = document.createElement("option");
+    opt.value = st.name;
+    opt.textContent = st.name;
+    sel.appendChild(opt);
+  });
+}
+
 
 function minutesToText(m){ return `${Math.floor(m/60)}時間${m%60}分`; }
 
@@ -610,18 +625,22 @@ function renderPomodoroStats() {
 let lastPomodoroAdd = null; // ← 直前の追加記録
 
 function addPomodoroMinutes(min) {
+  const subject = document.getElementById("pomodoroSubject").value;
+
   const session = {
     id: Date.now(),
     date: todayKey(),
-    minutes: min
+    minutes: min,
+    subject
   };
 
   pomodoroSessions.push(session);
   savePomodoroSessions();
 
-  lastPomodoroAdd = session;   // ← Undo もそのまま使える
+  lastPomodoroAdd = session;
   showUndoToast(min);
 }
+
 
 
 function showUndoToast(min) {
@@ -741,14 +760,18 @@ function renderPomodoroHistoryScreen() {
     const row = document.createElement("div");
     row.className = "achievement-card";
     row.innerHTML = `
-      <div style="flex:1;">
-        ${s.date}　${minutesToText(s.minutes)}
-      </div>
-      <button class="small danger"
-        onclick="deletePomodoro(${s.id}); renderPomodoroHistoryScreen();">
-        削除
-      </button>
+    <div style="flex:1;">
+    ${s.date}　${minutesToText(s.minutes)}
+    <div style="font-size:0.85em; color:#666;">
+    項目：${s.subject || "未指定"}
+    </div>
+    </div>
+    <button class="small danger"
+    onclick="deletePomodoro(${s.id}); renderPomodoroHistoryScreen();">
+    削除
+    </button>
     `;
+
     pomodoroHistoryList.appendChild(row);
   });
 }
