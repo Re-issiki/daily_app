@@ -629,41 +629,33 @@ function openPomodoro() {
 
   fillPomodoroSubjectSelect();
   
-  // まず保存されてる選択を取得
   const savedSubject = localStorage.getItem("pomodoroSubjectSel");
   const savedItem    = localStorage.getItem("pomodoroItemSel");
 
-  // 復元
   if (savedSubject) pomodoroSubject.value = savedSubject;
   fillPomodoroItemSelect(pomodoroSubject.value);
   if (savedItem) pomodoroItem.value = savedItem;
 
-  // ワーク/ブレイク設定
   pomodoroWork.value  = localStorage.getItem("pomodoroWork")  || 25;
   pomodoroBreak.value = localStorage.getItem("pomodoroBreak") || 5;
 
   renderPomodoroStats();
 
-  // タイマーが動いていたら復元
+  // タイマー復元
   if (timerState) {
     const elapsed = Math.floor((Date.now() - timerState.startedAt)/1000);
-    remaining = Math.max(0, timerState.sessionTotal - elapsed);
-    mode = timerState.mode;
+    remaining = Math.max(0, timerState.remaining - elapsed);
+    currentMode = timerState.mode;
+    mode = currentMode; // UI用に反映
 
-    // 再描画する前に選択を保持
-    const currentSubject = pomodoroSubject.value;
-    const currentItem    = pomodoroItem.value;
+    // sessionTotal を残り時間に合わせて更新
+    timerState.sessionTotal = remaining;
+    timerState.startedAt = Date.now();
+    saveTimerState();
 
-    runTimer(timerState.work, timerState.brk);
-
-    // ここで選択を復元
-    pomodoroSubject.value = currentSubject;
-    pomodoroItem.value    = currentItem;
+    runPomodoroTimer(timerState.work, timerState.brk);
   }
 }
-
-
-
 
 
 
@@ -895,8 +887,11 @@ function saveTimerState() {
 
 
 function startPomodoro() {
-  const work = Number(pomodoroWork.value);
-  const brk  = Number(pomodoroBreak.value);
+  const subject = pomodoroSubject.value;
+  const item = pomodoroItem.value;
+  const work  = Number(pomodoroWork.value);
+  const brk   = Number(pomodoroBreak.value);
+  const repeat = Number(pomodoroRepeat.value);
 
   localStorage.setItem("pomodoroWork", work);
   localStorage.setItem("pomodoroBreak", brk);
@@ -904,51 +899,95 @@ function startPomodoro() {
   localStorage.setItem("pomodoroItemSel", pomodoroItem.value);
 
 
-  mode = "work";
-  remaining = work * 60;
+  if (!subject || !item) {
+    alert("科目と項目を選択してください");
+    return;
+  }
 
+  const itemName = pomodoroItem.options[pomodoroItem.selectedIndex].text;
+
+  const confirmMsg = `科目：${pomodoroSubject.options[pomodoroSubject.selectedIndex].text}\n` +
+                     `項目：${itemName}\n` +
+                     `ポモドーロ時間：${work}分、休憩時間：${brk}分\n` +
+                     `繰り返し回数：${repeat}回\n\n` +
+                     `以上で実行しますか？`;
+
+  if (!confirm(confirmMsg)) return;
+
+  // 開始後はボタン切り替え
+  document.getElementById("pomodoroStartBtn").style.display = "none";
+  document.getElementById("pomodoroCancelBtn").style.display = "inline-block";
+
+  // タイマー初期化
+  currentRepeat = repeat;       // ← 繰り返し回数をセット
+  currentMode = "work";
+  remaining = work * 60;
   timerState = {
-    mode,
+    mode: currentMode,
     remaining,
-    sessionTotal: work * 60,
+    sessionTotal: work*60,
     work,
     brk,
+    repeat,
     startedAt: Date.now()
   };
-
-  saveTimerState();
-  runTimer(work, brk);
+saveTimerState();
+runPomodoroTimer(work, brk);
 }
 
 
 
+
 function finishPomodoro(minutes) {
-  const subject = document.getElementById("pomodoroSubject").value;
-  const item = Number(document.getElementById("pomodoroItem").value);
+  const subject = pomodoroSubject.value;
+  const itemId  = Number(pomodoroItem.value);
+
+  // セッション保存
   const session = {
     id: Date.now(),
     date: getDateKey(new Date()),
     minutes,
     subject,
-    item   // ← index のまま保存でOK
+    item: itemId
   };
 
   pomodoroSessions.push(session);
   savePomodoro();
-  adjustItemMinutes(subject, item, minutes); // ← ★加算
-  showUndoToast(session);
-  refreshPomodoroUI();
+
+  // 対応する項目に時間を加算
+  adjustItemMinutes(subject, itemId, minutes);
+
+  // UI 更新
+  renderPomodoroStats();
+  renderPomodoroHistoryScreen();
+  showUndoToast(minutes);
 }
 
-function adjustItemMinutes(statusId, itemIndex, deltaMinutes) {
+// itemId で加算する専用関数
+function adjustItemMinutesById(statusId, itemId, deltaMinutes) {
   const st = statusData[statusId];
-  if(!st || !Array.isArray(st.items)) return;
+  if (!st || !Array.isArray(st.items)) return;
 
-  const it = st.items[itemIndex];
-  if(!it) return;
+  const it = st.items.find(it => it.id === itemId);
+  if (!it) return;
 
   it.minutes = (it.minutes || 0) + deltaMinutes;
-  if(it.minutes < 0) it.minutes = 0;
+  if (it.minutes < 0) it.minutes = 0;
+
+  saveStorage();
+  renderHome();
+}
+
+
+function adjustItemMinutes(statusId, itemId, deltaMinutes) {
+  const st = statusData[statusId];
+  if (!st || !Array.isArray(st.items)) return;
+
+  const it = st.items.find(it => it.id === itemId);
+  if (!it) return;
+
+  it.minutes = (it.minutes || 0) + deltaMinutes;
+  if (it.minutes < 0) it.minutes = 0;
 
   saveStorage();
   renderHome();
@@ -956,45 +995,69 @@ function adjustItemMinutes(statusId, itemIndex, deltaMinutes) {
 
 const circle = document.querySelector(".timerCircle .fg");
 
-function runTimer(work, brk) {
+function runPomodoroTimer(work, brk) {
   clearInterval(timerId);
 
   timerId = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - timerState.startedAt) / 1000);
-    remaining = timerState.sessionTotal - elapsed;
-
-    if (remaining < 0) remaining = 0;
-
+    remaining--;
     updateTimerUI(remaining, timerState.sessionTotal);
 
-    if (remaining === 0) {
+    if (remaining <= 0) {
       clearInterval(timerId);
 
-      if (mode === "work") {
+      if (currentMode === "work") {
+        // 作業時間終了 → 記録
         addPomodoroMinutes(work);
-        mode = "break";
-        setTimerColor();
 
+        if (currentRepeat > 1) {
+          // 次は休憩
+          currentMode = "break";
+          remaining = brk * 60;
+          timerState = {
+            mode: currentMode,
+            remaining,
+            sessionTotal: brk * 60,
+            work,
+            brk,
+            startedAt: Date.now()
+          };
+          currentRepeat--; // 繰り返し回数は work が終わった時点で減らす
+          saveTimerState();
+          runPomodoroTimer(work, brk);
+        } else {
+          // 繰り返し終了
+          endPomodoroCycle();
+        }
+
+      } else if (currentMode === "break") {
+        // 休憩終了 → 次の work
+        currentMode = "work";
+        remaining = work * 60;
         timerState = {
-          mode,
-          remaining: brk * 60,
-          sessionTotal: brk * 60,
-          work, brk,
+          mode: currentMode,
+          remaining,
+          sessionTotal: work * 60,
+          work,
+          brk,
           startedAt: Date.now()
         };
         saveTimerState();
-        runTimer(work, brk);
-
-      } else {
-        mode = "work";
-        timerState = null;
-        saveTimerState();
-        renderPomodoroStats();
+        runPomodoroTimer(work, brk);
       }
     }
-
   }, 1000);
 }
+
+
+function endPomodoroCycle() {
+  alert("ポモドーロサイクルが終了しました！");
+  document.getElementById("pomodoroStartBtn").style.display = "inline-block";
+  document.getElementById("pomodoroCancelBtn").style.display = "none";
+  timerState = null;
+  saveTimerState();
+  renderPomodoroStats();
+}
+
 
 function updateTimerUI(remain, total) {
   const t = Math.floor(remain / 60);

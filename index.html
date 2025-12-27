@@ -144,6 +144,10 @@
     <label>休憩時間（分）</label>
     <input id="pomodoroBreak" type="number" min="1" value="5">
 
+    <!-- 繰り返し回数 -->
+    <label>繰り返し回数</label>
+    <input id="pomodoroRepeat" type="number" min="1" value="1">
+
     <div class="timerWrap">
       <svg class="timerCircle" viewBox="0 0 100 100">
         <circle class="bg" cx="50" cy="50" r="45" />
@@ -152,7 +156,9 @@
       <div id="pomodoroTimerText" class="timerText">00:00</div>
     </div>
 
-    <button onclick="startPomodoro()">開始</button>
+    <!-- 開始／中断ボタン -->
+    <button id="pomodoroStartBtn" onclick="startPomodoro()">開始</button>
+    <button id="pomodoroCancelBtn" onclick="cancelPomodoro()" style="display:none;">中断</button>
   </div>
 
   <div class="card">
