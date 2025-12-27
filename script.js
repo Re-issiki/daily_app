@@ -564,11 +564,15 @@ let remaining = 0;
 let mode = "work"; // work / break
 
 function openPomodoro() {
-  switchScreen("pomodoro");
+  hideAll();
+  pomodoro.classList.remove("hidden");
+
   fillPomodoroSubjectSelect();
   const first = document.getElementById("pomodoroSubject").value;
   fillPomodoroItemSelect(first);
+  renderPomodoroStats();
 }
+
 
 
 function fillPomodoroItemSelect(statusId) {
