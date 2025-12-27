@@ -1097,5 +1097,5 @@ window.addEventListener("load", () => {
 
 applyBackground();
 applyCardOpacity();
-renderHome();
+
 
