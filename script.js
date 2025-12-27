@@ -556,12 +556,6 @@ function todayKey() {
   return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
 }
 
-function addPomodoroMinutes(min) {
-  const k = todayKey();
-  pomodoroLog[k] = (pomodoroLog[k] || 0) + min;
-  savePomodoroLog();
-}
-
 const pomodoro = document.getElementById("pomodoro");
 const pomodoroTimer = document.getElementById("pomodoroTimer");
 
@@ -581,15 +575,15 @@ function fillPomodoroSubjectSelect() {
   const sel = document.getElementById("pomodoroSubject");
   sel.innerHTML = "";
 
-  // ステータス一覧が存在する前提
-  (statusData || []).forEach(st => {
+  // ← ここを Object.keys に変更
+  Object.keys(statusData).forEach(key => {
+    const st = statusData[key];
     const opt = document.createElement("option");
-    opt.value = st.name;
-    opt.textContent = st.name;
+    opt.value = key;          // 科目IDで管理（後の連動に有利）
+    opt.textContent = st.title;
     sel.appendChild(opt);
   });
 
-  // もし1件も無ければ「未指定」だけ入れる
   if (!sel.children.length) {
     const opt = document.createElement("option");
     opt.value = "";
@@ -597,6 +591,7 @@ function fillPomodoroSubjectSelect() {
     sel.appendChild(opt);
   }
 }
+
 
 
 
@@ -844,14 +839,20 @@ function getLast7DaysData() {
   for (let i = 6; i >= 0; i--) {
     const d = new Date(now);
     d.setDate(now.getDate() - i);
-    const k = getDateKey(d);
+    const key = getDateKey(d);
+
+    const minutes = pomodoroSessions
+      .filter(s => s.date === key)
+      .reduce((a,b)=>a+b.minutes, 0);
+
     days.push({
       label: `${d.getMonth()+1}/${d.getDate()}`,
-      minutes: pomodoroLog[k] || 0
+      minutes
     });
   }
   return days;
 }
+
 
 // 先週（7〜13日前）
 function getLastWeekTotal() {
