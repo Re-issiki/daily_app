@@ -429,28 +429,23 @@ minuteSelect.addEventListener("change", saveStatusFormState);
 
 
 function addStudy() {
-  if (itemSelect.value === "") return;
-
-  saveStatusFormState();
+  const selectedId = Number(itemSelect.value);
+  const item = statusData[currentKey].items.find(it => it.id === selectedId);
+  if(!item) return;
 
   const h = Number(hourSelect.value);
   const min = Number(minuteSelect.value);
-  const m = h * 60 + min;
+  const m = h*60 + min;
+  if(m <= 0) return;
 
-  if (m <= 0) return;
+  if(!confirm(`${item.name} に「${h}時間${min}分」を追加します。本当によろしいですか？`)) return;
 
-  // 追加確認ダイアログ
-  const targetName = statusData[currentKey].items[itemSelect.value].name;
-  const message =
-    `${targetName} に「${h}時間${min}分」を追加します。\n本当によろしいですか？`;
-
-  if (!confirm(message)) return;
-
-  statusData[currentKey].items[itemSelect.value].minutes += m;
+  item.minutes += m;
   saveStorage();
   renderItemList();
   drawChart();
 }
+
 
 
 // ===== チャート =====
@@ -659,13 +654,14 @@ function fillPomodoroItemSelect(statusId) {
     return;
   }
 
-  st.items.forEach((it, index) => {
+  st.items.forEach((it) => {
     const opt = document.createElement("option");
-    opt.value = index;      // ← ★ index に変更
+    opt.value = it.id;      // ← idで管理
     opt.textContent = it.name;
     sel.appendChild(opt);
   });
 }
+
 
 function fillPomodoroSubjectSelect() {
   const sel = document.getElementById("pomodoroSubject");
@@ -709,22 +705,21 @@ let lastPomodoroAdd = null; // ← 直前の追加記録
 
 function addPomodoroMinutes(min) {
   const subject = document.getElementById("pomodoroSubject").value;
+  const item = Number(document.getElementById("pomodoroItem").value);
 
   const session = {
     id: Date.now(),
     date: todayKey(),
     minutes: min,
-    subject
+    subject,
+    item
   };
 
   pomodoroSessions.push(session);
-  savePomodoro();
-
+  savePomodoro();  // ここだけで保存
   lastPomodoroAdd = session;
   showUndoToast(min);
 }
-
-
 
 function showUndoToast(min) {
   const t = document.getElementById("undoToast");
@@ -737,16 +732,13 @@ function showUndoToast(min) {
 function undoPomodoro() {
   if (!lastPomodoroAdd) return;
 
-  const { date, minutes } = lastPomodoroAdd;
-  pomodoroLog[date] = Math.max(0, (pomodoroLog[date] || 0) - minutes);
+  const idx = pomodoroSessions.findIndex(s => s.id === lastPomodoroAdd.id);
+  if(idx !== -1) pomodoroSessions.splice(idx, 1);
 
-
-  savePomodoroLog();
+  savePomodoro();  // ここも pomodoroSessions のみ
   lastPomodoroAdd = null;
-
   document.getElementById("undoToast").style.display = "none";
   renderPomodoroStats();
-  alert("直前のポモドーロ記録を取り消しました");
 }
 
 function getTotalForDate(key) {
@@ -919,17 +911,18 @@ function finishPomodoro(minutes) {
 
 function adjustItemMinutes(statusId, itemIndex, deltaMinutes) {
   const st = statusData[statusId];
-  if (!st || !st.items) return;
+  if(!st || !Array.isArray(st.items)) return;
 
   const it = st.items[itemIndex];
-  if (!it) return;
+  if(!it) return;
 
-  if (!it.minutes) it.minutes = 0;
-  it.minutes = Math.max(0, it.minutes + deltaMinutes);
+  it.minutes = (it.minutes || 0) + deltaMinutes;
+  if(it.minutes < 0) it.minutes = 0;
 
   saveStorage();
   renderHome();
 }
+
 const circle = document.querySelector(".timerCircle .fg");
 
 function runTimer(work, brk) {
@@ -1151,9 +1144,13 @@ window.addEventListener("load", () => {
         renderPomodoroStats();
         // タイマーが動いていたら復元
         if (timerState) {
+          const elapsed = Math.floor((Date.now() - timerState.startedAt)/1000);
+          timerState.remaining = Math.max(0, timerState.sessionTotal - elapsed);
+          remaining = timerState.remaining;
           mode = timerState.mode;
           runTimer(timerState.work, timerState.brk);
         }
+
   }
 
 
