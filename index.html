@@ -131,8 +131,12 @@
   <h1>ポモドーロ</h1>
 
   <div class="card">
-    <label>対象項目</label>
-    <select id="pomodoroSubject"></select>
+    <label>ステータス（科目）</label>
+    <select id="pomodoroSubject" onchange="fillPomodoroItemSelect(this.value)"></select>
+
+    <label>項目</label>
+    <select id="pomodoroItem"></select>
+
 
     <label>作業時間</label>
     <select id="pomodoroWork">

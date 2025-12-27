@@ -564,33 +564,34 @@ let remaining = 0;
 let mode = "work"; // work / break
 
 function openPomodoro() {
-  hideAll();
-  pomodoro.classList.remove("hidden");
-
+  switchScreen("pomodoro");
   fillPomodoroSubjectSelect();
-  renderPomodoroStats();
+  const first = document.getElementById("pomodoroSubject").value;
+  fillPomodoroItemSelect(first);
 }
 
-function fillPomodoroSubjectSelect() {
-  const sel = document.getElementById("pomodoroSubject");
+
+function fillPomodoroItemSelect(statusId) {
+  const sel = document.getElementById("pomodoroItem");
   sel.innerHTML = "";
 
-  // ← ここを Object.keys に変更
-  Object.keys(statusData).forEach(key => {
-    const st = statusData[key];
-    const opt = document.createElement("option");
-    opt.value = key;          // 科目IDで管理（後の連動に有利）
-    opt.textContent = st.title;
-    sel.appendChild(opt);
-  });
-
-  if (!sel.children.length) {
+  const st = statusData[statusId];
+  if (!st || !st.items || !st.items.length) {
     const opt = document.createElement("option");
     opt.value = "";
-    opt.textContent = "（選択できる項目がありません）";
+    opt.textContent = "（項目がありません）";
     sel.appendChild(opt);
+    return;
   }
+
+  st.items.forEach(it => {
+    const opt = document.createElement("option");
+    opt.value = it.id;
+    opt.textContent = it.name;
+    sel.appendChild(opt);
+  });
 }
+
 
 
 
@@ -710,17 +711,20 @@ function renderPomodoroHistory() {
   });
 }
 
-function deletePomodoro(id) {
-  if (!confirm("このポモドーロ記録を削除しますか？")) return;
+function deletePomodoroSession(id) {
+  const idx = pomodoroSessions.findIndex(s => s.id === id);
+  if (idx === -1) return;
 
-  pomodoroSessions =
-    pomodoroSessions.filter(s => s.id !== id);
+  const s = pomodoroSessions[idx];
 
-  savePomodoroSessions();
-  renderPomodoroStats();
-  renderPomodoroHistoryScreen();  // ← こちらだけに統一
+  // ★ 先にステータス側を減算
+  adjustItemMinutes(s.subject, s.item, -s.minutes);
 
+  pomodoroSessions.splice(idx, 1);
+  savePomodoro();
+  refreshPomodoroUI();
 }
+
 
 function renderPomodoroStats() {
   const today = getTotalForDate(todayKey());
@@ -792,6 +796,41 @@ function startPomodoro() {
 
   runTimer(work, brk);
 }
+
+function finishPomodoro(minutes) {
+  const subject = document.getElementById("pomodoroSubject").value;
+  const item = document.getElementById("pomodoroItem").value;
+
+  const session = {
+    id: Date.now(),
+    date: getDateKey(new Date()),
+    minutes,
+    subject,
+    item
+  };
+
+  pomodoroSessions.push(session);
+  savePomodoro();
+  adjustItemMinutes(subject, item, minutes); // ← ★加算
+  showUndoToast(session);
+  refreshPomodoroUI();
+}
+
+function adjustItemMinutes(statusId, itemId, deltaMinutes) {
+  const st = statusData[statusId];
+  if (!st || !st.items) return;
+
+  const it = st.items.find(i => i.id === itemId);
+  if (!it) return;
+
+  if (!it.minutes) it.minutes = 0;
+  it.minutes = Math.max(0, it.minutes + deltaMinutes);
+
+  saveAll();   // ← 既存の保存処理に合わせる
+  renderStatusButtons();
+}
+
+
 
 function runTimer(work, brk) {
   clearInterval(timerId);
