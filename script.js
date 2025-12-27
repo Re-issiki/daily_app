@@ -521,8 +521,26 @@ function applyCardOpacity() {
 
 //ポモドーロタイマー
 let pomodoroTimer = null;
-let pomodoroSeconds = 25 * 60; // 25分
-let pomodoroRemaining = pomodoroSeconds;
+let pomodoroStudySeconds = 25 * 60;
+let pomodoroBreakSeconds = 5 * 60;
+let pomodoroRemaining = pomodoroStudySeconds;
+let pomodoroCycleCount = 4;
+let currentCycle = 1;
+let isStudyPhase = true; // true = 勉強中, false = 休憩中
+
+const studyInput = document.getElementById("pomodoroStudyInput");
+const breakInput = document.getElementById("pomodoroBreakInput");
+const cyclesInput = document.getElementById("pomodoroCyclesInput");
+
+// 設定が変わったら即反映
+[studyInput, breakInput, cyclesInput].forEach(input => {
+  input.addEventListener("input", () => {
+    pomodoroStudySeconds = Number(studyInput.value) * 60 || 25*60;
+    pomodoroBreakSeconds = Number(breakInput.value) * 60 || 5*60;
+    pomodoroCycleCount = Number(cyclesInput.value) || 4;
+    resetPomodoro();
+  });
+});
 
 function openPomodoro() {
   hideAll();
@@ -564,28 +582,30 @@ function drawPomodoro() {
 
 function startPomodoro() {
   if (pomodoroTimer) return;
-
-  // 入力値を取得して秒に変換
-  const minutes = Number(pomodoroMinutesInput.value) || 25;
-  pomodoroSeconds = minutes * 60;
-
-  // 残り時間がリセットされていれば秒数を初期化
-  if (pomodoroRemaining > pomodoroSeconds || pomodoroRemaining === pomodoroSeconds) {
-    pomodoroRemaining = pomodoroSeconds;
-  }
-
   pomodoroTimer = setInterval(() => {
     pomodoroRemaining--;
     if (pomodoroRemaining <= 0) {
-      clearInterval(pomodoroTimer);
-      pomodoroTimer = null;
-      alert("ポモドーロ終了！");
-      pomodoroRemaining = pomodoroSeconds;
+      // フェーズ切り替え
+      if (isStudyPhase) {
+        alert(`勉強${currentCycle}セット終了！休憩開始`);
+        pomodoroRemaining = pomodoroBreakSeconds;
+      } else {
+        if (currentCycle >= pomodoroCycleCount) {
+          clearInterval(pomodoroTimer);
+          pomodoroTimer = null;
+          alert("ポモドーロ全サイクル終了！");
+          resetPomodoro();
+          return;
+        } else {
+          currentCycle++;
+          alert(`休憩終了！次の勉強セット開始`);
+          pomodoroRemaining = pomodoroStudySeconds;
+        }
+      }
+      isStudyPhase = !isStudyPhase;
     }
     drawPomodoro();
   }, 1000);
-
-  drawPomodoro(); // 即座に描画
 }
 
 
@@ -600,10 +620,17 @@ const pomodoroMinutesInput = document.getElementById("pomodoroMinutes");
 
 function resetPomodoro() {
   pausePomodoro();
-  const minutes = Number(pomodoroMinutesInput.value) || 25;
-  pomodoroSeconds = minutes * 60;
-  pomodoroRemaining = pomodoroSeconds;
+  currentCycle = 1;
+  isStudyPhase = true;
+  pomodoroRemaining = pomodoroStudySeconds;
   drawPomodoro();
+}
+
+function pausePomodoro() {
+  if (pomodoroTimer) {
+    clearInterval(pomodoroTimer);
+    pomodoroTimer = null;
+  }
 }
 
 //確認ログ

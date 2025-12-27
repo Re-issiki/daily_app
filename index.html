@@ -129,7 +129,15 @@
 <div id="pomodoro" class="screen hidden">
   <button class="back" onclick="backHome()">← 戻る</button>
   <h1>ポモドーロタイマー</h1>
-  <label>時間（分）:</label>
+  <div style="text-align:center; margin-bottom:10px;">
+    <label>勉強時間(分)：</label>
+    <input id="pomodoroStudyInput" type="number" min="1" value="25" style="width:60px;">
+    <label>休憩時間(分)：</label>
+    <input id="pomodoroBreakInput" type="number" min="1" value="5" style="width:60px;">
+    <label>繰り返し回数：</label>
+    <input id="pomodoroCyclesInput" type="number" min="1" value="4" style="width:60px;">
+  </div>
+
   <input type="number" id="pomodoroMinutes" value="25" min="1" max="180">
   <canvas id="pomodoroCanvas" width="200" height="200"></canvas>
   <div style="text-align:center; margin-top:10px;">
