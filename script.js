@@ -548,6 +548,9 @@ function openPomodoro() {
   drawPomodoro();
 }
 
+const pomodoroPhaseLabel = document.getElementById("pomodoroPhase");
+const pomodoroCycleLabel = document.getElementById("pomodoroCycleDisplay");
+
 function drawPomodoro() {
   const canvas = document.getElementById("pomodoroCanvas");
   const ctx = canvas.getContext("2d");
@@ -563,10 +566,11 @@ function drawPomodoro() {
   ctx.stroke();
 
   // 進捗円
-  const progress = (pomodoroSeconds - pomodoroRemaining) / pomodoroSeconds;
+  const totalSeconds = isStudyPhase ? pomodoroStudySeconds : pomodoroBreakSeconds;
+  const progress = (totalSeconds - pomodoroRemaining) / totalSeconds;
   ctx.beginPath();
   ctx.arc(center, center, radius, -Math.PI/2, -Math.PI/2 + 2 * Math.PI * progress);
-  ctx.strokeStyle = "#4f46e5";
+  ctx.strokeStyle = isStudyPhase ? "#4f46e5" : "#16a34a";
   ctx.lineWidth = 10;
   ctx.stroke();
 
@@ -578,7 +582,12 @@ function drawPomodoro() {
   const m = Math.floor(pomodoroRemaining / 60);
   const s = pomodoroRemaining % 60;
   ctx.fillText(`${m}:${s.toString().padStart(2,"0")}`, center, center);
+
+  // フェーズ表示更新
+  pomodoroPhaseLabel.textContent = isStudyPhase ? "勉強中" : "休憩中";
+  pomodoroCycleLabel.textContent = `${currentCycle} / ${pomodoroCycleCount}`;
 }
+
 
 function startPomodoro() {
   if (pomodoroTimer) return;
