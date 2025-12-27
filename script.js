@@ -581,13 +581,23 @@ function fillPomodoroSubjectSelect() {
   const sel = document.getElementById("pomodoroSubject");
   sel.innerHTML = "";
 
-  statusData.forEach(st => {
+  // ステータス一覧が存在する前提
+  (statusData || []).forEach(st => {
     const opt = document.createElement("option");
     opt.value = st.name;
     opt.textContent = st.name;
     sel.appendChild(opt);
   });
+
+  // もし1件も無ければ「未指定」だけ入れる
+  if (!sel.children.length) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "（選択できる項目がありません）";
+    sel.appendChild(opt);
+  }
 }
+
 
 
 function minutesToText(m){ return `${Math.floor(m/60)}時間${m%60}分`; }
