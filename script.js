@@ -889,6 +889,8 @@ function hideAll() {
   status.classList.add("hidden");
   edit.classList.add("hidden");
   achievementList.classList.add("hidden");
+  pomodoro.classList.add("hidden");
+  pomodoroHistoryScreen.classList.add("hidden");
 }
 
 loadStorage();
