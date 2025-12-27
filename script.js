@@ -520,6 +520,7 @@ function applyCardOpacity() {
 }
 
 //ポモドーロタイマー
+// ===== ポモドーロタイマー =====
 let pomodoroTimer = null;
 let pomodoroStudySeconds = 25 * 60;
 let pomodoroBreakSeconds = 5 * 60;
@@ -531,8 +532,10 @@ let isStudyPhase = true; // true = 勉強中, false = 休憩中
 const studyInput = document.getElementById("pomodoroStudyInput");
 const breakInput = document.getElementById("pomodoroBreakInput");
 const cyclesInput = document.getElementById("pomodoroCyclesInput");
+const pomodoroPhaseLabel = document.getElementById("pomodoroPhase");
+const pomodoroCycleLabel = document.getElementById("pomodoroCycleDisplay");
 
-// 設定が変わったら即反映
+// 入力変更時に即反映
 [studyInput, breakInput, cyclesInput].forEach(input => {
   input.addEventListener("input", () => {
     pomodoroStudySeconds = Number(studyInput.value) * 60 || 25*60;
@@ -542,23 +545,15 @@ const cyclesInput = document.getElementById("pomodoroCyclesInput");
   });
 });
 
-function openPomodoro() {
-  hideAll();
-  document.getElementById("pomodoro").classList.remove("hidden");
-  drawPomodoro();
-}
-
-const pomodoroPhaseLabel = document.getElementById("pomodoroPhase");
-const pomodoroCycleLabel = document.getElementById("pomodoroCycleDisplay");
-
 function drawPomodoro() {
   const canvas = document.getElementById("pomodoroCanvas");
   const ctx = canvas.getContext("2d");
   const radius = canvas.width / 2 - 10;
   const center = canvas.width / 2;
 
-  // 背景円
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 背景円
   ctx.beginPath();
   ctx.arc(center, center, radius, 0, 2 * Math.PI);
   ctx.strokeStyle = "#e5e7eb";
@@ -574,7 +569,7 @@ function drawPomodoro() {
   ctx.lineWidth = 10;
   ctx.stroke();
 
-  // 中心に残り時間表示
+  // 残り時間表示
   ctx.fillStyle = "#374151";
   ctx.font = "20px sans-serif";
   ctx.textAlign = "center";
@@ -583,11 +578,10 @@ function drawPomodoro() {
   const s = pomodoroRemaining % 60;
   ctx.fillText(`${m}:${s.toString().padStart(2,"0")}`, center, center);
 
-  // フェーズ表示更新
+  // フェーズとサイクル表示
   pomodoroPhaseLabel.textContent = isStudyPhase ? "勉強中" : "休憩中";
   pomodoroCycleLabel.textContent = `${currentCycle} / ${pomodoroCycleCount}`;
 }
-
 
 function startPomodoro() {
   if (pomodoroTimer) return;
@@ -617,15 +611,12 @@ function startPomodoro() {
   }, 1000);
 }
 
-
 function pausePomodoro() {
   if (pomodoroTimer) {
     clearInterval(pomodoroTimer);
     pomodoroTimer = null;
   }
 }
-
-const pomodoroMinutesInput = document.getElementById("pomodoroMinutes");
 
 function resetPomodoro() {
   pausePomodoro();
@@ -635,21 +626,14 @@ function resetPomodoro() {
   drawPomodoro();
 }
 
-function pausePomodoro() {
-  if (pomodoroTimer) {
-    clearInterval(pomodoroTimer);
-    pomodoroTimer = null;
-  }
-}
-
-//確認ログ
+// ===== 記録機能 =====
 function addPomodoroRecord() {
   if (!currentKey) {
     alert("ステータスを選択してから記録してください。");
     return;
   }
 
-  const minutes = Math.floor((pomodoroSeconds - pomodoroRemaining) / 60);
+  const minutes = Math.floor((pomodoroStudySeconds - pomodoroRemaining) / 60);
   if (minutes <= 0) {
     alert("まだ勉強していません。");
     return;
@@ -663,18 +647,9 @@ function addPomodoroRecord() {
   saveStorage();
   renderItemList();
   drawChart();
-
   resetPomodoro();
 }
 
-pomodoroMinutesInput.addEventListener("input", () => {
-  // 入力値取得
-  const minutes = Number(pomodoroMinutesInput.value) || 25;
-  pomodoroSeconds = minutes * 60;
-  pomodoroRemaining = pomodoroSeconds;
-  pausePomodoro();
-  drawPomodoro();
-});
 
 
 
