@@ -628,27 +628,40 @@ function openPomodoro() {
   setCurrentScreen("pomodoro");
 
   fillPomodoroSubjectSelect();
-  fillPomodoroItemSelect(pomodoroSubject.value);
+  
+  // まず保存されてる選択を取得
+  const savedSubject = localStorage.getItem("pomodoroSubjectSel");
+  const savedItem    = localStorage.getItem("pomodoroItemSel");
 
-  // ここで復元
+  // 復元
+  if (savedSubject) pomodoroSubject.value = savedSubject;
+  fillPomodoroItemSelect(pomodoroSubject.value);
+  if (savedItem) pomodoroItem.value = savedItem;
+
+  // ワーク/ブレイク設定
   pomodoroWork.value  = localStorage.getItem("pomodoroWork")  || 25;
   pomodoroBreak.value = localStorage.getItem("pomodoroBreak") || 5;
 
-  if (localStorage.getItem("pomodoroSubjectSel"))
-    pomodoroSubject.value = localStorage.getItem("pomodoroSubjectSel");
-
-  fillPomodoroItemSelect(pomodoroSubject.value);
-
-  if (localStorage.getItem("pomodoroItemSel"))
-    pomodoroItem.value = localStorage.getItem("pomodoroItemSel");
-
   renderPomodoroStats();
 
+  // タイマーが動いていたら復元
   if (timerState) {
+    const elapsed = Math.floor((Date.now() - timerState.startedAt)/1000);
+    remaining = Math.max(0, timerState.sessionTotal - elapsed);
     mode = timerState.mode;
+
+    // 再描画する前に選択を保持
+    const currentSubject = pomodoroSubject.value;
+    const currentItem    = pomodoroItem.value;
+
     runTimer(timerState.work, timerState.brk);
+
+    // ここで選択を復元
+    pomodoroSubject.value = currentSubject;
+    pomodoroItem.value    = currentItem;
   }
 }
+
 
 
 
