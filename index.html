@@ -148,25 +148,22 @@
     <button onclick="startPomodoro()">開始</button>
   </div>
 
-  <div class="card">
-    <h2>タイマー</h2>
-    <div id="pomodoroTimer" style="font-size:2rem; font-weight:700;">
-      00:00
-    </div>
-    <button onclick="cancelPomodoro()">停止</button>
+  <div class="timerWrap">
+    <svg class="timerCircle" viewBox="0 0 100 100">
+      <circle class="bg" cx="50" cy="50" r="45" />
+      <circle class="fg" cx="50" cy="50" r="45" />
+    </svg>
+    <div id="pomodoroTimerText" class="timerText">00:00</div>
   </div>
 
   <div class="card">
-    <div class="card">
-      <h2>記録</h2>
-      <canvas id="pomodoroChart"></canvas>
-      <p id="todayPomodoro"></p>
-      <p id="weekPomodoro"></p>
-      <p id="lastWeekPomodoro" style="color:#555;"></p>
-    </div>
-
+    <h2>記録</h2>
+    <canvas id="pomodoroChart"></canvas>
+    <p id="todayPomodoro"></p>
+    <p id="weekPomodoro"></p>
+    <p id="lastWeekPomodoro" style="color:#555;"></p>
+  </div>
   
-  </div>
   <button onclick="openPomodoroHistory()">
     履歴一覧を見る
   </button>
@@ -190,15 +187,6 @@
 ">
   記録を追加しました
   <button onclick="undoPomodoro()" style="margin-left:8px;">取り消す</button>
-</div>
-
-<div class="timerWrap">
-  <svg class="timerCircle" viewBox="0 0 100 100">
-    <circle class="bg" cx="50" cy="50" r="45" />
-    <circle class="fg" cx="50" cy="50" r="45" />
-  </svg>
-
-  <div id="pomodoroTimerText" class="timerText">00:00</div>
 </div>
 
 <script src="script.js"></script>
