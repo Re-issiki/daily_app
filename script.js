@@ -400,13 +400,15 @@ function renderItemList() {
 
 function addItem() {
   if (!newItemName.value) return;
-  statusData[currentKey].items.push({ name: newItemName.value, minutes: 0 });
+  const id = Date.now();
+  statusData[currentKey].items.push({ id, name: newItemName.value, minutes: 0 });
   newItemName.value = "";
   saveStorage();
   updateItemSelect();
   renderItemList();
   drawChart();
 }
+
 
 function deleteItem(idx) {
   if (!confirm("この項目を削除しますか？")) return;
@@ -786,15 +788,20 @@ function deletePomodoro(id) {
   if (idx === -1) return;
 
   const s = pomodoroSessions[idx];
-
-  // ステータス側を減算
-  adjustItemMinutes(s.subject, s.item, -s.minutes);
+  const st = statusData[s.subject];
+  if (st) {
+    const item = st.items.find(it => it.id === s.item);
+    if(item) item.minutes = Math.max(0, item.minutes - s.minutes);
+  }
 
   pomodoroSessions.splice(idx, 1);
   savePomodoro();
+  saveStorage(); // ← 忘れずに
   renderPomodoroHistoryScreen();
   renderPomodoroStats();
 }
+
+
 
 function renderPomodoroStats() {
   const today = getTotalForDate(todayKey());
@@ -1030,11 +1037,12 @@ function getLastWeekTotal() {
   for (let i = 7; i <= 13; i++) {
     const d = new Date(now);
     d.setDate(now.getDate() - i);
-    const k = getDateKey(d);
-    sum += pomodoroLog[k] || 0;
+    const key = getDateKey(d);
+    sum += getTotalForDate(key);
   }
   return sum;
 }
+
 
 function drawPomodoroChart() {
   const ctx = document.getElementById("pomodoroChart");
@@ -1145,11 +1153,11 @@ window.addEventListener("load", () => {
         // タイマーが動いていたら復元
         if (timerState) {
           const elapsed = Math.floor((Date.now() - timerState.startedAt)/1000);
-          timerState.remaining = Math.max(0, timerState.sessionTotal - elapsed);
-          remaining = timerState.remaining;
+          remaining = Math.max(0, timerState.sessionTotal - elapsed);
           mode = timerState.mode;
           runTimer(timerState.work, timerState.brk);
         }
+
 
   }
 
