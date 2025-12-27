@@ -2,1292 +2,266 @@
 const home = document.getElementById("home");
 const status = document.getElementById("status");
 const edit = document.getElementById("edit");
+const achievementList = document.getElementById("achievementList");
+const pomodoro = document.getElementById("pomodoro");
+const pomodoroHistoryScreen = document.getElementById("pomodoroHistoryScreen");
 
+// ホーム関連
 const viewName = document.getElementById("viewName");
 const viewSchool = document.getElementById("viewSchool");
 const ach1 = document.getElementById("ach1");
 const ach2 = document.getElementById("ach2");
 const ach3 = document.getElementById("ach3");
-
 const statusButtons = document.getElementById("statusButtons");
+
+// ステータス関連
 const statusTitle = document.getElementById("statusTitle");
 const radarChart = document.getElementById("radarChart");
-
 const itemSelect = document.getElementById("itemSelect");
 const hourSelect = document.getElementById("hourSelect");
 const minuteSelect = document.getElementById("minuteSelect");
 const newItemName = document.getElementById("newItemName");
 const itemList = document.getElementById("itemList");
 
+// 編集画面関連
 const inputName = document.getElementById("inputName");
 const inputSchool = document.getElementById("inputSchool");
-const inputAch1 = document.getElementById("inputAch1");
-const inputAch2 = document.getElementById("inputAch2");
-const inputAch3 = document.getElementById("inputAch3");
 const newStatusName = document.getElementById("newStatusName");
 const statusManage = document.getElementById("statusManage");
-const achievementList = document.getElementById("achievementList");
+
+// 実績関連
 const newAchText = document.getElementById("newAchText");
 const newAchRank = document.getElementById("newAchRank");
 const achievementCards = document.getElementById("achievementCards");
 
+// ポモドーロ関連
+const pomodoroTimerText = document.getElementById("pomodoroTimerText");
+const pomodoroSubject = document.getElementById("pomodoroSubject");
+const pomodoroItem = document.getElementById("pomodoroItem");
+const pomodoroWork = document.getElementById("pomodoroWork");
+const pomodoroBreak = document.getElementById("pomodoroBreak");
+const pomodoroRepeat = document.getElementById("pomodoroRepeat");
+const pomodoroChart = document.getElementById("pomodoroChart");
+const pomodoroHistoryList = document.getElementById("pomodoroHistoryList");
 
-
+// ===== データ =====
+let profile = {};
+let statusData = {};
 let chart = null;
 let currentKey = "";
+let timerState = JSON.parse(localStorage.getItem("timerState") || "null");
+let pomodoroSessions = JSON.parse(localStorage.getItem("pomodoroSessions") || "[]");
+let lastPomodoroAdd = null;
 
-function saveCurrentKey(key){
-  localStorage.setItem("currentStatusKey", key);
-}
-function loadCurrentKey(){
-  return localStorage.getItem("currentStatusKey") || "";
-}
+// タイマー関連
+let timerId = null;
+let remaining = 0;
+let currentMode = "work";
+let currentRepeat = 0;
+const circle = document.querySelector(".timerCircle .fg");
 
+// ===== 初期化 =====
+for(let i=0;i<=24;i++) hourSelect.innerHTML += `<option>${i}</option>`;
+for(let i=0;i<=59;i++) minuteSelect.innerHTML += `<option>${i}</option>`;
 
 // ===== 永続化 =====
 function saveStorage() {
   localStorage.setItem("profile", JSON.stringify(profile));
   localStorage.setItem("statusData", JSON.stringify(statusData));
 }
-
 function loadStorage() {
   const p = localStorage.getItem("profile");
   const s = localStorage.getItem("statusData");
-
-  profile = p ? JSON.parse(p) : {
-    name: "Re",
-    school: "〇〇学校",
-    achievements: [],
-    displayAchievements: []
-  };
-
+  profile = p ? JSON.parse(p) : { name:"Re", school:"〇〇学校", achievements:[], displayAchievements:[] };
   statusData = s ? JSON.parse(s) : {};
-
-  // achievements が無い or 壊れてても必ず配列にする
-  if (!Array.isArray(profile.achievements)) {
-    profile.achievements = [];
-  }
-
-  if (!Array.isArray(profile.displayAchievements)) {
-    profile.displayAchievements = [];
-  }
+  if(!Array.isArray(profile.achievements)) profile.achievements=[];
+  if(!Array.isArray(profile.displayAchievements)) profile.displayAchievements=[];
 }
 
-function setCurrentScreen(id){
-  localStorage.setItem("currentScreen", id);
-}
-
-// ===== データ =====
-let profile = {
-  name: "Re",
-  school: "〇〇学校",
-
-  // 実績データ（無制限）
-  achievements: [],
-
-  // ホームに表示する実績ID（最大3つ）
-  displayAchievements: []
-};
-
-
-
-let statusData = {};
-
+// ===== 共通関数 =====
+function getDateKey(date) { return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`; }
+function todayKey() { return getDateKey(new Date()); }
+function saveCurrentKey(key){ localStorage.setItem("currentStatusKey", key); }
+function loadCurrentKey(){ return localStorage.getItem("currentStatusKey")||""; }
+function saveTimerState(){ localStorage.setItem("timerState", JSON.stringify(timerState)); }
+function savePomodoro(){ localStorage.setItem("pomodoroSessions", JSON.stringify(pomodoroSessions)); }
 
 // ===== ランク =====
 const rankTable = [
-  { m: 2160 * 60, r: 7 }, // S
-  { m: 720  * 60, r: 6 }, // A
-  { m: 504  * 60, r: 5 }, // B
-  { m: 168  * 60, r: 4 }, // C
-  { m: 72   * 60, r: 3 }, // D
-  { m: 24   * 60, r: 2 }, // E
-  { m: 0,           r: 1 } // F
+  { m: 2160*60, r: 7 }, { m: 720*60, r: 6 }, { m:504*60, r:5 },
+  { m:168*60, r:4 }, { m:72*60, r:3 }, { m:24*60, r:2 }, { m:0, r:1 }
 ];
-
-
 const rankLabel = ["","F","E","D","C","B","A","S"];
-const minutesToRank = m => rankTable.find(t => m >= t.m).r;
-function minutesToHM(m) {
-  if (m <= 0) return "未学習";
-  const h = Math.floor(m / 60);
-  const min = m % 60;
-  return `${h}時間${min}分`;
-}
-
-
-// ===== 初期化 =====
-for (let i = 0; i <= 24; i++) hourSelect.innerHTML += `<option>${i}</option>`;
-for (let i = 0; i <= 59; i++) minuteSelect.innerHTML += `<option>${i}</option>`;
+const minutesToRank = m=>rankTable.find(t=>m>=t.m).r;
+const minutesToHM = m=>m<=0?"未学習":`${Math.floor(m/60)}時間${m%60}分`;
 
 // ===== ホーム =====
-function renderHome() {
-  viewName.textContent = `名前：${profile.name}`;
-  viewSchool.textContent = `所属：${profile.school}`;
-
-  const achEls = [ach1, ach2, ach3];
-
-  achEls.forEach((el, i) => {
+function renderHome(){
+  viewName.textContent=`名前：${profile.name}`;
+  viewSchool.textContent=`所属：${profile.school}`;
+  [ach1,ach2,ach3].forEach((el,i)=>{
     const id = profile.displayAchievements[i];
-    const a = profile.achievements.find(x => x.id === id);
-
-
-    if (!a || !a.text) {
-      el.innerHTML = `${i + 1}.`;
-      return;
-    }
-
-    el.innerHTML = `
-      <div>実績${i + 1}　ランク:${rankToJP(a.rank)}</div>
-      <div class="achievement-text ${a.rank}">
-        ${a.text}
-      </div>
-    `;
+    const a = profile.achievements.find(x=>x.id===id);
+    el.innerHTML = a?.text?`<div>実績${i+1}　ランク:${rankLabel[a.rank]||""}</div><div class="achievement-text ${a.rank}">${a.text}</div>`:`${i+1}.`;
   });
-
-  statusButtons.innerHTML = "";
- 
-  Object.keys(statusData).forEach(k => {
+  statusButtons.innerHTML="";
+  Object.keys(statusData).forEach(k=>{
     const total = getStatusTotalMinutes(k);
     const card = document.createElement("div");
-    card.className = "status-card";
-    card.innerHTML = `
-    <div class="status-title">${statusData[k].title}</div>
-    <div class="status-time">
-    総時間：${minutesToHM(total)}
-    </div>
-    `;
-    card.onclick = () => openStatus(k);
+    card.className="status-card";
+    card.innerHTML = `<div class="status-title">${statusData[k].title}</div><div class="status-time">総時間：${minutesToHM(total)}</div>`;
+    card.onclick = ()=>openStatus(k);
     statusButtons.appendChild(card);
   });
 }
+function getStatusTotalMinutes(key){ return statusData[key]?.items?.reduce((sum,i)=>sum+i.minutes,0)||0; }
 
-function rankToJP(rank) {
-  return {
-    c: "C",
-    b: "B",
-    a: "A",
-    s: "S",
-    ss: "SS"
-  }[rank];
-}
-
-function addAchievement() {
-  const text = newAchText.value.trim();
-  const rank = newAchRank.value;
-  if (!text) return;
-
-  const id = Date.now();
-
-  profile.achievements.push({ id, text, rank });
-
-  // ★ 3つまでは自動でホーム表示
-  if (profile.displayAchievements.length < 3) {
-    profile.displayAchievements.push(id);
-  }
-
-  newAchText.value = "";
-  saveStorage();
-  renderAchievementList();
-  renderHome();
-}
-
-
-
-
-function openAchievementList() {
-  hideAll();
-  achievementList.classList.remove("hidden");
-  setCurrentScreen("achievementList");
-  renderAchievementList();
-}
-
-
-function renderAchievementList() {
-  achievementCards.innerHTML = "";
-
-  profile.achievements.forEach((a, i) => {
-    if (!a.text) return;
-
-    const card = document.createElement("div");
-    card.className = "achievement-card";
-    card.draggable = true;
-    card.dataset.id = a.id;
-    card.addEventListener("dragstart", handleDragStart);
-    card.addEventListener("dragover", handleDragOver);
-    card.addEventListener("drop", handleDrop);
-
-
-    const selected = profile.displayAchievements.includes(a.id);
-
-   
-    card.innerHTML = `
-    <div class="achievement-rank ${a.rank}">
-    ${rankToJP(a.rank)}
-    </div>
-    <div class="achievement-content">
-    <div class="achievement-text ${a.rank}">
-    ${a.text}
-    </div>
-    <button class="small"
-    style="background:${selected ? '#2563eb' : '#555'}"
-    onclick="toggleDisplayAchievement(${a.id})">
-    ${selected ? "表示中" : "ホーム表示"}
-    </button>
-    <button class="small" style="background:#dc2626"
-    onclick="deleteAchievement(${a.id})">
-    削除
-    </button>
-    </div>
-    `;
-
-
-    achievementCards.appendChild(card);
-  });
-}
-
-let dragId = null;
-
-function handleDragStart(e) {
-  dragId = Number(e.currentTarget.dataset.id);
-}
-
-function handleDragOver(e) {
-  e.preventDefault(); // これ必須
-}
-
-function handleDrop(e) {
-  e.preventDefault();
-
-  const dropId = Number(e.currentTarget.dataset.id);
-  if (dragId === dropId) return;
-
-  const list = profile.achievements;
-
-  const from = list.findIndex(a => a.id === dragId);
-  const to   = list.findIndex(a => a.id === dropId);
-
-  if (from === -1 || to === -1) return;
-
-  const [moved] = list.splice(from, 1);
-  list.splice(to, 0, moved);
-
-  saveStorage();
-  renderAchievementList();
-  renderHome();
-}
-
-
-function deleteAchievement(id) {
-  if (!confirm("この実績を削除しますか？")) return;
-
-  // 実績本体を削除
-  profile.achievements = profile.achievements.filter(a => a.id !== id);
-
-  // ホーム表示IDからも削除
-  profile.displayAchievements =
-    profile.displayAchievements.filter(x => x !== id);
-
-  saveStorage();
-  renderAchievementList();
-  renderHome();
-}
-
-
-function toggleDisplayAchievement(id) {
-  const idx = profile.displayAchievements.indexOf(id);
-
-  if (idx >= 0) {
-    profile.displayAchievements.splice(idx, 1);
-  } else {
-    if (profile.displayAchievements.length >= 3) {
-      alert("表示できるのは3つまで");
-      return;
-    }
-    profile.displayAchievements.push(id);
-  }
-
-  saveStorage();
-  renderAchievementList();
-  renderHome();
-}
-
-
-
-// ===== ステータス =====
-function openStatus(key) {
-  currentKey = key;
-  saveCurrentKey(key);
-
-  const st = statusData[key];
-
-  // データが壊れていた場合の保険
-  if (!st || !Array.isArray(st.items)) {
-    backHome();
-    return;
-  }
-
-  hideAll();
-  status.classList.remove("hidden");
-  setCurrentScreen("status");
-
-  statusTitle.textContent = st.title;
-  updateItemSelect();
-  renderItemList();
-  drawChart();
-
+// ===== ステータス画面 =====
+function openStatus(key){
+  currentKey=key; saveCurrentKey(key);
+  const st=statusData[key];
+  if(!st?.items) return backHome();
+  hideAll(); status.classList.remove("hidden");
+  statusTitle.textContent=st.title; updateItemSelect(); renderItemList(); drawChart();
   const savedItem = localStorage.getItem("status_item");
   const savedHour = localStorage.getItem("status_hour");
   const savedMin  = localStorage.getItem("status_min");
-
-  if (savedItem !== null && statusData[currentKey].items[savedItem]) {
-    itemSelect.value = savedItem;
-  } else {
-    itemSelect.value = 0;
-  }
-
-  if (savedHour !== null) hourSelect.value = savedHour;
-  if (savedMin  !== null) minuteSelect.value = savedMin;
+  itemSelect.value = savedItem && st.items[savedItem]?savedItem:0;
+  if(savedHour!==null) hourSelect.value=savedHour;
+  if(savedMin!==null) minuteSelect.value=savedMin;
 }
-
-
-
-function updateItemSelect() {
-  itemSelect.innerHTML = "";
-  statusData[currentKey].items.forEach((i, idx) => {
-    itemSelect.innerHTML += `<option value="${idx}">${i.name}</option>`;
-  });
+function updateItemSelect(){
+  itemSelect.innerHTML="";
+  statusData[currentKey].items.forEach((i,idx)=>itemSelect.innerHTML+=`<option value="${idx}">${i.name}</option>`);
 }
-
-function resetItemTime(idx) {
-  if (!confirm("この項目の勉強時間をリセットしますか？")) return;
-  statusData[currentKey].items[idx].minutes = 0;
-  saveStorage();
-  renderItemList();
-  drawChart();
-}
-
-
-function renderItemList() {
-  itemList.innerHTML = "";
-
-  statusData[currentKey].items.forEach((i, idx) => {
-    const row = document.createElement("div");
-    row.className = "card";
-    row.style.padding = "8px";
-
-    row.innerHTML = `
-      <div style="display:flex; align-items:center; gap:6px;">
-        <span style="flex:1; font-weight:600;">${i.name}</span>
-
-        <button class="small"
-          onclick="resetItemTime(${idx})">リセット</button>
-
-        <button class="small" style="background:#dc2626"
-          onclick="deleteItem(${idx})">削除</button>
-      </div>
-
-      <div style="font-size:13px; color:#555; margin-top:4px;">
-        総時間：${minutesToHM(i.minutes)}
-      </div>
-    `;
-
+function renderItemList(){
+  itemList.innerHTML="";
+  statusData[currentKey].items.forEach((i,idx)=>{
+    const row=document.createElement("div"); row.className="card"; row.style.padding="8px";
+    row.innerHTML=`<div style="display:flex;align-items:center;gap:6px;"><span style="flex:1;font-weight:600;">${i.name}</span><button class="small" onclick="resetItemTime(${idx})">リセット</button><button class="small" style="background:#dc2626" onclick="deleteItem(${idx})">削除</button></div><div style="font-size:13px;color:#555;margin-top:4px;">総時間：${minutesToHM(i.minutes)}</div>`;
     itemList.appendChild(row);
   });
 }
-
-
-
-function addItem() {
-  if (!newItemName.value) return;
-  const id = Date.now();
-  statusData[currentKey].items.push({ id, name: newItemName.value, minutes: 0 });
-  newItemName.value = "";
-  saveStorage();
-  updateItemSelect();
-  renderItemList();
-  drawChart();
+function addItem(){
+  if(!newItemName.value) return;
+  const id=Date.now();
+  statusData[currentKey].items.push({id,name:newItemName.value,minutes:0});
+  newItemName.value="";
+  saveStorage(); updateItemSelect(); renderItemList(); drawChart();
 }
-
-
-function deleteItem(idx) {
-  if (!confirm("この項目を削除しますか？")) return;
-  statusData[currentKey].items.splice(idx, 1);
-  saveStorage();
-  updateItemSelect();
-  renderItemList();
-  drawChart();
-}
-
-function saveStatusFormState() {
-  localStorage.setItem("status_item", itemSelect.value);
-  localStorage.setItem("status_hour", hourSelect.value);
-  localStorage.setItem("status_min",  minuteSelect.value);
+function resetItemTime(idx){ if(!confirm("この項目の勉強時間をリセットしますか？")) return; statusData[currentKey].items[idx].minutes=0; saveStorage(); renderItemList(); drawChart(); }
+function deleteItem(idx){ if(!confirm("削除しますか？")) return; statusData[currentKey].items.splice(idx,1); saveStorage(); updateItemSelect(); renderItemList(); drawChart(); }
+function addStudy(){
+  const selectedId=Number(itemSelect.value);
+  const item=statusData[currentKey].items[selectedId]; if(!item) return;
+  const h=Number(hourSelect.value); const min=Number(minuteSelect.value); const m=h*60+min; if(m<=0) return;
+  if(!confirm(`${item.name}に${h}時間${min}分を追加しますか？`)) return;
+  item.minutes+=m; saveStorage(); renderItemList(); drawChart();
 }
 itemSelect.addEventListener("change", saveStatusFormState);
 hourSelect.addEventListener("change", saveStatusFormState);
 minuteSelect.addEventListener("change", saveStatusFormState);
-
-
-
-function addStudy() {
-  const selectedId = Number(itemSelect.value);
-  const item = statusData[currentKey].items.find(it => it.id === selectedId);
-  if(!item) return;
-
-  const h = Number(hourSelect.value);
-  const min = Number(minuteSelect.value);
-  const m = h*60 + min;
-  if(m <= 0) return;
-
-  if(!confirm(`${item.name} に「${h}時間${min}分」を追加します。本当によろしいですか？`)) return;
-
-  item.minutes += m;
-  saveStorage();
-  renderItemList();
-  drawChart();
-}
-
-
+function saveStatusFormState(){ localStorage.setItem("status_item",itemSelect.value); localStorage.setItem("status_hour",hourSelect.value); localStorage.setItem("status_min",minuteSelect.value); }
 
 // ===== チャート =====
-function drawChart() {
-  const items = statusData[currentKey].items;
-  if (chart) chart.destroy();
-  if (!items.length) return;
+function drawChart(){
+  const items=statusData[currentKey]?.items||[]; if(chart) chart.destroy(); if(!items.length) return;
+  chart=new Chart(radarChart,{type:"radar",data:{labels:items.map(i=>i.name),datasets:[{data:items.map(i=>minutesToRank(i.minutes))}]},options:{plugins:{legend:{display:false}},scales:{r:{min:1,max:7,ticks:{callback:v=>rankLabel[v]}}}}});
+}
 
-  chart = new Chart(radarChart, {
-    type: "radar",
-    data: {
-      labels: items.map(i => i.name),
-      datasets: [{
-        data: items.map(i => minutesToRank(i.minutes))
-      }]
-    },
-    options: {
-      plugins: {
-        legend: { display: false } // ← ここで表示を止める
-      },
-      scales: {
-        r: {
-          min: 1,
-          max: 7,
-          ticks: { callback: v => rankLabel[v] }
-        }
-      }
+// ===== 編集画面 =====
+function openEdit(){ hideAll(); edit.classList.remove("hidden"); inputName.value=localStorage.getItem("editName")||profile.name; inputSchool.value=localStorage.getItem("editSchool")||profile.school; renderStatusManage(); }
+function saveData(){ profile.name=inputName.value.trim()||profile.name; profile.school=inputSchool.value.trim()||profile.school; saveStorage(); localStorage.removeItem("editName"); localStorage.removeItem("editSchool"); backHome(); }
+inputName.addEventListener("input",()=>localStorage.setItem("editName",inputName.value));
+inputSchool.addEventListener("input",()=>localStorage.setItem("editSchool",inputSchool.value));
+function renderStatusManage(){ statusManage.innerHTML=""; Object.keys(statusData).forEach(k=>{ const row=document.createElement("div"); row.style.display="flex"; row.innerHTML=`<span style="flex:1">${statusData[k].title}</span><button class="small danger" onclick="deleteStatus('${k}')">削除</button>`; statusManage.appendChild(row); }); }
+function addStatus(){ if(!newStatusName.value) return; const key="s"+Date.now(); statusData[key]={title:newStatusName.value,items:[]}; newStatusName.value=""; saveStorage(); renderStatusManage(); renderHome(); }
+function deleteStatus(key){ if(!confirm("削除しますか？")) return; delete statusData[key]; saveStorage(); backHome(); }
+
+// ===== 実績 =====
+function addAchievement(){ const text=newAchText.value.trim(); const rank=newAchRank.value; if(!text) return; const id=Date.now(); profile.achievements.push({id,text,rank}); if(profile.displayAchievements.length<3) profile.displayAchievements.push(id); newAchText.value=""; saveStorage(); renderAchievementList(); renderHome(); }
+function openAchievementList(){ hideAll(); achievementList.classList.remove("hidden"); renderAchievementList(); }
+function renderAchievementList(){ achievementCards.innerHTML=""; profile.achievements.forEach(a=>{ if(!a.text) return; const card=document.createElement("div"); card.className="achievement-card"; card.draggable=true; card.dataset.id=a.id; card.innerHTML=`<div class="achievement-rank ${a.rank}">${rankLabel[a.rank]}</div><div class="achievement-content"><div class="achievement-text ${a.rank}">${a.text}</div><button class="small" style="background:${profile.displayAchievements.includes(a.id)?'#2563eb':'#555'}" onclick="toggleDisplayAchievement(${a.id})">${profile.displayAchievements.includes(a.id)?'表示中':'ホーム表示'}</button><button class="small" style="background:#dc2626" onclick="deleteAchievement(${a.id})">削除</button></div>`; achievementCards.appendChild(card); }); }
+function deleteAchievement(id){ if(!confirm("削除しますか？")) return; profile.achievements=profile.achievements.filter(a=>a.id!==id); profile.displayAchievements=profile.displayAchievements.filter(x=>x!==id); saveStorage(); renderAchievementList(); renderHome(); }
+function toggleDisplayAchievement(id){ const idx=profile.displayAchievements.indexOf(id); if(idx>=0) profile.displayAchievements.splice(idx,1); else{ if(profile.displayAchievements.length>=3){ alert("表示は3つまで"); return; } profile.displayAchievements.push(id); } saveStorage(); renderAchievementList(); renderHome(); }
+
+// ===== ポモドーロ =====
+function fillPomodoroSubjectSelect(){
+  pomodoroSubject.innerHTML="";
+  const keys=Object.keys(statusData);
+  if(!keys.length){ pomodoroSubject.innerHTML=`<option value="">（ステータスがありません）</option>`; return; }
+  keys.forEach(k=>{ const opt=document.createElement("option"); opt.value=k; opt.textContent=statusData[k].title; pomodoroSubject.appendChild(opt); });
+}
+function fillPomodoroItemSelect(statusId){
+  pomodoroItem.innerHTML="";
+  const st=statusData[statusId];
+  if(!st?.items?.length){ pomodoroItem.innerHTML=`<option value="">（項目がありません）</option>`; return; }
+  st.items.forEach(it=>{ const opt=document.createElement("option"); opt.value=it.id; opt.textContent=it.name; pomodoroItem.appendChild(opt); });
+}
+function addPomodoroMinutes(min){
+  const subject=pomodoroSubject.value; const itemId=Number(pomodoroItem.value);
+  const session={id:Date.now(),date:todayKey(),minutes:min,subject,item:itemId};
+  pomodoroSessions.push(session); savePomodoro(); lastPomodoroAdd=session; showUndoToast(min);
+  adjustItemMinutes(subject,itemId,min); renderPomodoroStats(); renderPomodoroHistoryScreen();
+}
+function undoPomodoro(){ if(!lastPomodoroAdd) return; const idx=pomodoroSessions.findIndex(s=>s.id===lastPomodoroAdd.id); if(idx!==-1) pomodoroSessions.splice(idx,1); savePomodoro(); lastPomodoroAdd=null; document.getElementById("undoToast").style.display="none"; renderPomodoroStats(); renderPomodoroHistoryScreen(); }
+function startPomodoro(){
+  const subject=pomodoroSubject.value; const item=Number(pomodoroItem.value);
+  const work=Number(pomodoroWork.value); const brk=Number(pomodoroBreak.value); const repeat=Number(pomodoroRepeat.value);
+  if(!subject||!item){ alert("科目と項目を選択してください"); return; }
+  currentRepeat=repeat; currentMode="work"; remaining=work*60;
+  timerState={mode:currentMode,remaining,sessionTotal:work*60,work,brk,repeat,startedAt:Date.now()}; saveTimerState();
+  document.getElementById("pomodoroStartBtn").style.display="none"; document.getElementById("pomodoroCancelBtn").style.display="inline-block";
+  runPomodoroTimer(work,brk);
+}
+function runPomodoroTimer(work,brk){
+  clearInterval(timerId);
+  timerId=setInterval(()=>{
+    remaining--; timerState.remaining=remaining; saveTimerState(); updateTimerUI(remaining,timerState.sessionTotal);
+    if(remaining<=0){
+      clearInterval(timerId);
+      if(currentMode==="work"){
+        addPomodoroMinutes(work);
+        if(currentRepeat>1){ currentMode="break"; remaining=brk*60; currentRepeat--; timerState={mode:currentMode,remaining,sessionTotal:brk*60,work,brk,repeat:currentRepeat,startedAt:Date.now()}; saveTimerState(); runPomodoroTimer(work,brk);}
+        else endPomodoroCycle();
+      }else{ currentMode="work"; remaining=work*60; timerState={mode:currentMode,remaining,sessionTotal:work*60,work,brk,repeat:currentRepeat,startedAt:Date.now()}; saveTimerState(); runPomodoroTimer(work,brk);}
     }
-  });
+  },1000);
 }
-
-// ===== 編集画面入力の一時保存 =====
-function saveEditFormState() {
-  localStorage.setItem("editName", inputName.value);
-  localStorage.setItem("editSchool", inputSchool.value);
+function endPomodoroCycle(){ alert("ポモドーロサイクル終了"); document.getElementById("pomodoroStartBtn").style.display="inline-block"; document.getElementById("pomodoroCancelBtn").style.display="none"; timerState=null; saveTimerState(); renderPomodoroStats(); }
+function renderPomodoroStats(){
+  const todayTotal=pomodoroSessions.filter(s=>s.date===todayKey()).reduce((a,b)=>a+b.minutes,0);
+  document.getElementById("todayPomodoro").textContent=`今日の合計：${Math.floor(todayTotal/60)}時間${todayTotal%60}分`;
+  drawPomodoroChart(); renderPomodoroHistoryScreen();
 }
-
-// 入力中にリアルタイム保存
-inputName.addEventListener("input", saveEditFormState);
-inputSchool.addEventListener("input", saveEditFormState);
-
-// ===== 編集 =====
-function openEdit() {
-  hideAll();
-  edit.classList.remove("hidden");
-  setCurrentScreen("edit");
-
-  // localStorage があれば復元、なければ profile の値
-  inputName.value   = localStorage.getItem("editName")   || profile.name;
-  inputSchool.value = localStorage.getItem("editSchool") || profile.school;
-
-  renderStatusManage();
-}
-
-function renderStatusManage() {
-  statusManage.innerHTML = "";
-  Object.keys(statusData).forEach(k => {
-    const row = document.createElement("div");
-    row.style.display = "flex";
-    row.innerHTML = `
-      <span style="flex:1">${statusData[k].title}</span>
-      <button class="small danger" onclick="deleteStatus('${k}')">
-        削除
-      </button>
-    `;
-    statusManage.appendChild(row);
-  });
-}
-
-
-function getStatusTotalMinutes(key) {
-  return statusData[key].items.reduce((sum, item) => {
-    return sum + item.minutes;
-  }, 0);
-}
-
-
-function addStatus() {
-  if (!newStatusName.value) return;
-
-  const key = "s" + Date.now();
-
-  statusData[key] = {
-    title: newStatusName.value,
-    items: []
-  };
-
-  newStatusName.value = "";
-  saveStorage();
-  renderStatusManage();
-  renderHome(); // ← これ超重要
-}
-
-
-function deleteStatus(key) {
-  if (!confirm("削除しますか？")) return;
-  delete statusData[key];
-  saveStorage();
-  backHome();
-}
-
-function setBackgroundImage(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    const base64 = reader.result;
-    localStorage.setItem("bgImage", base64);
-    applyBackground();
-  };
-  reader.readAsDataURL(file);
-}
-
-function applyBackground() {
-  const bg = localStorage.getItem("bgImage");
-  if (bg) {
-    document.body.style.backgroundImage = `url(${bg})`;
-    document.body.classList.add("has-bg");
-  } else {
-    document.body.style.backgroundImage = "";
-    document.body.classList.remove("has-bg");
-  }
-}
-
-function clearBackground() {
-  if (!confirm("背景画像をリセットしますか？")) return;
-  localStorage.removeItem("bgImage");
-  applyBackground();
-}
-
-function setCardOpacity(value) {
-  localStorage.setItem("cardOpacity", value);
-  applyCardOpacity();
-}
-
-function applyCardOpacity() {
-  const v = localStorage.getItem("cardOpacity") || 1;
-
-  document.documentElement
-    .style.setProperty("--card-bg-alpha", v);
-
-  const slider = document.getElementById("cardOpacitySlider");
-  if (slider) slider.value = v;
-}
-
-//ポモドーロ機能
-// 1セッション単位で保存
-let pomodoroSessions = JSON.parse(localStorage.getItem("pomodoroSessions") || "[]");
-
-function savePomodoro() {
-  localStorage.setItem("pomodoroSessions", JSON.stringify(pomodoroSessions));
-}
-
-
-// ポモドーロ記録（1日→分）
-let pomodoroLog = JSON.parse(localStorage.getItem("pomodoroLog") || "{}");
-
-function savePomodoroLog() {
-  localStorage.setItem("pomodoroLog", JSON.stringify(pomodoroLog));
-}
-
-function todayKey() {
-  const d = new Date();
-  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-}
-
-const pomodoro = document.getElementById("pomodoro");
-const pomodoroTimer = document.getElementById("pomodoroTimer");
-
-let timerId = null;
-let remaining = 0;
-let mode = "work"; // work / break
-
-function openPomodoro() {
-  hideAll();
-  pomodoro.classList.remove("hidden");
-  setCurrentScreen("pomodoro");
-
-  fillPomodoroSubjectSelect();
-  
-  const savedSubject = localStorage.getItem("pomodoroSubjectSel");
-  const savedItem    = localStorage.getItem("pomodoroItemSel");
-
-  if (savedSubject) pomodoroSubject.value = savedSubject;
-  fillPomodoroItemSelect(pomodoroSubject.value);
-  if (savedItem) pomodoroItem.value = savedItem;
-
-  pomodoroWork.value  = localStorage.getItem("pomodoroWork")  || 25;
-  pomodoroBreak.value = localStorage.getItem("pomodoroBreak") || 5;
-
-  renderPomodoroStats();
-
-  // タイマー復元
-  if (timerState) {
-    const elapsed = Math.floor((Date.now() - timerState.startedAt)/1000);
-    remaining = Math.max(0, timerState.remaining - elapsed);
-    currentMode = timerState.mode;
-    mode = currentMode; // UI用に反映
-
-    // sessionTotal を残り時間に合わせて更新
-    timerState.sessionTotal = remaining;
-    timerState.startedAt = Date.now();
-    saveTimerState();
-
-    runPomodoroTimer(timerState.work, timerState.brk);
-  }
-}
-
-
-
-function fillPomodoroItemSelect(statusId) {
-  const sel = document.getElementById("pomodoroItem");
-  sel.innerHTML = "";
-
-  const st = statusData[statusId];
-  if (!st || !st.items || !st.items.length) {
-    const opt = document.createElement("option");
-    opt.value = "";
-    opt.textContent = "（項目がありません）";
-    sel.appendChild(opt);
-    return;
-  }
-
-  st.items.forEach((it) => {
-    const opt = document.createElement("option");
-    opt.value = it.id;      // ← idで管理
-    opt.textContent = it.name;
-    sel.appendChild(opt);
-  });
-}
-
-
-function fillPomodoroSubjectSelect() {
-  const sel = document.getElementById("pomodoroSubject");
-  sel.innerHTML = "";
-
-  // ステータスが1つも無い場合
-  if (!Object.keys(statusData).length) {
-    const opt = document.createElement("option");
-    opt.value = "";
-    opt.textContent = "（ステータスがありません）";
-    sel.appendChild(opt);
-    return;
-  }
-
-  Object.keys(statusData).forEach(key => {
-    const opt = document.createElement("option");
-    opt.value = key;
-    opt.textContent = statusData[key].title;
-    sel.appendChild(opt);
-  });
-}
-
-
-function minutesToText(m){ return `${Math.floor(m/60)}時間${m%60}分`; }
-
-function getWeekTotal() {
-  const now = new Date();
-  const start = new Date(now);
-  start.setDate(now.getDate() - 6);
-
-  let sum = 0;
-  for (const k in pomodoroLog) {
-    const d = new Date(k);
-    if (d >= start && d <= now) sum += pomodoroLog[k];
-  }
-  return sum;
-}
-
-//記録リセット
-let lastPomodoroAdd = null; // ← 直前の追加記録
-
-function addPomodoroMinutes(min) {
-  const subject = document.getElementById("pomodoroSubject").value;
-  const item = Number(document.getElementById("pomodoroItem").value);
-
-  const session = {
-    id: Date.now(),
-    date: todayKey(),
-    minutes: min,
-    subject,
-    item
-  };
-
-  pomodoroSessions.push(session);
-  savePomodoro();  // ここだけで保存
-  lastPomodoroAdd = session;
-  showUndoToast(min);
-}
-
-function showUndoToast(min) {
-  const t = document.getElementById("undoToast");
-  t.style.display = "block";
-  t.firstChild.textContent =
-    `${minutesToText(min)} を記録しました`;
-  setTimeout(() => t.style.display = "none", 6000); // 6秒で消える
-}
-
-function undoPomodoro() {
-  if (!lastPomodoroAdd) return;
-
-  const idx = pomodoroSessions.findIndex(s => s.id === lastPomodoroAdd.id);
-  if(idx !== -1) pomodoroSessions.splice(idx, 1);
-
-  savePomodoro();  // ここも pomodoroSessions のみ
-  lastPomodoroAdd = null;
-  document.getElementById("undoToast").style.display = "none";
-  renderPomodoroStats();
-}
-
-function getTotalForDate(key) {
-  return pomodoroSessions
-    .filter(s => s.date === key)
-    .reduce((a,b)=>a+b.minutes, 0);
-}
-
-function getWeekTotalFromSessions() {
-  const now = new Date();
-  let sum = 0;
-
-  for (let i=0;i<7;i++){
-    const d = new Date(now);
-    d.setDate(now.getDate()-i);
-    sum += getTotalForDate(getDateKey(d));
-  }
-  return sum;
-}
-
-function renderPomodoroHistory() {
-  const box = document.getElementById("pomodoroHistoryList");
-  box.innerHTML = "";
-
-  // 新しい順に
-  const list = [...pomodoroSessions].sort((a,b)=>b.id-a.id);
-
-  list.forEach(s => {
-    const div = document.createElement("div");
-    div.className = "achievement-card"; // 既存デザイン流用
-    div.innerHTML = `
-      <div style="flex:1;">
-        ${s.date}　${minutesToText(s.minutes)}
-      </div>
-      <button class="small danger" onclick="deletePomodoro(${s.id})">
-        削除
-      </button>
-    `;
-    box.appendChild(div);
-  });
-}
-
-function deletePomodoro(id) {
-  const idx = pomodoroSessions.findIndex(s => s.id === id);
-  if (idx === -1) return;
-
-  const s = pomodoroSessions[idx];
-  const st = statusData[s.subject];
-  if (st) {
-    const item = st.items.find(it => it.id === s.item);
-    if(item) item.minutes = Math.max(0, item.minutes - s.minutes);
-  }
-
-  pomodoroSessions.splice(idx, 1);
-  savePomodoro();
-  saveStorage(); // ← 忘れずに
-  renderPomodoroHistoryScreen();
-  renderPomodoroStats();
-}
-
-
-
-function renderPomodoroStats() {
-  const today = getTotalForDate(todayKey());
-
-  document.getElementById("todayPomodoro").textContent =
-    `今日の合計：${minutesToText(today)}`;
-
-  document.getElementById("weekPomodoro").textContent =
-    `直近7日：${minutesToText(getWeekTotal())}`;
-
-  const lastWeek = getLastWeekTotal();
-  document.getElementById("lastWeekPomodoro").textContent =
-    `先週の合計：${minutesToText(lastWeek)}`;
-
-  drawPomodoroChart();
-  renderPomodoroHistory(); // ← 追加
-}
-
-const pomodoroHistoryScreen =
-  document.getElementById("pomodoroHistoryScreen");
-const pomodoroHistoryList =
-  document.getElementById("pomodoroHistoryList");
-
-function openPomodoroHistory() {
-  hideAll();
-  pomodoroHistoryScreen.classList.remove("hidden");
-  setCurrentScreen("pomodoroHistoryScreen");
-  renderPomodoroHistoryScreen();
-}
-
-function renderPomodoroHistoryScreen() {
-  pomodoroHistoryList.innerHTML = "";
-
-  if (!pomodoroSessions.length) {
-    pomodoroHistoryList.innerHTML =
-      `<p style="color:#666;">履歴がありません</p>`;
-    return;
-  }
-
-  const list = [...pomodoroSessions].sort((a,b)=>b.id-a.id);
-
-  list.forEach(s => {
-    const row = document.createElement("div");
-    row.className = "achievement-card";
-    row.innerHTML = `
-    <div style="flex:1;">
-    ${s.date}　${minutesToText(s.minutes)}
-    <div style="font-size:0.85em; color:#666;">
-    項目：${s.subject || "未指定"}
-    </div>
-    </div>
-    <button class="small danger"
-    onclick="deletePomodoro(${s.id}); renderPomodoroHistoryScreen();">
-    削除
-    </button>
-    `;
-
+function renderPomodoroHistoryScreen(){
+  pomodoroHistoryList.innerHTML="";
+  if(!pomodoroSessions.length){ pomodoroHistoryList.innerHTML=`<p style="color:#666;">履歴がありません</p>`; return; }
+  [...pomodoroSessions].sort((a,b)=>b.id-a.id).forEach(s=>{
+    const row=document.createElement("div"); row.className="achievement-card";
+    row.innerHTML=`<div style="flex:1;">${s.date}　${Math.floor(s.minutes/60)}時間${s.minutes%60}分<div style="font-size:0.85em;color:#666;">項目：${s.subject||"未指定"}</div></div><button class="small danger" onclick="deletePomodoro(${s.id})">削除</button>`;
     pomodoroHistoryList.appendChild(row);
   });
 }
-
-let timerState = JSON.parse(localStorage.getItem("timerState") || "null");
-
-function saveTimerState() {
-  localStorage.setItem("timerState", JSON.stringify(timerState));
+function deletePomodoro(id){ if(!confirm("削除しますか？")) return; pomodoroSessions=pomodoroSessions.filter(s=>s.id!==id); savePomodoro(); renderPomodoroStats(); }
+function drawPomodoroChart(){
+  const summary={}; pomodoroSessions.forEach(s=>{ summary[s.subject]=(summary[s.subject]||0)+s.minutes; });
+  if(pomodoroChart?.chart) pomodoroChart.chart.destroy();
+  const ctx=pomodoroChart.getContext("2d"); pomodoroChart.chart=new Chart(ctx,{type:"bar",data:{labels:Object.keys(summary),datasets:[{label:"分",data:Object.values(summary),backgroundColor:"#2196f3"}]},options:{indexAxis:'y'}});
 }
-
-
-function startPomodoro() {
-  const subject = pomodoroSubject.value;
-  const item = pomodoroItem.value;
-  const work  = Number(pomodoroWork.value);
-  const brk   = Number(pomodoroBreak.value);
-  const repeat = Number(pomodoroRepeat.value);
-
-  localStorage.setItem("pomodoroWork", work);
-  localStorage.setItem("pomodoroBreak", brk);
-  localStorage.setItem("pomodoroSubjectSel", pomodoroSubject.value);
-  localStorage.setItem("pomodoroItemSel", pomodoroItem.value);
-
-
-  if (!subject || !item) {
-    alert("科目と項目を選択してください");
-    return;
-  }
-
-  const itemName = pomodoroItem.options[pomodoroItem.selectedIndex].text;
-
-  const confirmMsg = `科目：${pomodoroSubject.options[pomodoroSubject.selectedIndex].text}\n` +
-                     `項目：${itemName}\n` +
-                     `ポモドーロ時間：${work}分、休憩時間：${brk}分\n` +
-                     `繰り返し回数：${repeat}回\n\n` +
-                     `以上で実行しますか？`;
-
-  if (!confirm(confirmMsg)) return;
-
-  // 開始後はボタン切り替え
-  document.getElementById("pomodoroStartBtn").style.display = "none";
-  document.getElementById("pomodoroCancelBtn").style.display = "inline-block";
-
-  // タイマー初期化
-  currentRepeat = repeat;       // ← 繰り返し回数をセット
-  currentMode = "work";
-  remaining = work * 60;
-  timerState = {
-    mode: currentMode,
-    remaining,
-    sessionTotal: work*60,
-    work,
-    brk,
-    repeat,
-    startedAt: Date.now()
-  };
-saveTimerState();
-runPomodoroTimer(work, brk);
-}
-
-
-
-
-function finishPomodoro(minutes) {
-  const subject = pomodoroSubject.value;
-  const itemId  = Number(pomodoroItem.value);
-
-  // セッション保存
-  const session = {
-    id: Date.now(),
-    date: getDateKey(new Date()),
-    minutes,
-    subject,
-    item: itemId
-  };
-
-  pomodoroSessions.push(session);
-  savePomodoro();
-
-  // 対応する項目に時間を加算
-  adjustItemMinutes(subject, itemId, minutes);
-
-  // UI 更新
-  renderPomodoroStats();
-  renderPomodoroHistoryScreen();
-  showUndoToast(minutes);
-}
-
-// itemId で加算する専用関数
-function adjustItemMinutesById(statusId, itemId, deltaMinutes) {
-  const st = statusData[statusId];
-  if (!st || !Array.isArray(st.items)) return;
-
-  const it = st.items.find(it => it.id === itemId);
-  if (!it) return;
-
-  it.minutes = (it.minutes || 0) + deltaMinutes;
-  if (it.minutes < 0) it.minutes = 0;
-
-  saveStorage();
-  renderHome();
-}
-
-
-function adjustItemMinutes(statusId, itemId, deltaMinutes) {
-  const st = statusData[statusId];
-  if (!st || !Array.isArray(st.items)) return;
-
-  const it = st.items.find(it => it.id === itemId);
-  if (!it) return;
-
-  it.minutes = (it.minutes || 0) + deltaMinutes;
-  if (it.minutes < 0) it.minutes = 0;
-
-  saveStorage();
-  renderHome();
-}
-
-const circle = document.querySelector(".timerCircle .fg");
-
-function runPomodoroTimer(work, brk) {
-  clearInterval(timerId);
-
-  timerId = setInterval(() => {
-    remaining--;
-    updateTimerUI(remaining, timerState.sessionTotal);
-
-    if (remaining <= 0) {
-      clearInterval(timerId);
-
-      if (currentMode === "work") {
-        // 作業時間終了 → 記録
-        addPomodoroMinutes(work);
-
-        if (currentRepeat > 1) {
-          // 次は休憩
-          currentMode = "break";
-          remaining = brk * 60;
-          timerState = {
-            mode: currentMode,
-            remaining,
-            sessionTotal: brk * 60,
-            work,
-            brk,
-            startedAt: Date.now()
-          };
-          currentRepeat--; // 繰り返し回数は work が終わった時点で減らす
-          saveTimerState();
-          runPomodoroTimer(work, brk);
-        } else {
-          // 繰り返し終了
-          endPomodoroCycle();
-        }
-
-      } else if (currentMode === "break") {
-        // 休憩終了 → 次の work
-        currentMode = "work";
-        remaining = work * 60;
-        timerState = {
-          mode: currentMode,
-          remaining,
-          sessionTotal: work * 60,
-          work,
-          brk,
-          startedAt: Date.now()
-        };
-        saveTimerState();
-        runPomodoroTimer(work, brk);
-      }
-    }
-  }, 1000);
-}
-
-
-function endPomodoroCycle() {
-  alert("ポモドーロサイクルが終了しました！");
-  document.getElementById("pomodoroStartBtn").style.display = "inline-block";
-  document.getElementById("pomodoroCancelBtn").style.display = "none";
-  timerState = null;
-  saveTimerState();
-  renderPomodoroStats();
-}
-
-
-function updateTimerUI(remain, total) {
-  const t = Math.floor(remain / 60);
-  const s = String(remain % 60).padStart(2,"0");
-  pomodoroTimerText.textContent = `${t}:${s}`;
-
-  const ratio = remain / total;
-  circle.style.strokeDashoffset = 282.6 * (1 - ratio);
-  setTimerColor();
-}
-
-
-function setTimerColor() {
-  const circle = document.querySelector(".timerCircle .fg");
-
-  if (mode === "work") {
-    circle.style.stroke = "#2196f3";   // 作業
-  } else {
-    circle.style.stroke = "#4caf50";   // 休憩
-  }
-}
-
-function cancelPomodoro() {
-  clearInterval(timerId);
-  document.getElementById("pomodoroTimerText").textContent = "00:00";
-}
-
-
-//折れ線グラフ
-let pomoChart = null;
-
-function getDateKey(date) {
-  return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
-}
-
-// 直近7日（今日含む）
-function getLast7DaysData() {
-  const days = [];
-  const now = new Date();
-
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(now);
-    d.setDate(now.getDate() - i);
-    const key = getDateKey(d);
-
-    const minutes = pomodoroSessions
-      .filter(s => s.date === key)
-      .reduce((a,b)=>a+b.minutes, 0);
-
-    days.push({
-      label: `${d.getMonth()+1}/${d.getDate()}`,
-      minutes
-    });
-  }
-  return days;
-}
-
-
-// 先週（7〜13日前）
-function getLastWeekTotal() {
-  const now = new Date();
-  let sum = 0;
-
-  for (let i = 7; i <= 13; i++) {
-    const d = new Date(now);
-    d.setDate(now.getDate() - i);
-    const key = getDateKey(d);
-    sum += getTotalForDate(key);
-  }
-  return sum;
-}
-
-
-function drawPomodoroChart() {
-  const ctx = document.getElementById("pomodoroChart");
-
-  const data = getLast7DaysData();
-
-  if (pomoChart) pomoChart.destroy();
-
-  pomoChart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: data.map(d => d.label),
-      datasets: [{
-        data: data.map(d => Math.floor(d.minutes / 60 * 100) / 100),
-        tension: 0.3
-      }]
-    },
-    options: {
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        y: {
-          title: {
-            display: true,
-            text: "時間（h）"
-          }
-        }
-      }
-    }
-  });
-}
-
-
-
-
-// ===== 画面 =====
-function saveData() {
-  profile.name   = inputName.value.trim() || profile.name;
-  profile.school = inputSchool.value.trim() || profile.school;
-
-  saveStorage();
-
-  // 一時保存は削除
-  localStorage.removeItem("editName");
-  localStorage.removeItem("editSchool");
-
-  backHome();
-}
-
-
-function backHome() {
-  hideAll();
-  home.classList.remove("hidden");
-  setCurrentScreen("home");
-
-  // profile の値を使って描画
-  renderHome();
-}
-
-function hideAll() {
-  home.classList.add("hidden");
-  status.classList.add("hidden");
-  edit.classList.add("hidden");
-  achievementList.classList.add("hidden");
-  pomodoro.classList.add("hidden");
-  pomodoroHistoryScreen.classList.add("hidden");
-}
-
+function updateTimerUI(remain,total){ const t=Math.floor(remain/60); const s=String(remain%60).padStart(2,"0"); pomodoroTimerText.textContent=`${t}:${s}`; if(circle) circle.style.strokeDashoffset = 282.6*(1 - remain/total); if(circle) circle.style.stroke=currentMode==="work"?"#2196f3":"#4caf50"; }
+function cancelPomodoro(){ clearInterval(timerId); pomodoroTimerText.textContent="00:00"; timerState=null; saveTimerState(); document.getElementById("pomodoroStartBtn").style.display="inline-block"; document.getElementById("pomodoroCancelBtn").style.display="none"; }
+function adjustItemMinutes(statusId,itemId,delta){ const st=statusData[statusId]; if(!st?.items) return; const it=st.items.find(i=>i.id===itemId); if(!it) return; it.minutes=(it.minutes||0)+delta; if(it.minutes<0) it.minutes=0; saveStorage(); renderHome(); }
+function showUndoToast(min){ const toast=document.getElementById("undoToast"); toast.textContent=`${min}分追加しました [元に戻す]`; toast.style.display="block"; setTimeout(()=>{toast.style.display="none";},4000); }
+
+// ===== 画面操作 =====
+function hideAll(){ home.classList.add("hidden"); status.classList.add("hidden"); edit.classList.add("hidden"); achievementList.classList.add("hidden"); pomodoro.classList.add("hidden"); pomodoroHistoryScreen?.classList.add("hidden"); }
+function backHome(){ hideAll(); home.classList.remove("hidden"); renderHome(); fillPomodoroSubjectSelect(); }
+
+// ===== 初期ロード =====
 loadStorage();
-window.addEventListener("load", () => {
-  const scr = localStorage.getItem("currentScreen") || "home";
-
-  hideAll();
-  document.getElementById(scr).classList.remove("hidden");
-
-  switch(scr) {
-    case "home":
-      renderHome();
-      break;
-
-    case "status":
-      currentKey = loadCurrentKey();
-      if (!currentKey || !statusData[currentKey]) {
-        backHome();
-        return;
-      }
-      const st = statusData[currentKey];
-      if (!st || !Array.isArray(st.items)) {
-        backHome();
-        return;
-      }
-      statusTitle.textContent = st.title;
-      updateItemSelect();
-      renderItemList();
-      drawChart();
-      break;
-
-    case "edit":
-      edit.classList.remove("hidden");
-      inputName.value   = localStorage.getItem("editName")   || profile.name;
-      inputSchool.value = localStorage.getItem("editSchool") || profile.school;
-      renderStatusManage();
-      break;
-
-    case "achievementList":
-      achievementList.classList.remove("hidden");
-      renderAchievementList();
-      break;
-
-    case "pomodoro":
-      pomodoro.classList.remove("hidden");
-
-      // 入力値復元
-      pomodoroWork.value  = localStorage.getItem("pomodoroWork")  || 25;
-      pomodoroBreak.value = localStorage.getItem("pomodoroBreak") || 5;
-      if (localStorage.getItem("pomodoroSubjectSel"))
-        pomodoroSubject.value = localStorage.getItem("pomodoroSubjectSel");
-
-      fillPomodoroSubjectSelect();
-      fillPomodoroItemSelect(pomodoroSubject.value);
-
-      if (localStorage.getItem("pomodoroItemSel"))
-        pomodoroItem.value = localStorage.getItem("pomodoroItemSel");
-
-      renderPomodoroStats();
-
-      // ★タイマー復元
-      if (timerState) {
-        const elapsed = Math.floor((Date.now() - timerState.startedAt) / 1000);
-        remaining = Math.max(0, timerState.sessionTotal - elapsed);
-        mode = timerState.mode;
-
-        // 元のワーク・ブレイク時間を保持
-        const work = timerState.work;
-        const brk  = timerState.brk;
-
-        // 残り時間を sessionTotal にセットし、開始時間を更新
-        timerState.sessionTotal = remaining;
-        timerState.startedAt = Date.now();
-
-        runTimer(work, brk);
-      }
-      break;
-
-    case "pomodoroHistoryScreen":
-      pomodoroHistoryScreen.classList.remove("hidden");
-      renderPomodoroHistoryScreen();
-      break;
-
-    default:
-      backHome();
-      break;
-  }
+window.addEventListener("load",()=>{
+  const scr=localStorage.getItem("currentScreen")||"home";
+  hideAll(); const el=document.getElementById(scr); if(el) el.classList.remove("hidden");
+  renderHome(); fillPomodoroSubjectSelect(); if(timerState){ const elapsed=Math.floor((Date.now()-timerState.startedAt)/1000); remaining=Math.max(0,timerState.remaining-elapsed); currentMode=timerState.mode; currentRepeat=timerState.repeat||1; runPomodoroTimer(timerState.work,timerState.brk);}
 });
-
-
-applyBackground();
-applyCardOpacity();
-
-
