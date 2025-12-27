@@ -841,6 +841,7 @@ function adjustItemMinutes(statusId, itemIndex, deltaMinutes) {
   saveStorage();
   renderHome();
 }
+const circle = document.querySelector(".timerCircle .fg");
 
 function runTimer(work, brk) {
   clearInterval(timerId);
@@ -863,13 +864,14 @@ function runTimer(work, brk) {
         addPomodoroMinutes(Number(document.getElementById("pomodoroWork").value));
         renderPomodoroStats();
         alert("作業終了！休憩に入ります");
-        mode = "work";
+        mode = "break";
         setTimerColor();
         remaining = work * 60;
         runTimer(work, brk);
 
       } else {
         alert("休憩終了！お疲れさま");
+        mode = "work";       // ← 戻す
         setTimerColor();   // ★ 緑に戻す
         renderPomodoroStats();
       }
@@ -880,17 +882,18 @@ function runTimer(work, brk) {
 function setTimerColor() {
   const circle = document.querySelector(".timerCircle .fg");
 
-  if (!circle) return;
-
-  // 作業 → 青、休憩 → 緑
-  circle.style.stroke =
-    mode === "work" ? "#60a5fa" : "#4ade80";
+  if (mode === "work") {
+    circle.style.stroke = "#2196f3";   // 作業
+  } else {
+    circle.style.stroke = "#4caf50";   // 休憩
+  }
 }
 
 function cancelPomodoro() {
   clearInterval(timerId);
-  pomodoroTimer.textContent = "00:00";
+  document.getElementById("pomodoroTimerText").textContent = "00:00";
 }
+
 
 //折れ線グラフ
 let pomoChart = null;
