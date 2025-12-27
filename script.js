@@ -694,7 +694,8 @@ function deletePomodoro(id) {
 
   savePomodoroSessions();
   renderPomodoroStats();
-  renderPomodoroHistory();
+  renderPomodoroHistoryScreen();  // ← こちらだけに統一
+
 }
 
 function renderPomodoroStats() {
