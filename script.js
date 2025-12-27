@@ -319,15 +319,24 @@ function openStatus(key) {
   currentKey = key;
   saveCurrentKey(key);
 
+  const st = statusData[key];
+
+  // データが壊れていた場合の保険
+  if (!st || !Array.isArray(st.items)) {
+    backHome();
+    return;
+  }
+
   hideAll();
   status.classList.remove("hidden");
   setCurrentScreen("status");
 
-  statusTitle.textContent = statusData[key].title;
+  statusTitle.textContent = st.title;
   updateItemSelect();
   renderItemList();
   drawChart();
 }
+
 
 function updateItemSelect() {
   itemSelect.innerHTML = "";
