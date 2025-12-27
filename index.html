@@ -164,8 +164,24 @@
       <p id="lastWeekPomodoro" style="color:#555;"></p>
     </div>
 
+  
   </div>
+  <div class="card">
+    <h2>履歴</h2>
+    <div id="pomodoroHistory"></div>
+  </div>
+
 </div>
+
+<div id="undoToast" style="
+  position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+  background:#111; color:white; padding:10px 14px; border-radius:12px;
+  display:none;
+">
+  記録を追加しました
+  <button onclick="undoPomodoro()" style="margin-left:8px;">取り消す</button>
+</div>
+
 
 
 <script src="script.js"></script>

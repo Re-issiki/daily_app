@@ -537,6 +537,13 @@ function applyCardOpacity() {
 }
 
 //ポモドーロ機能
+// 1セッション単位で保存
+let pomodoroSessions = JSON.parse(localStorage.getItem("pomodoroSessions") || "[]");
+
+function savePomodoroSessions() {
+  localStorage.setItem("pomodoroSessions", JSON.stringify(pomodoroSessions));
+}
+
 // ポモドーロ記録（1日→分）
 let pomodoroLog = JSON.parse(localStorage.getItem("pomodoroLog") || "{}");
 
@@ -597,6 +604,114 @@ function renderPomodoroStats() {
     `先週の合計：${minutesToText(lastWeek)}`;
 
   drawPomodoroChart();
+}
+
+//記録リセット
+let lastPomodoroAdd = null; // ← 直前の追加記録
+
+function addPomodoroMinutes(min) {
+  const session = {
+    id: Date.now(),
+    date: todayKey(),
+    minutes: min
+  };
+
+  pomodoroSessions.push(session);
+  savePomodoroSessions();
+
+  lastPomodoroAdd = session;   // ← Undo もそのまま使える
+  showUndoToast(min);
+}
+
+
+function showUndoToast(min) {
+  const t = document.getElementById("undoToast");
+  t.style.display = "block";
+  t.firstChild.textContent =
+    `${minutesToText(min)} を記録しました`;
+  setTimeout(() => t.style.display = "none", 6000); // 6秒で消える
+}
+
+function undoPomodoro() {
+  if (!lastPomodoroAdd) return;
+
+  const { key, amount } = lastPomodoroAdd;
+  pomodoroLog[key] = Math.max(0, (pomodoroLog[key] || 0) - amount);
+
+  savePomodoroLog();
+  lastPomodoroAdd = null;
+
+  document.getElementById("undoToast").style.display = "none";
+  renderPomodoroStats();
+  alert("直前のポモドーロ記録を取り消しました");
+}
+
+function getTotalForDate(key) {
+  return pomodoroSessions
+    .filter(s => s.date === key)
+    .reduce((a,b)=>a+b.minutes, 0);
+}
+
+function getWeekTotal() {
+  const now = new Date();
+  let sum = 0;
+
+  for (let i=0;i<7;i++){
+    const d = new Date(now);
+    d.setDate(now.getDate()-i);
+    sum += getTotalForDate(getDateKey(d));
+  }
+  return sum;
+}
+
+function renderPomodoroHistory() {
+  const box = document.getElementById("pomodoroHistory");
+  box.innerHTML = "";
+
+  // 新しい順に
+  const list = [...pomodoroSessions].sort((a,b)=>b.id-a.id);
+
+  list.forEach(s => {
+    const div = document.createElement("div");
+    div.className = "achievement-card"; // 既存デザイン流用
+    div.innerHTML = `
+      <div style="flex:1;">
+        ${s.date}　${minutesToText(s.minutes)}
+      </div>
+      <button class="small danger" onclick="deletePomodoro(${s.id})">
+        削除
+      </button>
+    `;
+    box.appendChild(div);
+  });
+}
+
+function deletePomodoro(id) {
+  if (!confirm("このポモドーロ記録を削除しますか？")) return;
+
+  pomodoroSessions =
+    pomodoroSessions.filter(s => s.id !== id);
+
+  savePomodoroSessions();
+  renderPomodoroStats();
+  renderPomodoroHistory();
+}
+
+function renderPomodoroStats() {
+  const today = getTotalForDate(todayKey());
+
+  document.getElementById("todayPomodoro").textContent =
+    `今日の合計：${minutesToText(today)}`;
+
+  document.getElementById("weekPomodoro").textContent =
+    `直近7日：${minutesToText(getWeekTotal())}`;
+
+  const lastWeek = getLastWeekTotal();
+  document.getElementById("lastWeekPomodoro").textContent =
+    `先週の合計：${minutesToText(lastWeek)}`;
+
+  drawPomodoroChart();
+  renderPomodoroHistory(); // ← 追加
 }
 
 
