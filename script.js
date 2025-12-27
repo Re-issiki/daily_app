@@ -540,9 +540,10 @@ function applyCardOpacity() {
 // 1セッション単位で保存
 let pomodoroSessions = JSON.parse(localStorage.getItem("pomodoroSessions") || "[]");
 
-function savePomodoroSessions() {
+function savePomodoro() {
   localStorage.setItem("pomodoroSessions", JSON.stringify(pomodoroSessions));
 }
+
 
 // ポモドーロ記録（1日→分）
 let pomodoroLog = JSON.parse(localStorage.getItem("pomodoroLog") || "{}");
@@ -596,6 +597,28 @@ function fillPomodoroItemSelect(statusId) {
   });
 }
 
+function fillPomodoroSubjectSelect() {
+  const sel = document.getElementById("pomodoroSubject");
+  sel.innerHTML = "";
+
+  // ステータスが1つも無い場合
+  if (!Object.keys(statusData).length) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "（ステータスがありません）";
+    sel.appendChild(opt);
+    return;
+  }
+
+  Object.keys(statusData).forEach(key => {
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = statusData[key].title;
+    sel.appendChild(opt);
+  });
+}
+
+
 function minutesToText(m){ return `${Math.floor(m/60)}時間${m%60}分`; }
 
 function getWeekTotal() {
@@ -609,22 +632,6 @@ function getWeekTotal() {
     if (d >= start && d <= now) sum += pomodoroLog[k];
   }
   return sum;
-}
-
-function renderPomodoroStats() {
-  const today = pomodoroLog[todayKey()] || 0;
-
-  document.getElementById("todayPomodoro").textContent =
-    `今日の合計：${minutesToText(today)}`;
-
-  document.getElementById("weekPomodoro").textContent =
-    `直近7日：${minutesToText(getWeekTotal())}`;
-
-  const lastWeek = getLastWeekTotal();
-  document.getElementById("lastWeekPomodoro").textContent =
-    `先週の合計：${minutesToText(lastWeek)}`;
-
-  drawPomodoroChart();
 }
 
 //記録リセット
@@ -641,7 +648,7 @@ function addPomodoroMinutes(min) {
   };
 
   pomodoroSessions.push(session);
-  savePomodoroSessions();
+  savePomodoro();
 
   lastPomodoroAdd = session;
   showUndoToast(min);
@@ -711,20 +718,20 @@ function renderPomodoroHistory() {
   });
 }
 
-function deletePomodoroSession(id) {
+function deletePomodoro(id) {
   const idx = pomodoroSessions.findIndex(s => s.id === id);
   if (idx === -1) return;
 
   const s = pomodoroSessions[idx];
 
-  // ★ 先にステータス側を減算
+  // ステータス側を減算
   adjustItemMinutes(s.subject, s.item, -s.minutes);
 
   pomodoroSessions.splice(idx, 1);
   savePomodoro();
-  refreshPomodoroUI();
+  renderPomodoroHistoryScreen();
+  renderPomodoroStats();
 }
-
 
 function renderPomodoroStats() {
   const today = getTotalForDate(todayKey());
