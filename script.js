@@ -65,7 +65,9 @@ function loadStorage() {
   }
 }
 
-
+function setCurrentScreen(id){
+  localStorage.setItem("currentScreen", id);
+}
 
 // ===== データ =====
 let profile = {
@@ -188,6 +190,7 @@ function addAchievement() {
 function openAchievementList() {
   hideAll();
   achievementList.classList.remove("hidden");
+  setCurrentScreen("achievementList");
   renderAchievementList();
 }
 
@@ -308,6 +311,7 @@ function openStatus(key) {
   currentKey = key;
   hideAll();
   status.classList.remove("hidden");
+  setCurrentScreen("status");
 
   statusTitle.textContent = statusData[key].title;
   updateItemSelect();
@@ -437,6 +441,7 @@ function drawChart() {
 function openEdit() {
   hideAll();
   edit.classList.remove("hidden");
+  setCurrentScreen("edit");
 
   inputName.value = profile.name;
   inputSchool.value = profile.school;
@@ -567,6 +572,7 @@ let mode = "work"; // work / break
 function openPomodoro() {
   hideAll();
   pomodoro.classList.remove("hidden");
+  setCurrentScreen("pomodoro");
 
   fillPomodoroSubjectSelect();
   const first = document.getElementById("pomodoroSubject").value;
@@ -758,6 +764,7 @@ const pomodoroHistoryList =
 function openPomodoroHistory() {
   hideAll();
   pomodoroHistoryScreen.classList.remove("hidden");
+  setCurrentScreen("pomodoroHistoryScreen");
   renderPomodoroHistoryScreen();
 }
 
@@ -987,6 +994,7 @@ function saveData() {
 function backHome() {
   hideAll();
   home.classList.remove("hidden");
+  setCurrentScreen("home");
   renderHome();
 }
 
@@ -1000,6 +1008,17 @@ function hideAll() {
 }
 
 loadStorage();
+window.addEventListener("load", () => {
+  const scr = localStorage.getItem("currentScreen") || "home";
+
+  hideAll();
+  document.getElementById(scr).classList.remove("hidden");
+
+  // 画面ごとに再描画が必要なら追記
+  if (scr === "status") drawChart();
+  if (scr === "achievementList") renderAchievementList();
+  if (scr === "pomodoroHistoryScreen") renderPomodoroHistoryScreen();
+});
 applyBackground();
 applyCardOpacity();
 renderHome();
