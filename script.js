@@ -479,15 +479,25 @@ function drawChart() {
   });
 }
 
+// ===== 編集画面入力の一時保存 =====
+function saveEditFormState() {
+  localStorage.setItem("editName", inputName.value);
+  localStorage.setItem("editSchool", inputSchool.value);
+}
+
+// 入力中にリアルタイム保存
+inputName.addEventListener("input", saveEditFormState);
+inputSchool.addEventListener("input", saveEditFormState);
+
 // ===== 編集 =====
 function openEdit() {
   hideAll();
   edit.classList.remove("hidden");
   setCurrentScreen("edit");
 
-  // profile の値を入力欄に反映
-  inputName.value = profile.name;
-  inputSchool.value = profile.school;
+  // localStorage があれば復元、なければ profile の値
+  inputName.value   = localStorage.getItem("editName")   || profile.name;
+  inputSchool.value = localStorage.getItem("editSchool") || profile.school;
 
   renderStatusManage();
 }
@@ -1082,14 +1092,15 @@ function drawPomodoroChart() {
 
 // ===== 画面 =====
 function saveData() {
-  // 空白トリムして profile に反映
-  profile.name = inputName.value.trim() || profile.name;
+  profile.name   = inputName.value.trim() || profile.name;
   profile.school = inputSchool.value.trim() || profile.school;
 
-  // localStorage に保存
   saveStorage();
 
-  // ホーム描画して戻る
+  // 一時保存は削除
+  localStorage.removeItem("editName");
+  localStorage.removeItem("editSchool");
+
   backHome();
 }
 
