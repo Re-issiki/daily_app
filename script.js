@@ -575,10 +575,16 @@ function openPomodoro() {
   setCurrentScreen("pomodoro");
 
   fillPomodoroSubjectSelect();
-  const first = document.getElementById("pomodoroSubject").value;
-  fillPomodoroItemSelect(first);
+  fillPomodoroItemSelect(pomodoroSubject.value);
   renderPomodoroStats();
+
+  // ★ タイマー復元
+  if (timerState) {
+    mode = timerState.mode;
+    runTimer(timerState.work, timerState.brk);
+  }
 }
+
 
 
 
@@ -799,22 +805,33 @@ function renderPomodoroHistoryScreen() {
   });
 }
 
+let timerState = JSON.parse(localStorage.getItem("timerState") || "null");
+
+function saveTimerState() {
+  localStorage.setItem("timerState", JSON.stringify(timerState));
+}
 
 
 function startPomodoro() {
-  const work = Number(document.getElementById("pomodoroWork").value);
-  const brk  = Number(document.getElementById("pomodoroBreak").value);
-
-  if (work <= 0 || brk <= 0) {
-    alert("時間は1分以上にしてください");
-    return;
-  }
+  const work = Number(pomodoroWork.value);
+  const brk  = Number(pomodoroBreak.value);
 
   mode = "work";
   remaining = work * 60;
 
+  timerState = {
+    mode,
+    remaining,
+    sessionTotal: work * 60,
+    work,
+    brk,
+    startedAt: Date.now()
+  };
+
+  saveTimerState();
   runTimer(work, brk);
 }
+
 
 
 function finishPomodoro(minutes) {
@@ -852,39 +869,54 @@ const circle = document.querySelector(".timerCircle .fg");
 
 function runTimer(work, brk) {
   clearInterval(timerId);
-  sessionTotal = (mode === "work" ? work : brk) * 60;
 
   timerId = setInterval(() => {
-    remaining--;
+    const elapsed = Math.floor((Date.now() - timerState.startedAt) / 1000);
+    remaining = timerState.sessionTotal - elapsed;
 
-    const t = Math.floor(remaining / 60);
-    const s = String(remaining % 60).padStart(2, "0");
-    document.getElementById("pomodoroTimerText").textContent = `${t}:${s}`;
+    if (remaining < 0) remaining = 0;
 
-    const ratio = remaining / sessionTotal;
-    circle.style.strokeDashoffset = 282.6 * (1 - ratio);
+    updateTimerUI(remaining, timerState.sessionTotal);
 
-    if (remaining <= 0) {
+    if (remaining === 0) {
       clearInterval(timerId);
 
       if (mode === "work") {
-        addPomodoroMinutes(Number(document.getElementById("pomodoroWork").value));
-        renderPomodoroStats();
-        alert("作業終了！休憩に入ります");
+        addPomodoroMinutes(work);
         mode = "break";
         setTimerColor();
-        remaining = work * 60;
+
+        timerState = {
+          mode,
+          remaining: brk * 60,
+          sessionTotal: brk * 60,
+          work, brk,
+          startedAt: Date.now()
+        };
+        saveTimerState();
         runTimer(work, brk);
 
       } else {
-        alert("休憩終了！お疲れさま");
-        mode = "work";       // ← 戻す
-        setTimerColor();   // ★ 緑に戻す
+        mode = "work";
+        timerState = null;
+        saveTimerState();
         renderPomodoroStats();
       }
     }
+
   }, 1000);
 }
+
+function updateTimerUI(remain, total) {
+  const t = Math.floor(remain / 60);
+  const s = String(remain % 60).padStart(2,"0");
+  pomodoroTimerText.textContent = `${t}:${s}`;
+
+  const ratio = remain / total;
+  circle.style.strokeDashoffset = 282.6 * (1 - ratio);
+  setTimerColor();
+}
+
 
 function setTimerColor() {
   const circle = document.querySelector(".timerCircle .fg");
