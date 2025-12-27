@@ -564,6 +564,16 @@ function drawPomodoro() {
 
 function startPomodoro() {
   if (pomodoroTimer) return;
+
+  // 入力値を取得して秒に変換
+  const minutes = Number(pomodoroMinutesInput.value) || 25;
+  pomodoroSeconds = minutes * 60;
+
+  // 残り時間がリセットされていれば秒数を初期化
+  if (pomodoroRemaining > pomodoroSeconds || pomodoroRemaining === pomodoroSeconds) {
+    pomodoroRemaining = pomodoroSeconds;
+  }
+
   pomodoroTimer = setInterval(() => {
     pomodoroRemaining--;
     if (pomodoroRemaining <= 0) {
@@ -574,7 +584,10 @@ function startPomodoro() {
     }
     drawPomodoro();
   }, 1000);
+
+  drawPomodoro(); // 即座に描画
 }
+
 
 function pausePomodoro() {
   if (pomodoroTimer) {
