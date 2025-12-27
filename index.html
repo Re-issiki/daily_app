@@ -192,7 +192,14 @@
   <button onclick="undoPomodoro()" style="margin-left:8px;">取り消す</button>
 </div>
 
+<div class="timerWrap">
+  <svg class="timerCircle" viewBox="0 0 100 100">
+    <circle class="bg" cx="50" cy="50" r="45" />
+    <circle class="fg" cx="50" cy="50" r="45" />
+  </svg>
 
+  <div id="pomodoroTimerText" class="timerText">00:00</div>
+</div>
 
 <script src="script.js"></script>
 </body>

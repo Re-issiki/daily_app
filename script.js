@@ -844,11 +844,17 @@ function adjustItemMinutes(statusId, itemIndex, deltaMinutes) {
 
 function runTimer(work, brk) {
   clearInterval(timerId);
+  sessionTotal = (mode === "work" ? work : brk) * 60;
 
   timerId = setInterval(() => {
     remaining--;
-    pomodoroTimer.textContent =
-      `${Math.floor(remaining/60)}:${String(remaining%60).padStart(2,"0")}`;
+
+    const t = Math.floor(remaining / 60);
+    const s = String(remaining % 60).padStart(2, "0");
+    document.getElementById("pomodoroTimerText").textContent = `${t}:${s}`;
+
+    const ratio = remaining / sessionTotal;
+    circle.style.strokeDashoffset = 282.6 * (1 - ratio);
 
     if (remaining <= 0) {
       clearInterval(timerId);
@@ -857,15 +863,28 @@ function runTimer(work, brk) {
         addPomodoroMinutes(Number(document.getElementById("pomodoroWork").value));
         renderPomodoroStats();
         alert("作業終了！休憩に入ります");
-        mode = "break";
-        remaining = brk * 60;
+        mode = "work";
+        setTimerColor();
+        remaining = work * 60;
         runTimer(work, brk);
+
       } else {
         alert("休憩終了！お疲れさま");
+        setTimerColor();   // ★ 緑に戻す
         renderPomodoroStats();
       }
     }
   }, 1000);
+}
+
+function setTimerColor() {
+  const circle = document.querySelector(".timerCircle .fg");
+
+  if (!circle) return;
+
+  // 作業 → 青、休憩 → 緑
+  circle.style.stroke =
+    mode === "work" ? "#60a5fa" : "#4ade80";
 }
 
 function cancelPomodoro() {
