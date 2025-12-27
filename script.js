@@ -584,17 +584,13 @@ function fillPomodoroItemSelect(statusId) {
     return;
   }
 
-  st.items.forEach(it => {
+  st.items.forEach((it, index) => {
     const opt = document.createElement("option");
-    opt.value = it.id;
+    opt.value = index;      // ← ★ index に変更
     opt.textContent = it.name;
     sel.appendChild(opt);
   });
 }
-
-
-
-
 
 function minutesToText(m){ return `${Math.floor(m/60)}時間${m%60}分`; }
 
@@ -799,14 +795,13 @@ function startPomodoro() {
 
 function finishPomodoro(minutes) {
   const subject = document.getElementById("pomodoroSubject").value;
-  const item = document.getElementById("pomodoroItem").value;
-
+  const item = Number(document.getElementById("pomodoroItem").value);
   const session = {
     id: Date.now(),
     date: getDateKey(new Date()),
     minutes,
     subject,
-    item
+    item   // ← index のまま保存でOK
   };
 
   pomodoroSessions.push(session);
@@ -816,21 +811,19 @@ function finishPomodoro(minutes) {
   refreshPomodoroUI();
 }
 
-function adjustItemMinutes(statusId, itemId, deltaMinutes) {
+function adjustItemMinutes(statusId, itemIndex, deltaMinutes) {
   const st = statusData[statusId];
   if (!st || !st.items) return;
 
-  const it = st.items.find(i => i.id === itemId);
+  const it = st.items[itemIndex];
   if (!it) return;
 
   if (!it.minutes) it.minutes = 0;
   it.minutes = Math.max(0, it.minutes + deltaMinutes);
 
-  saveAll();   // ← 既存の保存処理に合わせる
-  renderStatusButtons();
+  saveStorage();
+  renderHome();
 }
-
-
 
 function runTimer(work, brk) {
   clearInterval(timerId);
