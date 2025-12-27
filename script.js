@@ -535,6 +535,13 @@ const cyclesInput = document.getElementById("pomodoroCyclesInput");
 const pomodoroPhaseLabel = document.getElementById("pomodoroPhase");
 const pomodoroCycleLabel = document.getElementById("pomodoroCycleDisplay");
 
+function openPomodoro() {
+  hideAll();
+  pomodoro.classList.remove("hidden");
+  drawPomodoro(); // 初回描画
+}
+
+
 // 入力変更時に即反映
 [studyInput, breakInput, cyclesInput].forEach(input => {
   input.addEventListener("input", () => {
