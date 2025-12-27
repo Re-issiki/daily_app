@@ -144,16 +144,15 @@
     <label>休憩時間（分）</label>
     <input id="pomodoroBreak" type="number" min="1" value="5">
 
+    <div class="timerWrap">
+      <svg class="timerCircle" viewBox="0 0 100 100">
+        <circle class="bg" cx="50" cy="50" r="45" />
+        <circle class="fg" cx="50" cy="50" r="45" />
+      </svg>
+      <div id="pomodoroTimerText" class="timerText">00:00</div>
+    </div>
 
     <button onclick="startPomodoro()">開始</button>
-  </div>
-
-  <div class="timerWrap">
-    <svg class="timerCircle" viewBox="0 0 100 100">
-      <circle class="bg" cx="50" cy="50" r="45" />
-      <circle class="fg" cx="50" cy="50" r="45" />
-    </svg>
-    <div id="pomodoroTimerText" class="timerText">00:00</div>
   </div>
 
   <div class="card">
@@ -163,7 +162,7 @@
     <p id="weekPomodoro"></p>
     <p id="lastWeekPomodoro" style="color:#555;"></p>
   </div>
-  
+
   <button onclick="openPomodoroHistory()">
     履歴一覧を見る
   </button>
