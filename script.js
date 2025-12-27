@@ -335,7 +335,19 @@ function openStatus(key) {
   updateItemSelect();
   renderItemList();
   drawChart();
+
+  const savedItem = localStorage.getItem("status_item");
+  const savedHour = localStorage.getItem("status_hour");
+  const savedMin  = localStorage.getItem("status_min");
+
+  if (savedItem !== null) itemSelect.value = savedItem;
+  if (savedHour !== null) hourSelect.value = savedHour;
+  if (savedMin  !== null) minuteSelect.value = savedMin;
 }
+itemSelect.addEventListener("change", saveStatusFormState);
+hourSelect.addEventListener("change", saveStatusFormState);
+minuteSelect.addEventListener("change", saveStatusFormState);
+
 
 
 function updateItemSelect() {
@@ -403,9 +415,17 @@ function deleteItem(idx) {
   drawChart();
 }
 
+function saveStatusFormState() {
+  localStorage.setItem("status_item", itemSelect.value);
+  localStorage.setItem("status_hour", hourSelect.value);
+  localStorage.setItem("status_min",  minuteSelect.value);
+}
+
 
 function addStudy() {
   if (itemSelect.value === "") return;
+
+  saveStatusFormState();
 
   const h = Number(hourSelect.value);
   const min = Number(minuteSelect.value);
@@ -595,14 +615,27 @@ function openPomodoro() {
 
   fillPomodoroSubjectSelect();
   fillPomodoroItemSelect(pomodoroSubject.value);
+
+  // ここで復元
+  pomodoroWork.value  = localStorage.getItem("pomodoroWork")  || 25;
+  pomodoroBreak.value = localStorage.getItem("pomodoroBreak") || 5;
+
+  if (localStorage.getItem("pomodoroSubjectSel"))
+    pomodoroSubject.value = localStorage.getItem("pomodoroSubjectSel");
+
+  fillPomodoroItemSelect(pomodoroSubject.value);
+
+  if (localStorage.getItem("pomodoroItemSel"))
+    pomodoroItem.value = localStorage.getItem("pomodoroItemSel");
+
   renderPomodoroStats();
 
-  // ★ タイマー復元
   if (timerState) {
     mode = timerState.mode;
     runTimer(timerState.work, timerState.brk);
   }
 }
+
 
 
 
@@ -834,6 +867,12 @@ function saveTimerState() {
 function startPomodoro() {
   const work = Number(pomodoroWork.value);
   const brk  = Number(pomodoroBreak.value);
+
+  localStorage.setItem("pomodoroWork", work);
+  localStorage.setItem("pomodoroBreak", brk);
+  localStorage.setItem("pomodoroSubjectSel", pomodoroSubject.value);
+  localStorage.setItem("pomodoroItemSel", pomodoroItem.value);
+
 
   mode = "work";
   remaining = work * 60;
