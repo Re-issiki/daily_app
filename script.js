@@ -798,11 +798,17 @@ function startPomodoro() {
   const work = Number(document.getElementById("pomodoroWork").value);
   const brk  = Number(document.getElementById("pomodoroBreak").value);
 
+  if (work <= 0 || brk <= 0) {
+    alert("時間は1分以上にしてください");
+    return;
+  }
+
   mode = "work";
   remaining = work * 60;
 
   runTimer(work, brk);
 }
+
 
 function finishPomodoro(minutes) {
   const subject = document.getElementById("pomodoroSubject").value;

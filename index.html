@@ -138,18 +138,12 @@
     <select id="pomodoroItem"></select>
 
 
-    <label>作業時間</label>
-    <select id="pomodoroWork">
-      <option value="25">25分</option>
-      <option value="30">30分</option>
-      <option value="50">50分</option>
-    </select>
+    <label>作業時間（分）</label>
+    <input id="pomodoroWork" type="number" min="1" value="25">
 
-    <label>休憩時間</label>
-    <select id="pomodoroBreak">
-      <option value="5">5分</option>
-      <option value="10">10分</option>
-    </select>
+    <label>休憩時間（分）</label>
+    <input id="pomodoroBreak" type="number" min="1" value="5">
+
 
     <button onclick="startPomodoro()">開始</button>
   </div>
