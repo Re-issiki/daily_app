@@ -30,7 +30,6 @@
   <div class="card" id="statusButtons"></div>
 
   <button class="edit" onclick="openEdit()">＋ データ入力</button>
-  <button onclick="openPomodoro()">✎ 勉強する</button>
 </div>
 
 <!-- ステータス詳細 -->
@@ -126,74 +125,7 @@
   </div>
 </div>
 
-<div id="pomodoro" class="screen hidden">
-  <button class="back" onclick="backHome()">← 戻る</button>
-  <h1>ポモドーロ</h1>
-
-  <div class="card">
-    <label>ステータス（科目）</label>
-    <select id="pomodoroSubject" onchange="fillPomodoroItemSelect(this.value)"></select>
-
-    <label>項目</label>
-    <select id="pomodoroItem"></select>
-
-
-    <label>作業時間（分）</label>
-    <input id="pomodoroWork" type="number" min="1" value="25">
-
-    <label>休憩時間（分）</label>
-    <input id="pomodoroBreak" type="number" min="1" value="5">
-
-    <!-- 繰り返し回数 -->
-    <label>繰り返し回数</label>
-    <input id="pomodoroRepeat" type="number" min="1" value="1">
-
-    <div class="timerWrap">
-      <svg class="timerCircle" viewBox="0 0 100 100">
-        <circle class="bg" cx="50" cy="50" r="45" />
-        <circle class="fg" cx="50" cy="50" r="45" />
-      </svg>
-      <div id="pomodoroTimerText" class="timerText">00:00</div>
-    </div>
-
-    <!-- 開始／中断ボタン -->
-    <button id="pomodoroStartBtn" onclick="startPomodoro()">開始</button>
-    <button id="pomodoroCancelBtn" onclick="cancelPomodoro()" style="display:none;">中断</button>
-  </div>
-
-  <div class="card">
-    <h2>記録</h2>
-    <canvas id="pomodoroChart"></canvas>
-    <p id="todayPomodoro"></p>
-    <p id="weekPomodoro"></p>
-    <p id="lastWeekPomodoro" style="color:#555;"></p>
-  </div>
-
-  <button onclick="openPomodoroHistory()">
-    履歴一覧を見る
-  </button>
-
-
-</div>
-<div id="pomodoroHistoryScreen" class="screen hidden">
-  <button class="back" onclick="openPomodoro()">← 戻る</button>
-  <h1>ポモドーロ履歴</h1>
-
-  <div class="card">
-    <div id="pomodoroHistoryList"></div>
-  </div>
-</div>
-
-
-<div id="undoToast" style="
-  position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
-  background:#111; color:white; padding:10px 14px; border-radius:12px;
-  display:none;
-">
-  記録を追加しました
-  <button onclick="undoPomodoro()" style="margin-left:8px;">取り消す</button>
-</div>
-
 <script src="script.js"></script>
 </body>
 </html>
+
