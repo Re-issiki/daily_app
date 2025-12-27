@@ -583,11 +583,41 @@ function pausePomodoro() {
   }
 }
 
+const pomodoroMinutesInput = document.getElementById("pomodoroMinutes");
+
 function resetPomodoro() {
   pausePomodoro();
+  const minutes = Number(pomodoroMinutesInput.value) || 25;
+  pomodoroSeconds = minutes * 60;
   pomodoroRemaining = pomodoroSeconds;
   drawPomodoro();
 }
+
+//確認ログ
+function addPomodoroRecord() {
+  if (!currentKey) {
+    alert("ステータスを選択してから記録してください。");
+    return;
+  }
+
+  const minutes = Math.floor((pomodoroSeconds - pomodoroRemaining) / 60);
+  if (minutes <= 0) {
+    alert("まだ勉強していません。");
+    return;
+  }
+
+  if (!confirm(`${minutes}分を「${statusData[currentKey].title}」に追加しますか？`)) return;
+
+  statusData[currentKey].items[0] = statusData[currentKey].items[0] || {name:"勉強時間", minutes:0};
+  statusData[currentKey].items[0].minutes += minutes;
+
+  saveStorage();
+  renderItemList();
+  drawChart();
+
+  resetPomodoro();
+}
+
 
 
 
