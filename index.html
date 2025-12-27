@@ -131,26 +131,23 @@
   
   <button class="back" onclick="backHome()">← 戻る</button>
   <h1>ポモドーロタイマー</h1>
-  <div class="card"></div>
-  <div style="text-align:center; margin-bottom:10px;">
-    <div id="pomodoroPhase">勉強中</div>
-    <div id="pomodoroCycleDisplay">1 / 4</div>
-  </div>
-  
-  <canvas id="pomodoroCanvas" width="200" height="200"></canvas>
-  
-  <div style="margin-top:10px; text-align:center;">
-    <label>勉強時間(分)<input type="number" id="pomodoroStudyInput" value="25" min="1"></label>
-    <label>休憩時間(分)<input type="number" id="pomodoroBreakInput" value="5" min="1"></label>
-    <label>サイクル数<input type="number" id="pomodoroCyclesInput" value="4" min="1"></label>
-  </div>
-  
-  <div style="text-align:center; margin-top:10px;">
-    <button onclick="startPomodoro()">スタート</button>
-    <button onclick="pausePomodoro()">一時停止</button>
-    <button onclick="resetPomodoro()">リセット</button>
-    <button onclick="addPomodoroRecord()">記録</button>
-  </div>
+  <div class="card">
+    <div style="text-align:center; margin-bottom:10px;">
+      <div id="pomodoroPhase">勉強中</div>
+      <div id="pomodoroCycleDisplay">1 / 4</div>
+    </div>
+    <canvas id="pomodoroCanvas" width="200" height="200"></canvas>
+    <div style="margin-top:10px; text-align:center;">
+      <label>勉強時間(分)<input type="number" id="pomodoroStudyInput" value="25" min="1"></label>
+      <label>休憩時間(分)<input type="number" id="pomodoroBreakInput" value="5" min="1"></label>
+      <label>サイクル数<input type="number" id="pomodoroCyclesInput" value="4" min="1"></label>
+    </div>
+    <div style="text-align:center; margin-top:10px;">
+      <button onclick="startPomodoro()">スタート</button>
+      <button onclick="pausePomodoro()">一時停止</button>
+      <button onclick="resetPomodoro()">リセット</button>
+      <button onclick="addPomodoroRecord()">記録</button>
+    </div>  
   </div>
 </div>
 
