@@ -318,9 +318,6 @@ function toggleDisplayAchievement(id) {
 function openStatus(key) {
   currentKey = key;
   saveCurrentKey(key);
-  localStorage.setItem("currentStatusKey", key);
-
-
 
   hideAll();
   status.classList.remove("hidden");
@@ -1071,12 +1068,17 @@ window.addEventListener("load", () => {
     backHome();
     return;
   }
-  statusTitle.textContent = statusData[currentKey].title;
-  
+  const st = statusData[currentKey];
+
+  // あり得ない壊れ方をした場合の保険
+  if (!st || !Array.isArray(st.items)) {
+    backHome();
+    return;
+  }
+  statusTitle.textContent = st.title;
   updateItemSelect();
   renderItemList();
   drawChart();
-
 }
 
 
