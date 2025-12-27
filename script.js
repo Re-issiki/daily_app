@@ -536,6 +536,103 @@ function applyCardOpacity() {
   if (slider) slider.value = v;
 }
 
+//ポモドーロ機能
+// ポモドーロ記録（1日→分）
+let pomodoroLog = JSON.parse(localStorage.getItem("pomodoroLog") || "{}");
+
+function savePomodoroLog() {
+  localStorage.setItem("pomodoroLog", JSON.stringify(pomodoroLog));
+}
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+
+function addPomodoroMinutes(min) {
+  const k = todayKey();
+  pomodoroLog[k] = (pomodoroLog[k] || 0) + min;
+  savePomodoroLog();
+}
+
+const pomodoro = document.getElementById("pomodoro");
+const pomodoroTimer = document.getElementById("pomodoroTimer");
+
+let timerId = null;
+let remaining = 0;
+let mode = "work"; // work / break
+
+function openPomodoro() {
+  hideAll();
+  pomodoro.classList.remove("hidden");
+  renderPomodoroStats();
+}
+
+function minutesToText(m){ return `${Math.floor(m/60)}時間${m%60}分`; }
+
+function getWeekTotal() {
+  const now = new Date();
+  const start = new Date(now);
+  start.setDate(now.getDate() - 6);
+
+  let sum = 0;
+  for (const k in pomodoroLog) {
+    const d = new Date(k);
+    if (d >= start && d <= now) sum += pomodoroLog[k];
+  }
+  return sum;
+}
+
+function renderPomodoroStats() {
+  const today = pomodoroLog[todayKey()] || 0;
+  document.getElementById("todayPomodoro").textContent =
+    `今日の合計：${minutesToText(today)}`;
+
+  document.getElementById("weekPomodoro").textContent =
+    `直近7日：${minutesToText(getWeekTotal())}`;
+}
+
+function startPomodoro() {
+  const work = Number(document.getElementById("pomodoroWork").value);
+  const brk  = Number(document.getElementById("pomodoroBreak").value);
+
+  mode = "work";
+  remaining = work * 60;
+
+  runTimer(work, brk);
+}
+
+function runTimer(work, brk) {
+  clearInterval(timerId);
+
+  timerId = setInterval(() => {
+    remaining--;
+    pomodoroTimer.textContent =
+      `${Math.floor(remaining/60)}:${String(remaining%60).padStart(2,"0")}`;
+
+    if (remaining <= 0) {
+      clearInterval(timerId);
+
+      if (mode === "work") {
+        addPomodoroMinutes(Number(document.getElementById("pomodoroWork").value));
+        renderPomodoroStats();
+        alert("作業終了！休憩に入ります");
+        mode = "break";
+        remaining = brk * 60;
+        runTimer(work, brk);
+      } else {
+        alert("休憩終了！お疲れさま");
+        renderPomodoroStats();
+      }
+    }
+  }, 1000);
+}
+
+function cancelPomodoro() {
+  clearInterval(timerId);
+  pomodoroTimer.textContent = "00:00";
+}
+
 
 
 

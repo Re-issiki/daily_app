@@ -30,6 +30,7 @@
   <div class="card" id="statusButtons"></div>
 
   <button class="edit" onclick="openEdit()">＋ データ入力</button>
+  <button onclick="openPomodoro()">✎ 勉強する</button>
 </div>
 
 <!-- ステータス詳細 -->
@@ -124,6 +125,43 @@
     <button onclick="addAchievement()">実績を追加</button>
   </div>
 </div>
+
+<div id="pomodoro" class="screen hidden">
+  <button class="back" onclick="backHome()">← 戻る</button>
+  <h1>ポモドーロ</h1>
+
+  <div class="card">
+    <label>作業時間</label>
+    <select id="pomodoroWork">
+      <option value="25">25分</option>
+      <option value="30">30分</option>
+      <option value="50">50分</option>
+    </select>
+
+    <label>休憩時間</label>
+    <select id="pomodoroBreak">
+      <option value="5">5分</option>
+      <option value="10">10分</option>
+    </select>
+
+    <button onclick="startPomodoro()">開始</button>
+  </div>
+
+  <div class="card">
+    <h2>タイマー</h2>
+    <div id="pomodoroTimer" style="font-size:2rem; font-weight:700;">
+      00:00
+    </div>
+    <button onclick="cancelPomodoro()">停止</button>
+  </div>
+
+  <div class="card">
+    <h2>記録</h2>
+    <p id="todayPomodoro"></p>
+    <p id="weekPomodoro"></p>
+  </div>
+</div>
+
 
 <script src="script.js"></script>
 </body>
