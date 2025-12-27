@@ -585,12 +585,20 @@ function getWeekTotal() {
 
 function renderPomodoroStats() {
   const today = pomodoroLog[todayKey()] || 0;
+
   document.getElementById("todayPomodoro").textContent =
     `今日の合計：${minutesToText(today)}`;
 
   document.getElementById("weekPomodoro").textContent =
     `直近7日：${minutesToText(getWeekTotal())}`;
+
+  const lastWeek = getLastWeekTotal();
+  document.getElementById("lastWeekPomodoro").textContent =
+    `先週の合計：${minutesToText(lastWeek)}`;
+
+  drawPomodoroChart();
 }
+
 
 function startPomodoro() {
   const work = Number(document.getElementById("pomodoroWork").value);
@@ -631,6 +639,76 @@ function runTimer(work, brk) {
 function cancelPomodoro() {
   clearInterval(timerId);
   pomodoroTimer.textContent = "00:00";
+}
+
+//折れ線グラフ
+let pomoChart = null;
+
+function getDateKey(date) {
+  return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
+}
+
+// 直近7日（今日含む）
+function getLast7DaysData() {
+  const days = [];
+  const now = new Date();
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    const k = getDateKey(d);
+    days.push({
+      label: `${d.getMonth()+1}/${d.getDate()}`,
+      minutes: pomodoroLog[k] || 0
+    });
+  }
+  return days;
+}
+
+// 先週（7〜13日前）
+function getLastWeekTotal() {
+  const now = new Date();
+  let sum = 0;
+
+  for (let i = 7; i <= 13; i++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    const k = getDateKey(d);
+    sum += pomodoroLog[k] || 0;
+  }
+  return sum;
+}
+
+function drawPomodoroChart() {
+  const ctx = document.getElementById("pomodoroChart");
+
+  const data = getLast7DaysData();
+
+  if (pomoChart) pomoChart.destroy();
+
+  pomoChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: data.map(d => d.label),
+      datasets: [{
+        data: data.map(d => Math.floor(d.minutes / 60 * 100) / 100),
+        tension: 0.3
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          title: {
+            display: true,
+            text: "時間（h）"
+          }
+        }
+      }
+    }
+  });
 }
 
 
