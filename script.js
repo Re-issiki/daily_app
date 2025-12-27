@@ -714,6 +714,45 @@ function renderPomodoroStats() {
   renderPomodoroHistory(); // ← 追加
 }
 
+const pomodoroHistoryScreen =
+  document.getElementById("pomodoroHistoryScreen");
+const pomodoroHistoryList =
+  document.getElementById("pomodoroHistoryList");
+
+function openPomodoroHistory() {
+  hideAll();
+  pomodoroHistoryScreen.classList.remove("hidden");
+  renderPomodoroHistoryScreen();
+}
+
+function renderPomodoroHistoryScreen() {
+  pomodoroHistoryList.innerHTML = "";
+
+  if (!pomodoroSessions.length) {
+    pomodoroHistoryList.innerHTML =
+      `<p style="color:#666;">履歴がありません</p>`;
+    return;
+  }
+
+  const list = [...pomodoroSessions].sort((a,b)=>b.id-a.id);
+
+  list.forEach(s => {
+    const row = document.createElement("div");
+    row.className = "achievement-card";
+    row.innerHTML = `
+      <div style="flex:1;">
+        ${s.date}　${minutesToText(s.minutes)}
+      </div>
+      <button class="small danger"
+        onclick="deletePomodoro(${s.id}); renderPomodoroHistoryScreen();">
+        削除
+      </button>
+    `;
+    pomodoroHistoryList.appendChild(row);
+  });
+}
+
+
 
 function startPomodoro() {
   const work = Number(document.getElementById("pomodoroWork").value);

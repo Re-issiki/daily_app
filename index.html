@@ -166,12 +166,21 @@
 
   
   </div>
-  <div class="card">
-    <h2>履歴</h2>
-    <div id="pomodoroHistory"></div>
-  </div>
+  <button onclick="openPomodoroHistory()">
+    履歴一覧を見る
+  </button>
+
 
 </div>
+<div id="pomodoroHistoryScreen" class="screen hidden">
+  <button class="back" onclick="openPomodoro()">← 戻る</button>
+  <h1>ポモドーロ履歴</h1>
+
+  <div class="card">
+    <div id="pomodoroHistoryList"></div>
+  </div>
+</div>
+
 
 <div id="undoToast" style="
   position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
