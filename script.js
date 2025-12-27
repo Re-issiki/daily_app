@@ -631,6 +631,15 @@ function addPomodoroRecord() {
   resetPomodoro();
 }
 
+pomodoroMinutesInput.addEventListener("input", () => {
+  // 入力値取得
+  const minutes = Number(pomodoroMinutesInput.value) || 25;
+  pomodoroSeconds = minutes * 60;
+  pomodoroRemaining = pomodoroSeconds;
+  pausePomodoro();
+  drawPomodoro();
+});
+
 
 
 
