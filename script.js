@@ -31,6 +31,7 @@ const newAchText = document.getElementById("newAchText");
 const newAchRank = document.getElementById("newAchRank");
 const achievementCards = document.getElementById("achievementCards");
 
+const pomodoro = document.getElementById("pomodoro");
 
 
 let chart = null;
@@ -611,7 +612,9 @@ function hideAll() {
   status.classList.add("hidden");
   edit.classList.add("hidden");
   achievementList.classList.add("hidden");
+  pomodoro.classList.add("hidden"); // 追加
 }
+
 
 loadStorage();
 applyBackground();
