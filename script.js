@@ -701,6 +701,29 @@ function getWeekTotalMinutes() {
   return total;
 }
 
+function confirmStudyLog() {
+  const key = studyStatusSelect.value;
+  const idx = Number(studyItemSelect.value);
+  const h = Number(studyHour.value) || 0;
+  const m = Number(studyMinute.value) || 0;
+  const total = h * 60 + m;
+  if (total <= 0) {
+    alert("学習時間を入力してください");
+    return;
+  }
+
+  studyData = {
+    statusKey: key,
+    itemIndex: idx,
+    totalMinutes: total
+  };
+
+  studyLog.classList.add("hidden");     // ログ入力画面を隠す
+  studyTimer.classList.remove("hidden"); // タイマーだけ表示
+  startTimer(total * 60);               // 秒に変換
+}
+
+
 // ===== 画面 =====
 function saveData() {
   profile.name = inputName.value;
@@ -724,6 +747,8 @@ function hideAll() {
   status.classList.add("hidden");
   edit.classList.add("hidden");
   achievementList.classList.add("hidden");
+  studyLog.classList.add("hidden");      // 追加
+  studyTimer.classList.add("hidden"); 
 }
 
 loadStorage();
