@@ -31,7 +31,6 @@ const newAchText = document.getElementById("newAchText");
 const newAchRank = document.getElementById("newAchRank");
 const achievementCards = document.getElementById("achievementCards");
 
-const pomodoro = document.getElementById("pomodoro");
 
 
 let chart = null;
@@ -519,145 +518,6 @@ function applyCardOpacity() {
   if (slider) slider.value = v;
 }
 
-//ポモドーロタイマー
-// ===== ポモドーロタイマー =====
-let pomodoroTimer = null;
-let pomodoroStudySeconds = 25 * 60;
-let pomodoroBreakSeconds = 5 * 60;
-let pomodoroRemaining = pomodoroStudySeconds;
-let pomodoroCycleCount = 4;
-let currentCycle = 1;
-let isStudyPhase = true; // true = 勉強中, false = 休憩中
-
-const studyInput = document.getElementById("pomodoroStudyInput");
-const breakInput = document.getElementById("pomodoroBreakInput");
-const cyclesInput = document.getElementById("pomodoroCyclesInput");
-const pomodoroPhaseLabel = document.getElementById("pomodoroPhase");
-const pomodoroCycleLabel = document.getElementById("pomodoroCycleDisplay");
-
-function openPomodoro() {
-  hideAll();
-  pomodoro.classList.remove("hidden");
-  drawPomodoro(); // 初回描画
-}
-
-
-// 入力変更時に即反映
-[studyInput, breakInput, cyclesInput].forEach(input => {
-  input.addEventListener("input", () => {
-    pomodoroStudySeconds = Number(studyInput.value) * 60 || 25*60;
-    pomodoroBreakSeconds = Number(breakInput.value) * 60 || 5*60;
-    pomodoroCycleCount = Number(cyclesInput.value) || 4;
-    resetPomodoro();
-  });
-});
-
-function drawPomodoro() {
-  const canvas = document.getElementById("pomodoroCanvas");
-  const ctx = canvas.getContext("2d");
-  const radius = canvas.width / 2 - 10;
-  const center = canvas.width / 2;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // 背景円
-  ctx.beginPath();
-  ctx.arc(center, center, radius, 0, 2 * Math.PI);
-  ctx.strokeStyle = "#e5e7eb";
-  ctx.lineWidth = 10;
-  ctx.stroke();
-
-  // 進捗円
-  const totalSeconds = isStudyPhase ? pomodoroStudySeconds : pomodoroBreakSeconds;
-  const progress = (totalSeconds - pomodoroRemaining) / totalSeconds;
-  ctx.beginPath();
-  ctx.arc(center, center, radius, -Math.PI/2, -Math.PI/2 + 2 * Math.PI * progress);
-  ctx.strokeStyle = isStudyPhase ? "#4f46e5" : "#16a34a";
-  ctx.lineWidth = 10;
-  ctx.stroke();
-
-  // 残り時間表示
-  ctx.fillStyle = "#374151";
-  ctx.font = "20px sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  const m = Math.floor(pomodoroRemaining / 60);
-  const s = pomodoroRemaining % 60;
-  ctx.fillText(`${m}:${s.toString().padStart(2,"0")}`, center, center);
-
-  // フェーズとサイクル表示
-  pomodoroPhaseLabel.textContent = isStudyPhase ? "勉強中" : "休憩中";
-  pomodoroCycleLabel.textContent = `${currentCycle} / ${pomodoroCycleCount}`;
-}
-
-function startPomodoro() {
-  if (pomodoroTimer) return;
-  pomodoroTimer = setInterval(() => {
-    pomodoroRemaining--;
-    if (pomodoroRemaining <= 0) {
-      // フェーズ切り替え
-      if (isStudyPhase) {
-        alert(`勉強${currentCycle}セット終了！休憩開始`);
-        pomodoroRemaining = pomodoroBreakSeconds;
-      } else {
-        if (currentCycle >= pomodoroCycleCount) {
-          clearInterval(pomodoroTimer);
-          pomodoroTimer = null;
-          alert("ポモドーロ全サイクル終了！");
-          resetPomodoro();
-          return;
-        } else {
-          currentCycle++;
-          alert(`休憩終了！次の勉強セット開始`);
-          pomodoroRemaining = pomodoroStudySeconds;
-        }
-      }
-      isStudyPhase = !isStudyPhase;
-    }
-    drawPomodoro();
-  }, 1000);
-}
-
-function pausePomodoro() {
-  if (pomodoroTimer) {
-    clearInterval(pomodoroTimer);
-    pomodoroTimer = null;
-  }
-}
-
-function resetPomodoro() {
-  pausePomodoro();
-  currentCycle = 1;
-  isStudyPhase = true;
-  pomodoroRemaining = pomodoroStudySeconds;
-  drawPomodoro();
-}
-
-// ===== 記録機能 =====
-function addPomodoroRecord() {
-  if (!currentKey) {
-    alert("ステータスを選択してから記録してください。");
-    return;
-  }
-
-  const minutes = Math.floor((pomodoroStudySeconds - pomodoroRemaining) / 60);
-  if (minutes <= 0) {
-    alert("まだ勉強していません。");
-    return;
-  }
-
-  if (!confirm(`${minutes}分を「${statusData[currentKey].title}」に追加しますか？`)) return;
-
-  statusData[currentKey].items[0] = statusData[currentKey].items[0] || {name:"勉強時間", minutes:0};
-  statusData[currentKey].items[0].minutes += minutes;
-
-  saveStorage();
-  renderItemList();
-  drawChart();
-  resetPomodoro();
-}
-
-
 
 
 
@@ -682,9 +542,7 @@ function hideAll() {
   status.classList.add("hidden");
   edit.classList.add("hidden");
   achievementList.classList.add("hidden");
-  pomodoro.classList.add("hidden"); // 追加
 }
-
 
 loadStorage();
 applyBackground();
