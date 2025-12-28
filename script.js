@@ -570,28 +570,6 @@ function updateStudyItemSelect() {
 
 studyStatusSelect.onchange = updateStudyItemSelect;
 
-function confirmStudyLog() {
-  const key = studyStatusSelect.value;
-  const idx = Number(studyItemSelect.value);
-  const h = Number(studyHour.value) || 0;
-  const m = Number(studyMinute.value) || 0;
-  const total = h * 60 + m;
-  if (total <= 0) {
-    alert("学習時間を入力してください");
-    return;
-  }
-
-  studyData = {
-    statusKey: key,
-    itemIndex: idx,
-    totalMinutes: total
-  };
-
-  hideAll();
-  studyTimer.classList.remove("hidden");
-  startTimer(total * 60); // 秒に変換
-}
-
 function startTimer(seconds) {
   remainingSeconds = seconds;
   isPaused = false;
