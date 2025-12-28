@@ -148,12 +148,15 @@
 </div>
 
 <div id="studyTimer" class="screen hidden">
-  <canvas id="timerCanvas" width="400" height="400"></canvas>
-  <div style="text-align:center; margin-top:12px;">
-    <button class="small" onclick="pauseResumeTimer()">一時停止／再開</button>
-    <button class="small danger" onclick="cancelTimer()">中止</button>
+  <div class="timer-wrapper">
+    <canvas id="timerCanvas" width="300" height="300"></canvas>
+    <div class="timer-buttons">
+      <button class="small" onclick="pauseResumeTimer()">一時停止／再開</button>
+      <button class="small danger" onclick="cancelTimer()">中止</button>
+    </div>
   </div>
 </div>
+
 
 <script src="script.js"></script>
 </body>

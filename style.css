@@ -243,3 +243,23 @@ body.has-bg .card {
 .card {
   background: rgba(255,255,255,var(--card-bg-alpha));
 }
+
+.timer-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+#timerCanvas {
+  display: block;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.timer-buttons {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
