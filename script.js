@@ -682,10 +682,8 @@ function getWeekTotalMinutes() {
 function confirmStudyLog() {
   const key = studyStatusSelect.value;
   const idx = Number(studyItemSelect.value);
-  const h = Number(studyHour.value) || 0;
-  const m = Number(studyMinute.value) || 0;
-  const total = h * 60 + m;
-  if (total <= 0) {
+  const m = Number(studyMinute.value) || 0; // 分だけ
+  if (m <= 0) {
     alert("学習時間を入力してください");
     return;
   }
@@ -693,13 +691,14 @@ function confirmStudyLog() {
   studyData = {
     statusKey: key,
     itemIndex: idx,
-    totalMinutes: total
+    totalMinutes: m
   };
 
-  studyLog.classList.add("hidden");     // ログ入力画面を隠す
-  studyTimer.classList.remove("hidden"); // タイマーだけ表示
-  startTimer(total * 60);               // 秒に変換
+  studyLog.classList.add("hidden");       // ログ入力画面を隠す
+  studyTimer.classList.remove("hidden");  // タイマーだけ表示
+  startTimer(m * 60);                     // 秒に変換
 }
+
 
 
 // ===== 画面 =====
