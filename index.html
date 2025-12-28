@@ -27,6 +27,11 @@
   <button onclick="openAchievementList()">実績一覧を見る</button>
 
   <h2>ステータス</h2>
+  <div class="card">
+    <p id="todayTotal"></p>
+    <p id="weekTotal"></p>
+  </div>
+
   <div class="card" id="statusButtons"></div>
 
   <button class="edit" onclick="openEdit()">＋ データ入力</button>
@@ -122,6 +127,31 @@
     </select>
 
     <button onclick="addAchievement()">実績を追加</button>
+  </div>
+</div>
+
+<div id="studyLog" class="screen hidden">
+  <button class="back" onclick="cancelTimer()">← 戻る</button>
+  <h1>学習ログ入力</h1>
+  <div class="card">
+    <label>科目</label>
+    <select id="studyStatusSelect"></select>
+
+    <label>項目</label>
+    <select id="studyItemSelect"></select>
+
+    <label>学習時間</label>
+    <input type="number" id="studyHour" placeholder="時間"> 時
+    <input type="number" id="studyMinute" placeholder="分"> 分
+  </div>
+  <button onclick="confirmStudyLog()">入力後は勉強を開始します</button>
+</div>
+
+<div id="studyTimer" class="screen hidden">
+  <canvas id="timerCanvas" width="400" height="400"></canvas>
+  <div style="text-align:center; margin-top:12px;">
+    <button class="small" onclick="pauseResumeTimer()">一時停止／再開</button>
+    <button class="small danger" onclick="cancelTimer()">中止</button>
   </div>
 </div>
 

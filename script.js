@@ -383,7 +383,7 @@ function deleteItem(idx) {
 
 function addStudy() {
   if (itemSelect.value === "") return;
-  const m = hourSelect.value * 60 + Number(minuteSelect.value);
+  const m = Number(hourSelect.value) * 60 + Number(minuteSelect.value);
   if (m <= 0) return;
   statusData[currentKey].items[itemSelect.value].minutes += m;
   saveStorage();
@@ -518,8 +518,188 @@ function applyCardOpacity() {
   if (slider) slider.value = v;
 }
 
+//タイマー機能
+const todayTotalEl = document.getElementById("todayTotal");
+const weekTotalEl = document.getElementById("weekTotal");
+
+todayTotalEl.textContent = `今日の学習時間：${minutesToHM(getTodayTotalMinutes())}`;
+weekTotalEl.textContent = `今週の学習時間：${minutesToHM(getWeekTotalMinutes())}`;
 
 
+let studyData = {
+  statusKey: "",
+  itemIndex: 0,
+  totalMinutes: 0
+};
+
+let timer = null;
+let remainingSeconds = 0;
+let isPaused = false;
+
+// ホームにボタンを追加
+const studyButton = document.createElement("button");
+studyButton.textContent = "勉強する";
+studyButton.onclick = startStudyLog;
+home.appendChild(studyButton);
+
+function startStudyLog() {
+  hideAll();
+  studyLog.classList.remove("hidden");
+
+  // 科目と項目を選択肢に追加
+  studyStatusSelect.innerHTML = "";
+  Object.keys(statusData).forEach(k => {
+    const option = document.createElement("option");
+    option.value = k;
+    option.textContent = statusData[k].title;
+    studyStatusSelect.appendChild(option);
+  });
+  updateStudyItemSelect();
+}
+
+function updateStudyItemSelect() {
+  const key = studyStatusSelect.value;
+  studyItemSelect.innerHTML = "";
+  statusData[key].items.forEach((item, idx) => {
+    const option = document.createElement("option");
+    option.value = idx;
+    option.textContent = item.name;
+    studyItemSelect.appendChild(option);
+  });
+}
+
+studyStatusSelect.onchange = updateStudyItemSelect;
+
+function confirmStudyLog() {
+  const key = studyStatusSelect.value;
+  const idx = Number(studyItemSelect.value);
+  const h = Number(studyHour.value) || 0;
+  const m = Number(studyMinute.value) || 0;
+  const total = h * 60 + m;
+  if (total <= 0) {
+    alert("学習時間を入力してください");
+    return;
+  }
+
+  studyData = {
+    statusKey: key,
+    itemIndex: idx,
+    totalMinutes: total
+  };
+
+  hideAll();
+  studyTimer.classList.remove("hidden");
+  startTimer(total * 60); // 秒に変換
+}
+
+function startTimer(seconds) {
+  remainingSeconds = seconds;
+  isPaused = false;
+  drawTimer();
+
+  if (timer) clearInterval(timer);
+  timer = setInterval(() => {
+    if (!isPaused) {
+      remainingSeconds--;
+      drawTimer();
+      if (remainingSeconds <= 0) finishTimer();
+    }
+  }, 1000);
+}
+
+function drawTimer() {
+  const canvas = document.getElementById("timerCanvas");
+  const ctx = canvas.getContext("2d");
+  const size = canvas.width;
+  const radius = size / 2 - 20;
+  const center = size / 2;
+
+  ctx.clearRect(0, 0, size, size);
+
+  // 背景円
+  ctx.beginPath();
+  ctx.arc(center, center, radius, 0, 2 * Math.PI);
+  ctx.fillStyle = "#eee";
+  ctx.fill();
+
+  // 進捗円
+  const progress = 1 - remainingSeconds / (studyData.totalMinutes * 60);
+  ctx.beginPath();
+  ctx.arc(center, center, radius, -Math.PI/2, -Math.PI/2 + 2 * Math.PI * progress);
+  ctx.lineWidth = 20;
+  ctx.strokeStyle = "#4f46e5";
+  ctx.stroke();
+
+  // 残り時間テキスト
+  const min = Math.floor(remainingSeconds / 60);
+  const sec = remainingSeconds % 60;
+  ctx.fillStyle = "#000";
+  ctx.font = "30px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(`${min}分${sec}秒`, center, center);
+}
+
+function pauseResumeTimer() {
+  isPaused = !isPaused;
+}
+
+function cancelTimer() {
+  if (!confirm("勉強を中止しますか？")) return;
+  clearInterval(timer);
+  backHome();
+}
+
+function finishTimer() {
+  clearInterval(timer);
+
+  // 設定した項目に勉強時間を追加
+  const item = statusData[studyData.statusKey].items[studyData.itemIndex];
+  item.minutes += studyData.totalMinutes;
+
+  if (!item.logs) item.logs = [];
+  item.logs.push({ date: new Date().toISOString().slice(0,10), minutes: studyData.totalMinutes });
+
+  saveStorage();
+  backHome();
+  renderHome(); // ホームに反映
+  todayTotalEl.textContent = `今日の学習時間：${minutesToHM(getTodayTotalMinutes())}`;
+  weekTotalEl.textContent = `今週の学習時間：${minutesToHM(getWeekTotalMinutes())}`;
+}
+
+function getTodayTotalMinutes() {
+  const today = new Date().toISOString().slice(0,10);
+  let total = 0;
+  Object.values(statusData).forEach(s => {
+    s.items.forEach(item => {
+      if (item.logs) {
+        item.logs.forEach(log => {
+          if (log.date === today) total += log.minutes;
+        });
+      }
+    });
+  });
+  return total;
+}
+
+function getWeekTotalMinutes() {
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 0:日曜
+  const start = new Date(today);
+  start.setDate(today.getDate() - dayOfWeek); // 今週の日曜
+  let total = 0;
+  Object.values(statusData).forEach(s => {
+    s.items.forEach(item => {
+      if (item.logs) {
+        item.logs.forEach(log => {
+          const logDate = new Date(log.date);
+          if (logDate >= start && logDate <= today) total += log.minutes;
+        });
+      }
+    });
+  });
+  return total;
+}
 
 // ===== 画面 =====
 function saveData() {
@@ -535,6 +715,8 @@ function backHome() {
   hideAll();
   home.classList.remove("hidden");
   renderHome();
+  todayTotalEl.textContent = `今日の学習時間：${minutesToHM(getTodayTotalMinutes())}`;
+  weekTotalEl.textContent = `今週の学習時間：${minutesToHM(getWeekTotalMinutes())}`;
 }
 
 function hideAll() {
@@ -548,4 +730,5 @@ loadStorage();
 applyBackground();
 applyCardOpacity();
 renderHome();
-
+todayTotalEl.textContent = `今日の学習時間：${minutesToHM(getTodayTotalMinutes())}`;
+weekTotalEl.textContent = `今週の学習時間：${minutesToHM(getWeekTotalMinutes())}`;
